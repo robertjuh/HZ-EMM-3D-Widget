@@ -15,7 +15,7 @@
 		var camera;
 		
 		//data
-		var stringCurrentConcept = "TZW:gezicht"; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
+		var stringCurrentConcept = "TZW:hoofd"; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
 						
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 		function filterFirstSpheregeometryWithRay(event, mouse, camera){			
@@ -85,13 +85,14 @@
 						scene.remove(scene.children[i]);	
 					}
 				};
-														
-			stringCurrentConcept = "TZW:" + conceptNameString;		
-			console.log("callback is aangeroepen een geeft conceptstring:");
+			//TODO: stukje schrijven die speciale tekens weghaald (_ underscore bijvoorbeeld);
+			console.log("callback is aangeroepen, de naam van het aangeklikte object:");								
+			console.log(conceptNameString);		
+			stringCurrentConcept = "TZW:" + conceptNameString.lowerCaseFirstLetter(); //TODO blijkbaar moet het eerste karakter een lowercase hebben		
+			console.log("callback is aangeroepen de volgende aangepaste string:");
 			console.log(stringCurrentConcept);	
 			
-			ajaxCall(); //TODO is dit het?
-			
+			ajaxCall(); 
 			}		
 		}
 		
@@ -297,24 +298,23 @@
 		pointLight5.position.z = 0;
 		scene.add(pointLight5);
 	}	
-	
 			
-			
-	function ajaxCall(){
+	function ajaxCall(){	
 		var concept = stringCurrentConcept;
+				
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
 		}
 		var depth = typeof depth !== 'undefined' ? depth : 1 ;
 		var relations = typeof relations !== 'undefined' ? relations : "true,true";
-		//var ajaxCall = $.ajax({
+			
 		$.ajax({
 			type : "POST",
 			cache : false,
 			url : "php/VisualisationScript.php",
 			async : true,
 			data : {
-				concept : stringCurrentConcept,
+				concept : concept,
 				depth : depth.toString(),
 				relations : relations
 			},
@@ -454,5 +454,9 @@ $(document).ready(function() {
 			d3.selection.prototype.first = function() {
 				return d3.select(this[0][0]);
 			};	
+			
+			String.prototype.lowerCaseFirstLetter = function() {
+				return this.charAt(0).toLowerCase() + this.slice(1);
+			}
 	}		
 });
