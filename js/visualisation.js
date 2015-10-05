@@ -89,6 +89,9 @@
 			stringCurrentConcept = "TZW:" + conceptNameString;		
 			console.log("callback is aangeroepen een geeft conceptstring:");
 			console.log(stringCurrentConcept);	
+			
+			ajaxCall(); //TODO is dit het?
+			
 			}		
 		}
 		
@@ -179,9 +182,9 @@
 		
 		
 			
-			// Visualize RDF data
-			//will create nodes(spheres), labels and arrows and positions them.
-			function visualize(nodes, spheres, nodelinks, three_links) {
+		// Visualize RDF data
+		//will create nodes(spheres), labels and arrows and positions them.
+		function visualize(nodes, spheres, nodelinks, three_links) {
 				// Create nodes and randomize default position
 				for (var key in nodes) {
 					if (nodes.hasOwnProperty(key)) {
@@ -237,33 +240,150 @@
 						labels[key] = mesh1;
 						scene.add(mesh1);						
 						
-						createCallbackFunctionForSphere(sphere); 
-						
-						
+						createCallbackFunctionForSphere(sphere); 						
 					}
 				}
 
-				// Create arrows //TODO kan hier losse methode van maken				
-				for (var i = 0; i < nodelinks.length; i++) {
-					var origin = new THREE.Vector3(50, 100, 50);
-					var terminus = new THREE.Vector3(75, 75, 75);
-					var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
-					var distance = origin.distanceTo(terminus);
-					var arrow = new THREE.ArrowHelper(direction, origin, distance, 0x000000);
-					arrow.userData = {
-						target : nodes[nodelinks[i].target.name].name,
-						source : nodes[nodelinks[i].source.name].name
-					};
-					scene.add(arrow);
-					three_links.push(arrow);
-
-				}
+				createArrows(three_links, nodelinks, nodes);
 				initialiseConstraints(nodes, spheres, three_links);
 				
 				container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+		}
+	
+	function createArrows(three_links, nodelinks, nodes){
+		for (var i = 0; i < nodelinks.length; i++) {
+				var origin = new THREE.Vector3(50, 100, 50);
+				var terminus = new THREE.Vector3(75, 75, 75);
+				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
+				var distance = origin.distanceTo(terminus);
+				var arrow = new THREE.ArrowHelper(direction, origin, distance, 0x000000);
+				arrow.userData = {
+					target : nodes[nodelinks[i].target.name].name,
+					source : nodes[nodelinks[i].source.name].name
+				};
+				
+				scene.add(arrow);
+				three_links.push(arrow);
+		}		
+	}
+	
+	//adds lightsources to the scene, for aesthetic purposes
+	function createLightingForScene() {
+		// Instantiate light sources
+		var pointLight1 = new THREE.PointLight(0xFFFFFF);
+		pointLight1.position.x = 0;
+		pointLight1.position.y = 50;
+		pointLight1.position.z = 500;
+		scene.add(pointLight1);
+		var pointLight2 = new THREE.PointLight(0xFFFFFF);
+		pointLight2.position.x = 0;
+		pointLight2.position.y = 500;
+		pointLight2.position.z = -500;
+		scene.add(pointLight2);
+		var pointLight3 = new THREE.PointLight(0xFFFFFF);
+		pointLight3.position.x = 500;
+		pointLight3.position.y = 500;
+		pointLight3.position.z = 0;
+		scene.add(pointLight3);
+		var pointLight4 = new THREE.PointLight(0xFFFFFF);
+		pointLight4.position.x = -500;
+		pointLight4.position.y = 50;
+		pointLight4.position.z = 0;
+		scene.add(pointLight4);
+		var pointLight5 = new THREE.PointLight(0xFFFFFF);
+		pointLight5.position.x = 0;
+		pointLight5.position.y = -100;
+		pointLight5.position.z = 0;
+		scene.add(pointLight5);
+	}	
+	
+			
+			
+		function ajaxCall(){
+		var concept = stringCurrentConcept;
+		if ( typeof concept === 'undefined' || concept === '') {
+			throw "Concept is undefined";
+		}
+		var depth = typeof depth !== 'undefined' ? depth : 2 ;
+		var relations = typeof relations !== 'undefined' ? relations : "true,true";
+		//var ajaxCall = $.ajax({
+		$.ajax({
+			type : "POST",
+			cache : false,
+			url : "php/VisualisationScript.php",
+			async : true,
+			data : {
+				concept : stringCurrentConcept,
+				depth : depth.toString(),
+				relations : relations
+			},
+       success:function(result)//we got the response
+       {
+		console.log("ajax is gelukt ");
+       },
+       error:function(exception){alert('Exeption: '+exception);}	   
+		}).done(drawNewObjectsWithAjaxData);
+	}
+		
+		//gets called after the ajax call
+		var drawNewObjectsWithAjaxData = function (result) {
+		console.log("DATA");
+		console.log(result);
+		
+			// Create controls (orbitcontrols)		
+			var controls = new THREE.OrbitControls(camera);		//TODO kan controls verplaatst worden?
+			// Create arrays for spheres and links
+			//var spheres = [], //Contains spheres
+			three_links = [];
+			//Contains arrows
+			labels = [];
+			//Contains label sprites
+
+			var spheres = [];
+			var nodelinks = JSON.parse(result);
+			var nodes = [];
+
+			// Compute the distinct nodes from the links.
+			nodelinks.forEach(function(link) {
+				link.source = nodes[link.source] || (nodes[link.source] = {
+					name : link.source,
+					url : link.urlsource
+				});
+				link.target = nodes[link.target] || (nodes[link.target] = {
+					name : link.target,
+					url : link.urltarget
+				});
+			});
+
+			camera.updateProjectionMatrix();
+			visualize(nodes, spheres, nodelinks, three_links);
+			animate(); 		
+			
+			
+			// Animate the webGL objects for rendering
+			function animate() {
+				requestAnimationFrame(animate);
+				renderer.render(scene, camera);
+				controls.update();
+
+				for (var label in labels) {
+					labels[label].lookAt(camera.position); //makes the labels spin around to try to look at the camera
+				}
+				render();
 			}
+
+			// Extension of default render function, runs continuously, add code here if nessesary
+			function render() {
+
+			}
+			
+			
+			
+
+
+		}
 		
 //Wait for document to finish loading		
 $(document).ready(function() {
@@ -311,7 +431,12 @@ $(document).ready(function() {
 		scene.add(camera);
 		
 		//will start to draw spheres, labels and arrows on the renderer
-		startVisualisation(stringCurrentConcept);
+		//startVisualisation(stringCurrentConcept); //TODO volgorde?
+		
+		createLightingForScene();
+		
+		ajaxCall();
+
 	}
 	
 
@@ -324,103 +449,11 @@ $(document).ready(function() {
 		});	
 	}
 
-	//Prepares the scene before drawing anything onto it
-	function startVisualisation(concept, depth, relations) {
-		console.log("startVisualisation met volgende 3 parameters:")
-		console.log(concept);
-		console.log(depth);
-		console.log(relations);
-	
-		// Create controls (orbitcontrols)		
-		var controls = new THREE.OrbitControls(camera);
-	
-		// Create arrays for spheres and links
-		var spheres = [], //Contains spheres
-		three_links = [];
-		//Contains arrows
-		labels = [];
-		//Contains label sprites
 
-		// Instantiate light sources
-		var pointLight1 = new THREE.PointLight(0xFFFFFF);
-		pointLight1.position.x = 0;
-		pointLight1.position.y = 50;
-		pointLight1.position.z = 500;
-		scene.add(pointLight1);
-		var pointLight2 = new THREE.PointLight(0xFFFFFF);
-		pointLight2.position.x = 0;
-		pointLight2.position.y = 500;
-		pointLight2.position.z = -500;
-		scene.add(pointLight2);
-		var pointLight3 = new THREE.PointLight(0xFFFFFF);
-		pointLight3.position.x = 500;
-		pointLight3.position.y = 500;
-		pointLight3.position.z = 0;
-		scene.add(pointLight3);
-		var pointLight4 = new THREE.PointLight(0xFFFFFF);
-		pointLight4.position.x = -500;
-		pointLight4.position.y = 50;
-		pointLight4.position.z = 0;
-		scene.add(pointLight4);
-		var pointLight5 = new THREE.PointLight(0xFFFFFF);
-		pointLight5.position.x = 0;
-		pointLight5.position.y = -100;
-		pointLight5.position.z = 0;
-		scene.add(pointLight5);
 
-		if ( typeof concept === 'undefined' || concept === '') {
-			throw "Concept is undefined";
-		}
-		var depth = typeof depth !== 'undefined' ? depth : 2 ;
-		var relations = typeof relations !== 'undefined' ? relations : "true,true";
-
-		//gets called after the ajax call
-		var createNodesAndLinksForCurrentPage = function (result) {
-		console.log("DATA");
-		console.log(result);
-
-			var nodelinks = JSON.parse(result);
-			var nodes = [];
-
-			// Compute the distinct nodes from the links.
-			nodelinks.forEach(function(link) {
-				link.source = nodes[link.source] || (nodes[link.source] = {
-					name : link.source,
-					url : link.urlsource
-				});
-				link.target = nodes[link.target] || (nodes[link.target] = {
-					name : link.target,
-					url : link.urltarget
-				});
-			});
-
-			camera.updateProjectionMatrix();
-			visualize(nodes, spheres, nodelinks, three_links);
-			animate(); //TODO animate not defined
-			
-			
-			
-			// Animate the webGL objects for rendering
-			function animate() {
-				requestAnimationFrame(animate);
-				renderer.render(scene, camera);
-				controls.update();
-
-				for (var label in labels) {
-					labels[label].lookAt(camera.position); //makes the labels spin around to try to look at the camera
-				}
-				render();
-			}
-
-			// Extension of default render function, runs continuously, add code here if nessesary
-			function render() {
-
-			}
-			
-			
-			
-
-			//TODO verplaatsen naar initialiseerfase
+	//creates additional functions
+	createExtraFunctions();
+	function createExtraFunctions(){
 			d3.selection.prototype.moveToFront = function() {
 				return this.each(function() {
 					this.parentNode.appendChild(this);
@@ -429,26 +462,6 @@ $(document).ready(function() {
 
 			d3.selection.prototype.first = function() {
 				return d3.select(this[0][0]);
-			};
-		}
-		//var ajaxCall = $.ajax({
-		$.ajax({
-			type : "POST",
-			cache : false,
-			url : "php/VisualisationScript.php",
-			async : true,
-			data : {
-				concept : stringCurrentConcept,
-				depth : depth.toString(),
-				relations : relations
-			},
-       success:function(result)//we got the response
-       {
-		console.log("ajax is gelukt ");
-       },
-       error:function(exception){alert('Exeption: '+exception);}	   
-		}).done(createNodesAndLinksForCurrentPage );	//tot jhier
-	}
-
-		
+			};	
+	}		
 });
