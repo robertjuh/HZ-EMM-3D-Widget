@@ -15,7 +15,7 @@
 		var camera;
 		
 		//data
-		var stringCurrentConcept = "TZW:ogen"; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
+		var stringCurrentConcept = "TZW:gezicht"; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
 						
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 		function filterFirstSpheregeometryWithRay(event, mouse, camera){			
@@ -166,7 +166,6 @@
 				onDocumentMouseUp( event );
 		}
 
-		//TODO LOSMAKEN *(new method)
 		//colors the ball that is being clicked, serves no real purpose yet.
 		function onDocumentMouseDown(event){
 			event.preventDefault();
@@ -301,12 +300,12 @@
 	
 			
 			
-		function ajaxCall(){
+	function ajaxCall(){
 		var concept = stringCurrentConcept;
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
 		}
-		var depth = typeof depth !== 'undefined' ? depth : 2 ;
+		var depth = typeof depth !== 'undefined' ? depth : 1 ;
 		var relations = typeof relations !== 'undefined' ? relations : "true,true";
 		//var ajaxCall = $.ajax({
 		$.ajax({
@@ -328,7 +327,7 @@
 	}
 		
 		//gets called after the ajax call
-		var drawNewObjectsWithAjaxData = function (result) {
+	var drawNewObjectsWithAjaxData = function (result) {
 		console.log("DATA");
 		console.log(result);
 		
@@ -359,8 +358,7 @@
 
 			camera.updateProjectionMatrix();
 			visualize(nodes, spheres, nodelinks, three_links);
-			animate(); 		
-			
+			animate(); 				
 			
 			// Animate the webGL objects for rendering
 			function animate() {
@@ -378,17 +376,12 @@
 			function render() {
 
 			}
-			
-			
-			
-
-
 		}
 		
 //Wait for document to finish loading		
 $(document).ready(function() {
 	
-	initialiseTHREEComponents(); //TODO is hier geen betere constructie voor?	
+	initialiseTHREEComponents(); 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
@@ -433,6 +426,7 @@ $(document).ready(function() {
 		//will start to draw spheres, labels and arrows on the renderer
 		//startVisualisation(stringCurrentConcept); //TODO volgorde?
 		
+		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
 		ajaxCall();
@@ -448,11 +442,8 @@ $(document).ready(function() {
 		}, 600, "swing", function() {
 		});	
 	}
-
-
-
-	//creates additional functions
-	createExtraFunctions();
+	
+	//creates additional functions	
 	function createExtraFunctions(){
 			d3.selection.prototype.moveToFront = function() {
 				return this.each(function() {
