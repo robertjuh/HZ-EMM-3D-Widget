@@ -294,7 +294,9 @@
 		scene.add(pointLight5);
 	}	
 			
-	function ajaxCall(){	
+	function ajaxCall(){
+	  //TODO:Anton: hier staan nog heel veel globale variabelen in.
+	  //geef zoveel mogelijk parameters door via ajaxCall(.......), en documenteer hier vervolgens van welke andere globale variabelen gebruik wordt gemaakt.
 		var concept = stringCurrentConcept;
 				
 		if ( typeof concept === 'undefined' || concept === '') {
