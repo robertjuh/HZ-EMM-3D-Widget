@@ -85,13 +85,8 @@
 						scene.remove(scene.children[i]);	
 					}
 				};
-			//TODO: stukje schrijven die speciale tekens weghaald (_ underscore bijvoorbeeld);
-			console.log("callback is aangeroepen, de naam van het aangeklikte object:");								
-			console.log(conceptNameString);		
-			stringCurrentConcept = "TZW:" + conceptNameString.lowerCaseFirstLetter(); //TODO blijkbaar moet het eerste karakter een lowercase hebben		
-			console.log("callback is aangeroepen de volgende aangepaste string:");
-			console.log(stringCurrentConcept);	
-			
+			stringCurrentConcept = "TZW:" + conceptNameString.removeSpecialCharacters().lowerCaseFirstLetter(); //TODO formats so SPARQL can read, this is just for the testing environment
+
 			ajaxCall(); 
 			}		
 		}
@@ -199,10 +194,10 @@
 						    rings = 32;
 
 						// create the sphere's material and color
-						var sphereMaterial;						
-						if(nodes[key].name == "Gezicht"){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green
+						var sphereMaterial; //TODO onderstaande line zal aangepast moeten worden als deze op andere thesauri (dan tzw:) toegepast moet worden
+						if(nodes[key].name.removeSpecialCharacters().lowerCaseFirstLetter() === stringCurrentConcept.slice(4)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : "red"
+								color : "orange"
 							});												
 						}
 						else{
@@ -372,7 +367,7 @@
 				render();
 			}
 
-			// Extension of default render function, runs continuously, add code here if nessesary
+			// Extension of default render function, runs continuously, add code here if needed
 			function render() {
 
 			}
@@ -423,9 +418,6 @@ $(document).ready(function() {
 		camera.position.x = WIDTH/2;					
 		scene.add(camera);
 		
-		//will start to draw spheres, labels and arrows on the renderer
-		//startVisualisation(stringCurrentConcept); //TODO volgorde?
-		
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
@@ -457,6 +449,10 @@ $(document).ready(function() {
 			
 			String.prototype.lowerCaseFirstLetter = function() {
 				return this.charAt(0).toLowerCase() + this.slice(1);
+			}
+
+			String.prototype.removeSpecialCharacters = function() {
+				return this.replace(/[_-]/g, " ");
 			}
 	}		
 });
