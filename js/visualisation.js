@@ -294,9 +294,10 @@
 		scene.add(pointLight5);
 	}	
 			
-	function ajaxCall(){	
-		var concept = stringCurrentConcept;
+	function ajaxCall(){	//TODO hernoemen, initialiseVisualisationWithData ?
+		var concept = stringCurrentConcept; //TODO meegeven^
 				
+
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
 		}
