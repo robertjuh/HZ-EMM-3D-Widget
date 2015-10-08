@@ -2,7 +2,6 @@
 include_once (__DIR__ . '/QueryBuilder.class.php');
 include_once (__DIR__ . '/DataParser.class.php');
 include_once (__DIR__ . '/visitor/NodeMapVisitor.class.php');
-include_once (__DIR__ . '/ChromePhp.php');
 
 // Load data
 $querybuilder = new QueryBuilder($_POST["depth"], $_POST["concept"]);
