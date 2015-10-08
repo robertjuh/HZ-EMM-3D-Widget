@@ -23,7 +23,37 @@ $(document).ready(function() {
 		});
 	}
 
+	$('form').submit(function() {
+		var query = $('#query').val();
+		var selection = $('#selection').val();
+		var depth = $('#depth').val();
 
+		if (query != "") {
+			$('.result').html('<div style="text-align:center"><i class="fa fa-spinner fa-spin fa-3x"></i><br/><span>Loading data...</span></div>');
+			if (depth != "") {
+				getQuery(query, depth, true, selection);
+			} else {
+				runQuery(query, selection);
+			}
+		} else {
+			console.log("No given query");
+		}
+	});
+
+	$('nav').on('click', 'a', function() {
+		if ($(this).attr('href') == "#runQuery") {
+			$('#visualisation').fadeOut(function() {
+				$(this).html('');
+				$('#runQuery').fadeIn();
+			});
+		} else {
+			var str = $(this).attr('href').replace("#", "");
+			$('#visualisation').load(str).hide();
+			$('#runQuery').fadeOut(function() {
+				$('#visualisation').fadeIn();
+			});
+		}
+	});
 });
 
 function getQuery(concept, depth, run, selection) {
@@ -87,4 +117,24 @@ function runQuery(query, selection) {
 	});
 }
 
-
+/*
+ * Show the json string with nice syntax.
+ */
+function syntaxHighlight(json) {
+	json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+		var cls = 'number';
+		if (/^"/.test(match)) {
+			if (/:$/.test(match)) {
+				cls = 'key';
+			} else {
+				cls = 'string';
+			}
+		} else if (/true|false/.test(match)) {
+			cls = 'boolean';
+		} else if (/null/.test(match)) {
+			cls = 'null';
+		}
+		return '<span class="' + cls + '">' + match + '</span>';
+	});
+}
