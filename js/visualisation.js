@@ -265,6 +265,7 @@
 	}
 	
 	//adds lightsources to the scene, for aesthetic purposes
+	//TODO: Anton: scene meegeven
 	function createLightingForScene() {
 		// Instantiate light sources
 		var pointLight1 = new THREE.PointLight(0xFFFFFF);
