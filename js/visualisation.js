@@ -1,28 +1,38 @@
+console.log("en we gaan beginnen vent");
+
 /**
  * @author NJK @author robertjuh
  * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
- *
+ * 
+ * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
+ var startVisualisation = (function(currentPageName){
+	 
+	 console.log("startvisualisation is opgeroepee");
+
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
 		var	mouse = new THREE.Vector2();
 		
 		//THREE drawing items
-		var container;
-		var scene;
-		var renderer;
-		var camera;
+		//var VisualisationJsModule.container;
+		//var scene;
+		//var renderer;
+		//var camera;		
+		
+		var currentPage = currentPageName;
 		
 		//data
-		var stringCurrentConcept = "TZW:hoofd"; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
-						
+		var stringCurrentConcept = currentPage; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
+		
+					
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
-		function filterFirstSpheregeometryWithRay(event, mouse, camera){			
+		function filterFirstSpheregeometryWithRay(event, mouse){			
 			normalizeCurrentMouseCoordinates(event);						
-			raycaster.setFromCamera( mouse, camera );
-			
-			var intersects = raycaster.intersectObjects( scene.children ); 
+			raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
+
+			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 
 			
 			//If there is an intersection, and it is a sphere, apply click event.
 			if ( intersects.length > 0 ) {					
@@ -44,11 +54,12 @@
 		}
 		
 		//Colors the selected sphere a random color, serves no real purpose yet. 
-		function colorSelectedSphere(event, mouse, camera){
-			normalizeCurrentMouseCoordinates(event);			
-			raycaster.setFromCamera( mouse, camera );
+		function colorSelectedSphere(event, mouse){
+			normalizeCurrentMouseCoordinates(event);
 			
-			var intersects = raycaster.intersectObjects( scene.children ); 			
+			raycaster.setFromCamera( mouse, VisualisationJsModule.camera );
+			
+			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 			
 			
 			//If there is an intersection, and it is a sphere, apply click event.
 			if ( intersects.length > 0 ) {					
@@ -76,20 +87,24 @@
 			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - renderer.domElement.offsetTop) / renderer.domElement.height ) * 2 + 1;			
 		}		
 		
-		//create a callback function for each sphere
+		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
-				for( var i = scene.children.length - 1; i >= 0; i--) {						
-					//does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
-					if(scene.children[i].geometry != null | scene.children[i].type == "Object3D"){
-						scene.remove(scene.children[i]);	
-					}
-				};
+//				for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) {						
+//					//does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
+//					if(VisualisationJsModule.scene.children[i].geometry != null | VisualisationJsModule.scene.children[i].type == "Object3D"){
+//						VisualisationJsModule.scene.remove(VisualisationJsModule.scene.children[i]);	
+//					}
+//				};
+			clearCanvas();
 			stringCurrentConcept = "TZW:" + conceptNameString.removeSpecialCharacters().lowerCaseFirstLetter(); //TODO formats so SPARQL can read, this is just for the testing environment
+			currentConcept = stringCurrentConcept;
 
-			ajaxCall(); 
+			initialiseDrawingSequence(currentConcept); 
 			}		
 		}
+		
+
 		
 		//functions for arrows
 		function setArrowOrigin(arrow, origin, spheres) {
@@ -149,7 +164,7 @@
 					}
 				}
 			}
-			renderer.render(scene, camera);
+			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
 		
 		
@@ -165,13 +180,16 @@
 		//colors the ball that is being clicked, serves no real purpose yet.
 		function onDocumentMouseDown(event){
 			event.preventDefault();
-			colorSelectedSphere(event, mouse, camera); //Mouse and camera are global variables.
+			
+console.log("SNAPT HIJ DIT NIETTTT");
+console.log(VisualisationJsModule.camera);
+			colorSelectedSphere(event, mouse); //Mouse and camera are global variables.
 		}
 		
 		//calls the callback function on mouse up, on the appointed sphere. Mouse and camera are global variables.
 		function onDocumentMouseUp(event){
 			event.preventDefault();	
-			filterFirstSpheregeometryWithRay(event, mouse, camera);
+			filterFirstSpheregeometryWithRay(event, mouse);
 		}
 		//end of functions for mouseEvents -----======-----
 		
@@ -197,12 +215,12 @@
 						var sphereMaterial; //TODO onderstaande line zal aangepast moeten worden als deze op andere thesauri (dan tzw:) toegepast moet worden
 						if(nodes[key].name.removeSpecialCharacters().lowerCaseFirstLetter() === stringCurrentConcept.slice(4)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : "orange"
+								color : JSONStyleSheet.jsonStyle.THREEColourScheme.nodes.centerNode
 							});												
 						}
 						else{
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : "steelblue"
+								color : JSONStyleSheet.jsonStyle.THREEColourScheme.nodes.surroundingNode
 							});
 						}
 
@@ -212,13 +230,14 @@
 						spheres[key] = sphere;						
 
 						// add the sphere to the scene
-						scene.add(sphere);				
+						VisualisationJsModule.scene.add(sphere);				
 
 						// Create label mesh //TODO functie maken
 						var canvas1 = document.createElement('canvas');
 						var context1 = canvas1.getContext('2d');
-						context1.font = "Bold 30px Arial";
-						context1.fillStyle = "rba(0,0,0,0.95)";
+						context1.font = JSONStyleSheet.jsonStyle.THREEColourScheme.layout.nodeLabelFont2;
+						//context1.fillStyle = "rba(0,0,0,0.95)";
+						context1.fillStyle = JSONStyleSheet.jsonStyle.THREEColourScheme.layout.labelTextColor;
 						context1.fillText(nodes[key].name, 0, 20);
 						var texture1 = new THREE.Texture(canvas1);
 						texture1.needsUpdate = true;
@@ -233,7 +252,7 @@
 						var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(40, 15), material1);						
 						
 						labels[key] = mesh1;
-						scene.add(mesh1);						
+						VisualisationJsModule.scene.add(mesh1);						
 						
 						createCallbackFunctionForSphere(sphere); 						
 					}
@@ -242,9 +261,9 @@
 				createArrows(three_links, nodelinks, nodes);
 				initialiseConstraints(nodes, spheres, three_links);
 				
-				container.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+				VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
 		}
 	
 	function createArrows(three_links, nodelinks, nodes){
@@ -253,63 +272,78 @@
 				var terminus = new THREE.Vector3(75, 75, 75);
 				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 				var distance = origin.distanceTo(terminus);
-				var arrow = new THREE.ArrowHelper(direction, origin, distance, 0x000000);
+				var arrow = new THREE.ArrowHelper(direction, origin, distance, JSONStyleSheet.jsonStyle.THREEColourScheme.arrows.defaultArrow);
 				arrow.userData = {
 					target : nodes[nodelinks[i].target.name].name,
 					source : nodes[nodelinks[i].source.name].name
 				};
 				
-				scene.add(arrow);
+				VisualisationJsModule.scene.add(arrow);
 				three_links.push(arrow);
 		}		
 	}
 	
 	//adds lightsources to the scene, for aesthetic purposes
-	//TODO: Anton: scene meegeven
 	function createLightingForScene() {
 		// Instantiate light sources
 		var pointLight1 = new THREE.PointLight(0xFFFFFF);
 		pointLight1.position.x = 0;
 		pointLight1.position.y = 50;
 		pointLight1.position.z = 500;
-		scene.add(pointLight1);
+		VisualisationJsModule.scene.add(pointLight1);
 		var pointLight2 = new THREE.PointLight(0xFFFFFF);
 		pointLight2.position.x = 0;
 		pointLight2.position.y = 500;
 		pointLight2.position.z = -500;
-		scene.add(pointLight2);
+		VisualisationJsModule.scene.add(pointLight2);
 		var pointLight3 = new THREE.PointLight(0xFFFFFF);
 		pointLight3.position.x = 500;
 		pointLight3.position.y = 500;
 		pointLight3.position.z = 0;
-		scene.add(pointLight3);
+		VisualisationJsModule.scene.add(pointLight3);
 		var pointLight4 = new THREE.PointLight(0xFFFFFF);
 		pointLight4.position.x = -500;
 		pointLight4.position.y = 50;
 		pointLight4.position.z = 0;
-		scene.add(pointLight4);
+		VisualisationJsModule.scene.add(pointLight4);
 		var pointLight5 = new THREE.PointLight(0xFFFFFF);
 		pointLight5.position.x = 0;
 		pointLight5.position.y = -100;
 		pointLight5.position.z = 0;
-		scene.add(pointLight5);
+		VisualisationJsModule.scene.add(pointLight5);
+	}
+
+	function clearCanvas(){
+			for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) {						
+				//does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
+				if(VisualisationJsModule.scene.children[i].geometry != null | VisualisationJsModule.scene.children[i].type == "Object3D"){
+					VisualisationJsModule.scene.remove(VisualisationJsModule.scene.children[i]);	
+				}
+			};			
 	}	
 			
-	function ajaxCall(){
-	  //TODO:Anton: hier staan nog heel veel globale variabelen in.
+	function initialiseDrawingSequence(concept, depth){ //can pass "currentconcept" with this
+	clearCanvas();
+	  //TODO:clear het canvas
 	  //geef zoveel mogelijk parameters door via ajaxCall(.......), en documenteer hier vervolgens van welke andere globale variabelen gebruik wordt gemaakt.
-		var concept = stringCurrentConcept;
+		//var concept = stringCurrentConcept;
+		//var concept = stringCurrentConcept;
 				
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
 		}
+		
+
 		var depth = typeof depth !== 'undefined' ? depth : 1 ;
+		
+		
 		var relations = typeof relations !== 'undefined' ? relations : "true,true";
 			
 		$.ajax({
 			type : "POST",
 			cache : false,
-			url : "php/VisualisationScript.php",
+			//url : "php/VisualisationScript.php",
+			url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 			async : true,
 			data : {
 				concept : concept,
@@ -328,9 +362,16 @@
 	var drawNewObjectsWithAjaxData = function (result) {
 		console.log("DATA");
 		console.log(result);
+		//console.log(currentPageq);
+		console.log(currentPageName);
+	console.log(currentPage);
 		
 			// Create controls (orbitcontrols)		
-			var controls = new THREE.OrbitControls(camera);		//TODO kan controls verplaatst worden?
+			//var controls = new THREE.OrbitControls(camera);		//TODO kan controls verplaatst worden? maak nu naar ieder call nieuwe controls..
+			//var controls = new THREE.OrthographicTrackballControls(camera);	
+			//var controls = new THREE.PointerLockControls(camera);	
+			
+			
 			// Create arrays for spheres and links
 			//var spheres = [], //Contains spheres
 			three_links = [];
@@ -354,18 +395,18 @@
 				});
 			});
 
-			camera.updateProjectionMatrix();
+			VisualisationJsModule.camera.updateProjectionMatrix();
 			visualize(nodes, spheres, nodelinks, three_links);
 			animate(); 				
 			
 			// Animate the webGL objects for rendering
 			function animate() {
 				requestAnimationFrame(animate);
-				renderer.render(scene, camera);
-				controls.update();
+				renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
+				VisualisationJsModule.controls.update();
 
 				for (var label in labels) {
-					labels[label].lookAt(camera.position); //makes the labels spin around to try to look at the camera
+					labels[label].lookAt(VisualisationJsModule.camera.position); //makes the labels spin around to try to look at the camera
 				}
 				render();
 			}
@@ -376,6 +417,9 @@
 			}
 		}
 		
+		console.log("visualisationJsModule print");
+				console.log(VisualisationJsModule);
+		
 //Wait for document to finish loading		
 $(document).ready(function() {
 	
@@ -383,49 +427,71 @@ $(document).ready(function() {
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
-	function initialiseTHREEComponents(){
+	function initialiseTHREEComponents(){ //current page name als concept meen
+		VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
 		console.log("initialise three components wordt hier aangeroepen");
-		var HEIGHT = 600;
-		var WIDTH = 600;
-				
-		//creating the canvas everything is drawn on
-		container = document.getElementById( 'canvasje' );
-		document.body.appendChild( container );
+		var containerHEIGHT = VisualisationJsModule.height;
+		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
+		
+		console.log("currentpage");		
+		console.log(currentPage);
+		
+
+		//document.getElementById("content").appendChild( VisualisationJsModule.container ); //This code will decide where on the wiki page this 
+		document.body.appendChild( VisualisationJsModule.container ); //als ik dit doe lukt het wel in chrome en FF, bovenstaande methode lijkt hij geen element te kunnen pakken uit de huidige wiki pagina
+
 	
 		//the style of the canvas
-		d3.select("#canvasje").style("background", "steelblue")
-			.style("width",WIDTH + "px")
-			.style("height",HEIGHT + "px");
+		d3.select("#canvasje").style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.layout.backGround)
+			.style("width",containerWIDTH + "px")
+			.style("height",containerHEIGHT + "px");
 		
-		// Create scene
-		scene = new THREE.Scene();
+		//todo dit is tijdelijke code
+		d3.select("body").append("text")         // append text
+			.style("fill", "black")   // fill the text with the colour black
+			.attr("x", 200)           // set x position of left side of text
+			.attr("y", 100)           // set y position of bottom of text 
+			.text("DEZE PAGINA GAAT OVER: " + currentPageName);     // define the text to display 
+		
+		
+		
+		
 		
 		// Create Renderer
 		renderer = new THREE.WebGLRenderer({
 			alpha : true,
 			antialiasing : true
 		});
-		renderer.setClearColor(0x000000, 0);
-		renderer.setSize(WIDTH, HEIGHT);		
-		container.appendChild(renderer.domElement);
+
+		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
+		VisualisationJsModule.camera.position.x = containerWIDTH/2;					
+		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
 				
-		// Set camera attributes and create camera
-		var VIEW_ANGLE = 45, //field of view
-		    ASPECT = WIDTH / HEIGHT, 
-			//ASPECT  = $container[0].clientWidth / $container[0].clientHeight,
-		    NEAR = 0.1,
-		    FAR = 10000;
-		camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-		camera.position.z = 200;
-		camera.position.y = 100;
-		camera.position.x = WIDTH/2;					
-		scene.add(camera);
+
+		renderer.setClearColor(0x000000, 0);
+		renderer.setSize(containerWIDTH, containerHEIGHT);		
+		VisualisationJsModule.container.appendChild(renderer.domElement);
+				
+
+		
+		//controls = new THREE.OrbitControls(camera);	
+		
 		
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
-		ajaxCall();
+		initialiseDrawingSequence("TZW:hoofd");
+		
+		//slidertje = new createSlider(containerHEIGHT);
+		createSlider(containerHEIGHT, initialiseDrawingSequence, stringCurrentConcept); //creates the slider for the depth
 
+		console.log("depth jongeen wtfff");
+		//console.log(depth);
+		
+		//depth = createSlider.HEIGHT;
+		//console.log(slidertje.sliderDepth);
+		
+		
 	}
 	
 
@@ -458,4 +524,6 @@ $(document).ready(function() {
 				return this.replace(/[_-]/g, " ");
 			}
 	}		
+});
+
 });
