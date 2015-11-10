@@ -11,7 +11,7 @@ class DataParser {
 	function parseDataRDF1() {
 		
 				
-					file_put_contents('php://stderr', print_r('---json decode resultaat:', TRUE));
+					file_put_contents('php://stderr', print_r('---json decode resultaatje:', TRUE));
 					file_put_contents('php://stderr', print_r($this, TRUE));
 
 					
