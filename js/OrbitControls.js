@@ -574,11 +574,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 	//this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	//this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	
-	document.getElementById("canvasje").addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-	document.getElementById("canvasje").addEventListener( 'mousedown', onMouseDown, false );
-	document.getElementById("canvasje").addEventListener( 'mousewheel', onMouseWheel, false );
-	document.getElementById("canvasje").addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	//document.getElementById("canvasje").addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	//document.getElementById("canvasje").addEventListener( 'mousedown', onMouseDown, false );
+	//document.getElementById("canvasje").addEventListener( 'mousewheel', onMouseWheel, false );
+	//document.getElementById("canvasje").addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 	
+	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 	
 	console.log(this);
 

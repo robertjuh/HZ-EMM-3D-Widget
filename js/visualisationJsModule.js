@@ -19,9 +19,14 @@ console.log("WORDT VISUALISATIONMODULE TELKENS AANGEROEPEN??????");
 	    NEAR = 10,
 	    FAR = 10000;
 	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
-	var controls = new THREE.OrbitControls(camera);
+	var container = document.getElementById( containerDivId );
+	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	
+	
+//	var heyaa = d3.select("div").append("div:div");
+//	console.log("heyaaa=");
+//	console.log(heyaa);	
 	//"private" method:
 	var myPrivateMethod = function () {
 		console.log("I can be accessed only from within YAHOO.myProject.myModule");
@@ -34,7 +39,7 @@ console.log("WORDT VISUALISATIONMODULE TELKENS AANGEROEPEN??????");
 		scene : scene,
 		camera : camera,
 		controls : controls,
-		container : document.getElementById( 'canvasje' ),
+		container : container,
 		
 		getContainerSize: function () {
 			var size = [WIDTH,HEIGHT]

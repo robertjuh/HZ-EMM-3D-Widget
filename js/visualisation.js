@@ -1,5 +1,22 @@
 console.log("en we gaan beginnen vent");
 
+//var htmlElementID = 'canvasje';
+
+	
+	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
+	var containerDivId = containerDiv[0][0].id;
+
+	//targetDivId kan een element op de mediawiki zijn.
+	//var targetDivId = 'catlinks';
+	var targetDivId = 'content';
+	
+	
+	//dat oranje stuk moet genormaliseerd worden
+	console.log(document.getElementById("content"));   //goed resultaat
+	console.log(document.getElementById("catlinks"));	//klikt niet goe
+	console.log(document.getElementById("firstheading"));	//niks
+	console.log(document.getElementById('mw-content-text'));	//werkt niet / scheve klik
+	console.log(document.getElementById('mw-navigation'));	//goed`! onderaan pagina
 /**
  * @author NJK @author robertjuh
  * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
@@ -29,7 +46,7 @@ console.log("en we gaan beginnen vent");
 					
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 		function filterFirstSpheregeometryWithRay(event, mouse){			
-			normalizeCurrentMouseCoordinates(event);						
+			normalizeCurrentMouseCoordinates(event, mouse);						
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
 
 			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 
@@ -41,7 +58,9 @@ console.log("en we gaan beginnen vent");
 					switch(intersects[0].object.geometry.type){
 						case 'SphereGeometry':
 						intersects[0].object.material.color.setHex( Math.random() * 0xffffff ); 
-							intersects[0].object.callback(intersects[0].object.name); //calls the callback function on the chosen geometry item
+							intersects[0].object.callback(intersects[0].object.urlName); //calls the callback function on the chosen geometry item
+							console.log("de naam van het aangeklikte object = ");
+							console.log(intersects[0].object.urlName);
 							return;
 						case 'PlaneGeometry':
 							intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
@@ -55,7 +74,7 @@ console.log("en we gaan beginnen vent");
 		
 		//Colors the selected sphere a random color, serves no real purpose yet. 
 		function colorSelectedSphere(event, mouse){
-			normalizeCurrentMouseCoordinates(event);
+			normalizeCurrentMouseCoordinates(event,mouse);
 			
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera );
 			
@@ -82,11 +101,12 @@ console.log("en we gaan beginnen vent");
 		
 		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
 		//uses the mouse variable which is a THREE.Vector2
-		function normalizeCurrentMouseCoordinates(e){
-			mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - renderer.domElement.offsetLeft ) / renderer.domElement.width ) * 2 - 1;
+		function normalizeCurrentMouseCoordinates(e, mouse){
+			mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - renderer.domElement.offsetLeft ) / renderer.domElement.width ) * 2 - 1;			
 			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - renderer.domElement.offsetTop) / renderer.domElement.height ) * 2 + 1;			
-		}		
-		
+		}
+
+
 		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
@@ -97,10 +117,14 @@ console.log("en we gaan beginnen vent");
 //					}
 //				};
 			clearCanvas();
-			stringCurrentConcept = "TZW:" + conceptNameString.removeSpecialCharacters().lowerCaseFirstLetter(); //TODO formats so SPARQL can read, this is just for the testing environment
-			currentConcept = stringCurrentConcept;
+			//stringCurrentConcept = "TZW:" + conceptNameString.removeSpecialCharacters().lowerCaseFirstLetter(); //TODO formats so SPARQL can read, this is just for the testing environment
+			//currentConcept = stringCurrentConcept;
 
-			initialiseDrawingSequence(currentConcept); 
+			
+			 window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;			
+			//initialiseDrawingSequence(currentConcept); 
+			//initialiseDrawingSequence(window.location.href.getFirstPartOfUrl() + conceptNameString); 
+			
 			}		
 		}
 		
@@ -227,6 +251,7 @@ console.log(VisualisationJsModule.camera);
 						//create the sphere
 						var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 						sphere.name = nodes[key].name;
+						sphere.urlName = nodes[key].url.getLastPartOfUrl();
 						spheres[key] = sphere;						
 
 						// add the sphere to the scene
@@ -337,7 +362,7 @@ console.log(VisualisationJsModule.camera);
 		var depth = typeof depth !== 'undefined' ? depth : 1 ;
 		
 		
-		var relations = typeof relations !== 'undefined' ? relations : "true,true";
+		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
 		$.ajax({
 			type : "POST",
@@ -438,11 +463,12 @@ $(document).ready(function() {
 		
 
 		//document.getElementById("content").appendChild( VisualisationJsModule.container ); //This code will decide where on the wiki page this 
-		document.body.appendChild( VisualisationJsModule.container ); //als ik dit doe lukt het wel in chrome en FF, bovenstaande methode lijkt hij geen element te kunnen pakken uit de huidige wiki pagina
-
+//		document.body.appendChild( VisualisationJsModule.container ); //als ik dit doe lukt het wel in chrome en FF, bovenstaande methode lijkt hij geen element te kunnen pakken uit de huidige wiki pagina
+		//document.getElementById("content").appendChild( VisualisationJsModule.container); //dit lukt
+		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
 		//the style of the canvas
-		d3.select("#canvasje").style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.layout.backGround)
+		d3.select("#" + containerDivId).style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.layout.backGround)
 			.style("width",containerWIDTH + "px")
 			.style("height",containerHEIGHT + "px");
 		
@@ -480,7 +506,7 @@ $(document).ready(function() {
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
-		initialiseDrawingSequence("TZW:hoofd");
+		initialiseDrawingSequence(currentPageName);
 		
 		//slidertje = new createSlider(containerHEIGHT);
 		createSlider(containerHEIGHT, initialiseDrawingSequence, stringCurrentConcept); //creates the slider for the depth
@@ -522,6 +548,17 @@ $(document).ready(function() {
 
 			String.prototype.removeSpecialCharacters = function() {
 				return this.replace(/[_-]/g, " ");
+			}
+			
+			String.prototype.getLastPartOfUrl= function() {
+				return this.replace(/[_-]/g, " ").split("/").pop();
+			}		
+			
+			String.prototype.getFirstPartOfUrl= function() {
+				var strArray = this.split("/");
+				strArray.splice(-1, 1); //remove last part of str
+				var joinedString = strArray.join("/")+"/";
+				return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
 			}
 	}		
 });

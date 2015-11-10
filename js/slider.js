@@ -9,7 +9,7 @@ console.log("ja createslider is geropee he");
 
 var HEIGHT = divHeight; //TODO KAN WEG IN project?
 
-var containerHeight = HEIGHT/2;
+var containerHeight = HEIGHT;
 
 var containerWidth = 60;
 var slideDepth = 1;
@@ -18,8 +18,22 @@ var tempSliderDepthInt=1;
 var sliderOffsetTop = 20;
 var sliderOffsetSides = 10;
 
-var sliderDiv = d3.select("body").append("div").attr("id", "sliderDiv").attr("width", containerWidth).attr("height", containerHeight);
-var svgContainer = d3.select("#sliderDiv").append("svg").attr("width", containerWidth).attr("height", containerHeight).style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.slider.backGround);
+var sliderDiv = d3.select('#' + targetDivId).append("div")
+//var sliderDiv = d3.select('#' + containerDivId).append("div")
+	.attr("id", "sliderDiv")
+	.attr("width", containerWidth)
+	.attr("position", "fixed")
+	.attr("height", containerHeight)
+	.style("display", "inline-block");
+	
+console.log("sliderDiv");
+console.log(sliderDiv);
+var svgContainer = d3.select("#sliderDiv").append("svg")
+	.attr("width", containerWidth)
+	.attr("height", containerHeight)
+	.style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.slider.backGround);
+	
+console.log(svgContainer);
 
 var depthScale = d3.scale.linear()
         .domain([0,5])
