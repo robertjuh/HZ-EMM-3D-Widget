@@ -20,6 +20,8 @@ $objects = $parser -> parseDataRDF();
 // Handle data
 $visitor = new NodeMapVisitor();
 foreach ($objects as $object) {
+					file_put_contents('php://stderr', print_r('---objects:', TRUE));
+					file_put_contents('php://stderr', print_r($objects, TRUE));
 	$object -> accept($visitor);
 }
 

@@ -7,8 +7,50 @@ class DataParser {
 	function __construct($input) {
 		$this -> data = $input;
 	}
+	
+	function parseDataRDF1() {
+		
+				
+					file_put_contents('php://stderr', print_r('---json decode resultaat:', TRUE));
+					file_put_contents('php://stderr', print_r($this, TRUE));
+
+					
+					
+					
+					
+	    //Hashmap met subject -> hashmap[relation(s), object(s)]
+		
+		$items = array();
+
+		if (!isset($this -> data['@graph'])){
+			return $items;
+		}
+		
+		
+		
+		
+		foreach ($this->data['@graph'] as $item) {
+			$obj = new SKOSConcept($item['@id']);
+			foreach ($item as $key => $value) {
+				if (!$this -> isRelation($key)) {
+					$obj -> addProperty($key, $value);
+				}
+			}
+			$items[$item['@id']] = $obj;
+		}
+
+
+
+		return $items;
+	}
 
 	function parseDataRDF() {
+		
+				
+					file_put_contents('php://stderr', print_r('---json decode resultaat:', TRUE));
+					file_put_contents('php://stderr', print_r($this, TRUE));
+
+		
 		$items = array();
 
 		if (!isset($this -> data['@graph']))

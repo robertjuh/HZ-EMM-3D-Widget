@@ -26,7 +26,7 @@ class NodeMapVisitor extends Visitor {
 							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
 							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
 							break;
-						case strpos($key, "narrower") :
+						case strpos($key, "related") :
 							$item["urlsource"] = $object -> getProperty("page");
 							$item["urltarget"] = $concept -> getProperty("page");
 							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
