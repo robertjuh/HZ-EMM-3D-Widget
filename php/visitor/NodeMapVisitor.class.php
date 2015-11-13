@@ -13,7 +13,7 @@ class NodeMapVisitor extends Visitor {
 				foreach ($relation as $object) {
 					$item = array();
 					$item["type"] = $key;
-file_put_contents('php://stderr', print_r($object -> getName().$key.$concept -> getName()."\n", TRUE));
+//file_put_contents('php://stderr', print_r($object -> getName().$key.$concept -> getName()."\n", TRUE));
 					switch (true) {					
 						case strpos($key, "broader") :
 							$item["urlsource"] = $concept -> getProperty("page");
@@ -28,13 +28,13 @@ file_put_contents('php://stderr', print_r($object -> getName().$key.$concept -> 
 							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
 							break;
 						case strpos($key, "related") :
-file_put_contents('php://stderr', print_r($object -> getName()."---related with ".$concept -> getName(), TRUE));
+//file_put_contents('php://stderr', print_r($object -> getName()."---related with ".$concept -> getName(), TRUE));
 							$item["urlsource"] = $object -> getProperty("page");
 							$item["urltarget"] = $concept -> getProperty("page");
 							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
 							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
 							break;		
-									//narrower is toegevoegd maar functioneerd niet
+									//narrower is toegevoegd maar functioneert niet;Anton: volgens mij nu wel!
 
 						default :
 							return;

@@ -1,12 +1,27 @@
 <?php
 
 class QueryBuilder {
+    const SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //moet een constante worden //zoek op get current namespace/host. (zoek uit: kan ik smwgnamespace uit localsettigns halen?) 
+    const RDFQuery='
+			PREFIX uri: <dummyuri/>
+			PREFIX localuri: <dummyuri>
+			PREFIX skos: <dummyuri/Eigenschap-3ASkos-3A>
+			PREFIX skosem: <dummyuri/Eigenschap-3ASkosem-3A>
+			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
+			
+			construct { ?s ?p ?o }
+			where {
+			  ?c rdfs:label "%s" .
+			  ?c (%s){,%d} ?s .
+			  ?s ?p ?o
+			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept } )
+			}
+		';
 
 	private $depth;
 	private $concept;
-	private $heyhallo; //temp var, remove later
 	
-	private $SMWServer = "http://192.168.238.133/index.php/"; //moet een constante worden //zoek op get current namespace/host. (zoek uit: kan ik smwgnamespace uit localsettigns halen?) 
+	
 	
 	function __construct($depth, $concept) {
 		$this -> depth = $depth;
@@ -21,28 +36,7 @@ class QueryBuilder {
 		$relation = "";
 		$relations = explode(",", $relations);
 
-//		for($i=0; i<=1; $i++){
-		//for($i=0; i<=count($relations); $i++){
-			//if ($i != 0){$relations .= "|"};
-			
-//	foreach($relations as $rel){
-//			if ($relations == 0) {
-//				$relation .= "<>|!<>";			
-//			}
-file_put_contents('php://stderr', print_r($relations, TRUE));
 
-//		if (($relations[0] === 'broader') && ($relations[1] === 'narrower')) {
-//			$relation .= "<>|!<>";
-//		} else if (($relations[0] === 'true')) {
-//			$relation .= "skosem:broader";
-//		} else if (($relations[1] === 'true')) {
-//			$relation .= "skosem:narrower";
-//		} else {
-//			$relation .= "<>|!<>";
-//		}
-		
-		//foreach($relations as $rel){
-			//file_put_contents('php://stderr', print_r($rel, TRUE));
 			
 		$forEachIndex =0;
 		foreach($relations as $rel){
@@ -61,97 +55,23 @@ file_put_contents('php://stderr', print_r($relations, TRUE));
 					$relation .= "skosem:association";
 					break;
 				default:
-				//slice first one and increment
-				//array_shift($relations);
 				break;
-				//break
 			}
-		$forEachIndex++;
+			$forEachIndex++;
 		}
-			file_put_contents('php://stderr', print_r($relation, TRUE));
-		file_put_contents('php://stderr', print_r($relation, TRUE));	
-		//}
 
-
-			
-			
-//			else if (in_array("broader", $relations)) {
-//				$relation .= "skosem:broader";
-//			} 
-//			else if (in_array("narrower", $relations)) {
-//				$relation .= "skosem:narrower";
-//			} else if (in_array("related", $relations)) {
-//				$relation .= "skos:related";
-//			}
-			
-			
-//			else {
-//				$relation .= "<>|!<>";
-//			}
-//		}
-//		}
 
 
 		
 	
+	$resultRDFQuery = sprintf(self::RDFQuery, $concept, $relation, $depth);		
 
-	$heyhallo = sprintf('
-			PREFIX uri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
-            PREFIX localuri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
-			PREFIX skos: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
-			PREFIX skosem: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
-			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
-			
-			construct { ?s ?p ?o }
-			where {
-			  ?c rdfs:label "%s" .
-			  ?c (%s){,%d} ?s .
-			  ?s ?p ?o
-			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept } )
-			}
-		', $concept, $relation, $depth);		
-
-		//	var_dump($heyhallo);
-		file_put_contents('php://stderr', print_r($heyhallo, TRUE));
+	$resultRDFQuery=str_replace ( "dummyuri",self::SMWServer,$resultRDFQuery );
 		
-		
-    return sprintf('
-			PREFIX uri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
-            PREFIX localuri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
-			PREFIX skos: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
-			PREFIX skosem: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
-			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
-			
-			construct { ?s ?p ?o }
-			where {
-			  ?c rdfs:label "%s" .
-			  ?c (%s){,%d} ?s .
-			  ?s ?p ?o
-			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept } )
-			}
-		', $concept, $relation, $depth);	
+    return $resultRDFQuery;	
 
 
 		
-		
-
-		
-		
-    return sprintf('
-			PREFIX uri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
-            PREFIX localuri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
-			PREFIX skos: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
-			PREFIX skosem: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
-			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
-			
-			construct { ?s ?p ?o }
-			where {
-			  ?c rdfs:label "%s" .
-			  ?c (%s){,%d} ?s .
-			  ?s ?p ?o
-			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept } )
-			}
-		', $concept, $relation, $depth);		
 		
 	
 	}
