@@ -10,13 +10,6 @@ class DataParser {
 	
 	function parseDataRDF1() {
 		
-				
-					file_put_contents('php://stderr', print_r('---json decode resultaatje met superveel data. ziezo weeer een aanpassing:', TRUE));
-					file_put_contents('php://stderr', print_r($this, TRUE));
-
-					
-					
-					
 					
 	    //Hashmap met subject -> hashmap[relation(s), object(s)]
 		
@@ -46,16 +39,13 @@ class DataParser {
 
 	function parseDataRDF() {
 		
-				
-					file_put_contents('php://stderr', print_r('---json decode resultaat:', TRUE));
-					file_put_contents('php://stderr', print_r($this, TRUE));
-
 		
 		$items = array();
 
 		if (!isset($this -> data['@graph']))
 			return $items;
-		
+		//first create all objects; without relations
+		//these items are described in the array of the result-set
 		foreach ($this->data['@graph'] as $item) {
 			$obj = new SKOSConcept($item['@id']);
 			foreach ($item as $key => $value) {
@@ -66,13 +56,14 @@ class DataParser {
 			$items[$item['@id']] = $obj;
 		}
 
+		//now add relations. Only add relation if item is created by previous loop
 		foreach ($this->data['@graph'] as $item) {
 			$obj = $items[$item['@id']];
 			foreach ($item as $key => $value) {
 				if ($this -> isRelation($key)) {
 					if (is_array($value)) {
 						foreach ($value as $relation) {
-							if (array_key_exists($relation, $items))
+							if (array_key_exists($relation, $items))//object is created
 								$obj -> addRelation($key, $items[$relation]);
 						}
 					} else {

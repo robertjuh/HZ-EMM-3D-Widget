@@ -6,7 +6,7 @@ class QueryBuilder {
 	private $concept;
 	private $heyhallo; //temp var, remove later
 	
-	private $SMWServer = "http://127.0.0.1/mediawiki2/index.php/"; //moet een constante worden //zoek op get current namespace/host. (zoek uit: kan ik smwgnamespace uit localsettigns halen?) 
+	private $SMWServer = "http://192.168.238.133/index.php/"; //moet een constante worden //zoek op get current namespace/host. (zoek uit: kan ik smwgnamespace uit localsettigns halen?) 
 	
 	function __construct($depth, $concept) {
 		$this -> depth = $depth;
@@ -96,10 +96,10 @@ file_put_contents('php://stderr', print_r($relations, TRUE));
 	
 
 	$heyhallo = sprintf('
-			PREFIX uri: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/>
-            PREFIX localuri: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/>
-			PREFIX skos: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
-			PREFIX skosem: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
+			PREFIX uri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
+            PREFIX localuri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
+			PREFIX skos: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
+			PREFIX skosem: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
 			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
 			
 			construct { ?s ?p ?o }
@@ -116,10 +116,10 @@ file_put_contents('php://stderr', print_r($relations, TRUE));
 		
 		
     return sprintf('
-			PREFIX uri: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/>
-            PREFIX localuri: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/>
-			PREFIX skos: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
-			PREFIX skosem: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
+			PREFIX uri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
+            PREFIX localuri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
+			PREFIX skos: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
+			PREFIX skosem: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
 			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
 			
 			construct { ?s ?p ?o }
@@ -138,10 +138,10 @@ file_put_contents('php://stderr', print_r($relations, TRUE));
 		
 		
     return sprintf('
-			PREFIX uri: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/>
-            PREFIX localuri: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/>
-			PREFIX skos: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
-			PREFIX skosem: <http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
+			PREFIX uri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
+            PREFIX localuri: <http://192.168.238.133/index.php/Speciaal:URIResolver/>
+			PREFIX skos: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkos-3A>
+			PREFIX skosem: <http://192.168.238.133/index.php/Speciaal:URIResolver/Eigenschap-3ASkosem-3A>
 			PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>	
 			
 			construct { ?s ?p ?o }

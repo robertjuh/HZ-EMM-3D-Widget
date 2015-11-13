@@ -13,6 +13,7 @@ class NodeMapVisitor extends Visitor {
 				foreach ($relation as $object) {
 					$item = array();
 					$item["type"] = $key;
+file_put_contents('php://stderr', print_r($object -> getName().$key.$concept -> getName()."\n", TRUE));
 					switch (true) {					
 						case strpos($key, "broader") :
 							$item["urlsource"] = $concept -> getProperty("page");
@@ -27,6 +28,7 @@ class NodeMapVisitor extends Visitor {
 							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
 							break;
 						case strpos($key, "related") :
+file_put_contents('php://stderr', print_r($object -> getName()."---related with ".$concept -> getName(), TRUE));
 							$item["urlsource"] = $object -> getProperty("page");
 							$item["urltarget"] = $concept -> getProperty("page");
 							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
@@ -40,7 +42,7 @@ class NodeMapVisitor extends Visitor {
 					}
 					array_push($arr, $item);
 					
-						file_put_contents('php://stderr', print_r('---relations is:', TRUE));
+						/*file_put_contents('php://stderr', print_r('---relations is:', TRUE));
 						file_put_contents('php://stderr', print_r($relations, TRUE));
 						file_put_contents('php://stderr', print_r("---concept", TRUE));
 						file_put_contents('php://stderr', print_r($concept, TRUE));
@@ -51,7 +53,7 @@ class NodeMapVisitor extends Visitor {
 						file_put_contents('php://stderr', print_r("---arr", TRUE));
 						file_put_contents('php://stderr', print_r($arr, TRUE));
 						file_put_contents('php://stderr', print_r("---relation", TRUE));
-						file_put_contents('php://stderr', print_r($relation, TRUE));
+						file_put_contents('php://stderr', print_r($relation, TRUE));*/
 						
 				}
 			}

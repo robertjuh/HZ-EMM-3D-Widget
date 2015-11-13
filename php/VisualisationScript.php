@@ -5,7 +5,7 @@ include_once (__DIR__ . '/visitor/NodeMapVisitor.class.php');
 include_once (__DIR__ . '/ChromePhp.php');
 
 // Load data
-$querybuilder = new QueryBuilder($_POST["depth"], $_POST["concept"]);
+$querybuilder = new QueryBuilder(2, /*$_POST["concept"]*/"TZW:neus");
 
 $query = $querybuilder -> generateQuery($_POST["relations"]);
 $result = file_get_contents('http://localhost:3030/ds/query?output=json&query=' . urlencode($query));
@@ -14,14 +14,16 @@ $result = file_get_contents('http://localhost:3030/ds/query?output=json&query=' 
 						file_put_contents('php://stderr', print_r($result, TRUE));
 
 // Parse data
+
 $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
+file_put_contents('php://stderr', print_r(json_decode($result, true), TRUE));
 
 // Handle data
 $visitor = new NodeMapVisitor();
 foreach ($objects as $object) {
-					file_put_contents('php://stderr', print_r('---objects:', TRUE));
-					file_put_contents('php://stderr', print_r($objects, TRUE));
+					//file_put_contents('php://stderr', print_r('---objects:', TRUE));
+					//file_put_contents('php://stderr', print_r($objects, TRUE));
 	$object -> accept($visitor);
 }
 
