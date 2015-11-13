@@ -1,7 +1,8 @@
 <?php
 
 class QueryBuilder {
-    const SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //moet een constante worden //zoek op get current namespace/host. (zoek uit: kan ik smwgnamespace uit localsettigns halen?) 
+    const SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //zoek uit: kan ik deze variabele uit localsettings halen?) 
+    //Robert: vervang met je eigen server-gegevens!const SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //zoek uit: kan ik deze variabele uit localsettings halen?) 
     const RDFQuery='
 			PREFIX uri: <dummyuri/>
 			PREFIX localuri: <dummyuri>
@@ -57,7 +58,7 @@ class QueryBuilder {
 				default:
 				break;
 			}
-			$forEachIndex++;
+		        $forEachIndex++;
 		}
 
 
