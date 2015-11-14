@@ -1,8 +1,7 @@
 <?php
 
 class QueryBuilder {
-    const SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //zoek uit: kan ik deze variabele uit localsettings halen?) 
-    //Robert: vervang met je eigen server-gegevens!const SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //zoek uit: kan ik deze variabele uit localsettings halen?) 
+    //basic sparql-query, to be processed by QueryBuilder to get working query
     const RDFQuery='
 			PREFIX uri: <dummyuri/>
 			PREFIX localuri: <dummyuri>
@@ -19,14 +18,17 @@ class QueryBuilder {
 			}
 		';
 
+	//parameters passed by calling javascript
 	private $depth;
 	private $concept;
+	private $uri;
 	
 	
 	
-	function __construct($depth, $concept) {
+	function __construct($depth, $concept, $uri) {
 		$this -> depth = $depth;
 		$this -> concept = $concept;
+		$this -> uri = $uri;
 	}
 
 	function generateQuery($relations = "", $depth = "", $concept = "") {
@@ -39,6 +41,7 @@ class QueryBuilder {
 
 
 			
+		//replace each term with right skos-term
 		$forEachIndex =0;
 		foreach($relations as $rel){
 			if($forEachIndex != 0){$relation .= "|";}
@@ -63,13 +66,13 @@ class QueryBuilder {
 
 
 
-		
-	
-	$resultRDFQuery = sprintf(self::RDFQuery, $concept, $relation, $depth);		
+		//inject concept, relation and depth into sparql-query
+		$resultRDFQuery = sprintf(self::RDFQuery, $concept, $relation, $depth);	
+		//now replace dummyuri with correct uri-path of smw-resources
 
-	$resultRDFQuery=str_replace ( "dummyuri",self::SMWServer,$resultRDFQuery );
+		$resultRDFQuery=str_replace ( "dummyuri",$this -> uri,$resultRDFQuery );
 		
-    return $resultRDFQuery;	
+		return $resultRDFQuery;	
 
 
 		

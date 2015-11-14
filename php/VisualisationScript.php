@@ -4,11 +4,33 @@ include_once (__DIR__ . '/DataParser.class.php');
 include_once (__DIR__ . '/visitor/NodeMapVisitor.class.php');
 include_once (__DIR__ . '/ChromePhp.php');
 
+//called by javascript. Started in mediawiki-page by: {{#widget:EM3DNavigator| currentPageName={{PAGENAME}}}}
+
 // Load data
-$querybuilder = new QueryBuilder(2, /*$_POST["concept"]*/"TZW:neus");
+$SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver"; //server of Nick Steijaart
+//fuseki by default running on port 3030 on localhost
+$fusekiDataset='http://localhost:3030/ds';
+//values can be changed in LocalSettings: 
+//example:
+//$wgEM3DNavigatorUri='http://192.168.238.133/index.php/Speciaal:URIResolver';
+//$wgFusekiDataset='http://localhost:3030/ds';
+
+//@Robert: vervang met je eigen server-gegevens!?$SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver";
+
+//replace with parameter from calling script, if passed
+if (isset($_POST['uri']))
+  $SMWServer=$_POST['uri'];
+if (isset($_POST['fusekidataset']))
+  $fusekiDataset=$_POST['fusekidataset'];
+//TODO:check sanity of parameters depth,concept and relations
+//otherwise use default values
+$depth=intval ($_POST["depth"]);
+$querybuilder = new QueryBuilder($depth, $_POST["concept"],$SMWServer);
 
 $query = $querybuilder -> generateQuery($_POST["relations"]);
-$result = file_get_contents('http://localhost:3030/ds/query?output=json&query=' . urlencode($query));
+
+//execute query
+$result = file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query));
 
 						//file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
 						//file_put_contents('php://stderr', print_r($result, TRUE));

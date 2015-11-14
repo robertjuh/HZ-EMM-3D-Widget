@@ -8,7 +8,7 @@ class DataParser {
 		$this -> data = $input;
 	}
 	
-	function parseDataRDF1() {//not used right now; probably obsolete?
+	/*function parseDataRDF1() {//not used right now; likely obsolete?
 		
 					
 	    //Hashmap met subject -> hashmap[relation(s), object(s)]
@@ -35,7 +35,7 @@ class DataParser {
 
 
 		return $items;
-	}
+	}*/
 
 	function parseDataRDF() {
 		

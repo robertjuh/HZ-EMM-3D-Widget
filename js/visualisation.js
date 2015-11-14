@@ -1,5 +1,5 @@
 console.log("en we gaan beginnen vent");
-
+console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the uri to be passed to QueryBuilder
 //var htmlElementID = 'canvasje';
 
 	
@@ -359,7 +359,7 @@ console.log(VisualisationJsModule.camera);
 		}
 		
 
-		var depth = typeof depth !== 'undefined' ? depth : 1 ;
+		var depth = typeof depth !== 'undefined' ? depth : 2 ;
 		
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
@@ -373,7 +373,9 @@ console.log(VisualisationJsModule.camera);
 			data : {
 				concept : concept,
 				depth : depth.toString(),
-				relations : relations
+				relations : relations,
+				uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
+				fusekidataset : mw.config.get('wgEM3DNavigator').eM3DFusekiDataset
 			},
        success:function(result)//we got the response
        {
