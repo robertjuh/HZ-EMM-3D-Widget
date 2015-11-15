@@ -13,6 +13,7 @@ class NodeMapVisitor extends Visitor {
 				foreach ($relation as $object) {
 					$item = array();
 					$item["type"] = $key;
+					$item["distance"] = $object->distance;//TODO rewrite code so distance can be added to node instead of vertex
 //file_put_contents('php://stderr', print_r($object -> getName().$key.$concept -> getName()."\n", TRUE));
 					switch (true) {					
 						case strpos($key, "broader") :
