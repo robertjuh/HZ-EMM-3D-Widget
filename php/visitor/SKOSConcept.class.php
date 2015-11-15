@@ -49,6 +49,13 @@ class SKOSConcept extends Concept {
 	}
 	
 	/**
+	 * Returns an array of all properties
+	 */
+	public function getProperties() {
+		return $this->properties;
+	}
+
+	/**
 	 * Returns an array of all relations
 	 */
 	public function getRelations() {
