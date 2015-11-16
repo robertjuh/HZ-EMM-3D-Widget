@@ -6,74 +6,6 @@ include_once (__DIR__ . '/ChromePhp.php');
 
 $concept=$_POST["concept"];
 
-//TODO code for distance-calculation in separate class
-//start code for calculation of distances
-class PriorityQueue extends SplPriorityQueue
-{
-    public function compare($a, $b)
-    {
-        if ($a === $b) return 0;
-        return $a > $b ? -1 : 1;
-    }
-}
- 
-function calcDistances($start)
-{
-    // define an empty queue
-    $q = new PriorityQueue();
- 
-    // push the starting vertex into the queue
-    $q->insert($start, 0);
-    $q->rewind();
- 
-    // mark the distance to it 0
-    $start->distance = 0;
- 
-    while ($q->valid()) {
-        $t = $q->extract();
-        $t->visited = 1;
- 
-    foreach ($t->getRelations() as $key => $relation) {
-	foreach ($relation as $object) {
-            if (!$object->visited) {
-                if ($object->distance > $t->distance + 1) {
-                    $object->distance = $t->distance + 1;
-                    $object->parent = $t;
-                }
- 
- 
-                $q->insert($object, $object->distance);
-            }
-	}
-      }
-      $q->recoverFromCorruption();
-      $q->rewind();
-    }
-}
-/*
-get starting node of list of objects
-*/
-function getStart($concept,$objects){
-    $start=null;
-    foreach ($objects as $item) {
-      $itemName=str_replace("-3A",":",$item->getName());
-      if(strpos($itemName,$concept)>0)
-      $start=$item;
-    }
-    
-    return $start;
-}
-/*
-print all distances
-*/
-function printDistances($objects){
-    foreach ($objects as $item) {
-      $itemName=str_replace("-3A",":",$item->getName());
-      file_put_contents('php://stderr', $itemName."-".$item->distance."\n");
-    }
-}
-//end code for calculation of distances
-
 //called by javascript. Started in mediawiki-page by: {{#widget:EM3DNavigator| currentPageName={{PAGENAME}}}}
 
 // Load data
@@ -111,8 +43,7 @@ $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
 //file_put_contents('php://stderr', print_r(json_decode($result, true), TRUE));
 
-calcDistances(getStart($concept,$objects));
-printDistances($objects);
+$parser -> calcDistances($parser -> getStart($concept,$objects));
 // Handle data
 $visitor = new NodeMapVisitor();
 foreach ($objects as $object) {

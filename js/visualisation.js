@@ -292,7 +292,8 @@ console.log(VisualisationJsModule.camera);
 		}
 	
 	function createArrows(three_links, nodelinks, nodes){
-		for (var i = 0; i < nodelinks.length; i++) {
+		for (var i = 0; i < nodelinks.length; i++) 
+		if (nodelinks[i].source){
 				var origin = new THREE.Vector3(50, 100, 50);
 				var terminus = new THREE.Vector3(75, 75, 75);
 				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
@@ -412,6 +413,7 @@ console.log(VisualisationJsModule.camera);
 
 			// Compute the distinct nodes from the links.
 			nodelinks.forEach(function(link) {
+			  if (link.source){
 				link.source = nodes[link.source] || (nodes[link.source] = {
 					name : link.source,
 					url : link.urlsource
@@ -420,6 +422,7 @@ console.log(VisualisationJsModule.camera);
 					name : link.target,
 					url : link.urltarget
 				});
+			  }
 			});
 
 			VisualisationJsModule.camera.updateProjectionMatrix();
