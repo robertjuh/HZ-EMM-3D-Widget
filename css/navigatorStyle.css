@@ -1,4 +1,4 @@
-/* test */
+/* It is possible to ask attributes from this sheet with the following js code: VisualisationJsModule.getStyle(".containerAttributes").style.color; */
 
 #containerDiv{	
 	background-color: rgb(229,222,205);	
@@ -8,8 +8,8 @@
 .containerAttributes{
 	color: rgb(100,2,31) ;
 	background-color: rgb(29,22,235) ;
-	height: 678px;
-	width: 678px;
+	height: 456px;
+	width: 456px;
 	
 
 
@@ -28,13 +28,11 @@
 
 
 .sphere{
-	color: red;
-	width: 1500px;
+	color: rgb(191,172,136);
 }
 
 .sphere.centersphere{
-	color: black;
-	width: 500px;
+	color: rgb(76,151,214);
 }
 
 

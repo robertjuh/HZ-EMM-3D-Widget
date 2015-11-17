@@ -51,6 +51,33 @@ var VisualisationJsModule = (function () {
 		getContainerSize: function () {
 			var size = [WIDTH,HEIGHT]
 			return size;			
-		}	
+		},
+
+		getStyle: function(CLASSname) {
+					var styleSheets = window.document.styleSheets;
+					var styleSheetsLength = styleSheets.length;
+					for(var i = 0; i < styleSheetsLength; i++){
+						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
+						else { 
+							try {  if(!styleSheets[i].cssRules) {continue;} } 
+							//Note that SecurityError exception is specific to Firefox.
+							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
+							var classes = styleSheets[i].cssRules ;
+						}
+						for (var x = 0; x < classes.length; x++) {
+							if (classes[x].selectorText == CLASSname) {
+					 return classes[x];
+					 //console.log(classes[x]);
+					 //console.log(classes[x].style["font-family"]);
+					 //console.log(classes[x].style.color);
+					 //console.log(classes[x].style["font-size"]);
+								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
+								return ret;
+							}
+						}
+					}
+					return null;			
+			}
 	};
 });

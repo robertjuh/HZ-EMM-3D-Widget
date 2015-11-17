@@ -150,6 +150,8 @@ console.log("Het programma is gestart");
 			var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
 			    y = d3.scale.linear().domain([0, 300]).range([-1, 15]),
 			    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
+				
+			
 
 			for (var key in nodes) {
 				spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
@@ -241,12 +243,12 @@ console.log("Het programma is gestart");
 						var sphereMaterial; //TODO onderstaande line zal aangepast moeten worden als deze op andere thesauri (dan tzw:) toegepast moet worden
 						if(nodes[key].name.compareStrings(stringCurrentConcept.slice(4), true, true)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green //TODO split.pop(:)?
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : JSONStyleSheet.jsonStyle.THREEColourScheme.nodes.centerNode
+								color : VisualisationJsModule.getStyle(".sphere.centersphere").style.color
 							});												
 						}
 						else{
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : JSONStyleSheet.jsonStyle.THREEColourScheme.nodes.surroundingNode
+								color : VisualisationJsModule.getStyle(".sphere").style.color
 							});
 						}
 
@@ -499,26 +501,15 @@ $(document).ready(function() {
 	function initialiseTHREEComponents(){ //current page name als concept meen
 		VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
 		console.log("initialise three components wordt hier aangeroepen");
-		//var containerHEIGHT = VisualisationJsModule.height;
-		//var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		var containerHEIGHT = VisualisationJsModule.height;
 		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		
 		
 		console.log("currentpage");		
 		console.log(currentPage);
-		
 
-		//document.getElementById("content").appendChild( VisualisationJsModule.container ); //This code will decide where on the wiki page this 
-//		document.body.appendChild( VisualisationJsModule.container ); //als ik dit doe lukt het wel in chrome en FF, bovenstaande methode lijkt hij geen element te kunnen pakken uit de huidige wiki pagina
-		//document.getElementById("content").appendChild( VisualisationJsModule.container); //dit lukt
 		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
-		//the style of the canvas
-//		d3.select("#" + containerDivId).style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.layout.backGround)
-//			d3.select("#" + containerDivId)
-//			.style("width",containerWIDTH + "px")
-//			.style("height",containerHEIGHT + "px");
 		
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
@@ -526,11 +517,7 @@ $(document).ready(function() {
 			.attr("x", 200)           // set x position of left side of text
 			.attr("y", 100)           // set y position of bottom of text 
 			.text("DEZE PAGINA GAAT OVER: " + currentPageName);     // define the text to display 
-		
-		
-		
-		
-		
+				
 		// Create Renderer
 		renderer = new THREE.WebGLRenderer({
 			alpha : true,
@@ -556,21 +543,7 @@ $(document).ready(function() {
 		
 		initialiseDrawingSequence(currentPageName);
 		
-		//slidertje = new createSlider(containerHEIGHT);
-		createSlider(containerHEIGHT, initialiseDrawingSequence, stringCurrentConcept); //creates the slider for the depth
-
-		console.log("depth jongeen wtfff");
-		//console.log(depth);
-		
-		//depth = createSlider.HEIGHT;
-		//console.log(slidertje.sliderDepth);
-		
-
-
-	 
-		
-		
-		
+		createSlider(containerHEIGHT, initialiseDrawingSequence, stringCurrentConcept); //creates the slider for the depth	
 	}
 	
 
@@ -628,35 +601,6 @@ $(document).ready(function() {
 					}
 				}
 				return string1 === string2;
-			}
-			
-			
-			function getStyle2(CLASSname) {
-					var styleSheets = window.document.styleSheets;
-					var styleSheetsLength = styleSheets.length;
-					for(var i = 0; i < styleSheetsLength; i++){
-						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
-						else { 
-							try {  if(!styleSheets[i].cssRules) {continue;} } 
-							//Note that SecurityError exception is specific to Firefox.
-							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
-							var classes = styleSheets[i].cssRules ;
-						}
-						for (var x = 0; x < classes.length; x++) {
-							if (classes[x].selectorText == CLASSname) {
-					 return classes[x];
-					 //console.log(classes[x]);
-					 //console.log(classes[x].style["font-family"]);
-					 //console.log(classes[x].style.color);
-					 //console.log(classes[x].style["font-size"]);
-								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
-								return ret;
-							}
-						}
-					}
-					return null;
-			
 			}
 	}		
 });
