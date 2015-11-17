@@ -1,0 +1,57 @@
+/* test */
+
+#containerDiv{	
+	background-color: rgb(229,222,205);	
+}
+
+/* container represents the div that everything is being drawn on*/
+.containerAttributes{
+	color: rgb(100,2,31) ;
+	background-color: rgb(29,22,235) ;
+	height: 678px;
+	width: 678px;
+	
+
+
+}
+
+
+
+
+
+
+.slider{
+	color: rgb(210,2,35) ;
+}
+
+
+
+
+.sphere{
+	color: red;
+	width: 1500px;
+}
+
+.sphere.centersphere{
+	color: black;
+	width: 500px;
+}
+
+
+
+
+.arrow.default{
+	color: blue ;
+}
+
+.arrow.broader{
+	color: orange;
+}
+
+.arrow.narrower{
+	color: red;
+}
+
+.arrow.related{
+	color: steelblue;
+}
