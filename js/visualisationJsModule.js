@@ -1,17 +1,54 @@
 /**
 * Module of visualisation.js where most THREE.JS related tools are declared, the size of the canvas and
-* all objects related to drawing, viewing and rendering.
+* all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
 
 
 
 var VisualisationJsModule = (function () {
-	//"private" variables:
-	var WIDTH=600;
-	var HEIGHT=600;
-console.log("WORDT VISUALISATIONMODULE TELKENS AANGEROEPEN??????");	
+	d3.select('body').append('div').attr("class","containerAttributes").attr("id", "classContainer").style("display", "none");
 	
+	d3.select('#classContainer').append('div').attr("class","arrow narrower").style("display", "none");	
+	d3.select('#classContainer').append('div').attr("class","arrow broader").style("display", "none");	
+	d3.select('#classContainer').append('div').attr("class","arrow related").style("display", "none");
+	d3.select('#classContainer').append('div').attr("class","arrow default").style("display", "none");
+	
+	
+	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
+	d3.select('#classContainer').append('div').attr("class","sphere centersphere").style("display", "none");
+	
+	
+	
+		
+	d3.select('#classContainer').append('div').attr("class","slider").style("display", "none");	
+	
+	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
+	
+	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");	
+	
+	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");	
+	
+	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
+	
+	
+
+	
+//	var containerStyleAttributes = d3.select('.containerAttributes');
+//	var WIDTH=parseInt(containerStyleAttributes.style('width'));
+//	var HEIGHT=parseInt(containerStyleAttributes.style('height'));
+	
+
+
+var WIDTH=parseInt(d3.select('.containerAttributes').style('width'));
+var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'));
+	
+
+
+console.log(d3.select('.containerAttributes').style('colorNarrower'));	
+console.log(d3.select('.containerAttributes').style('colorNarrower'));	
+
+
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
 	    ASPECT = WIDTH / HEIGHT, 

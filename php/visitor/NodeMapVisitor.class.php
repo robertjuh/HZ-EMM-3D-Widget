@@ -9,19 +9,10 @@ class NodeMapVisitor extends Visitor {
 		$relations = $concept -> getRelations();
 		if (count($relations) != 0) {
 			$arr = array();
-			$item = array();
-			$item["type"] = "node";
-			$item["name"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
-			$item["distance"] = $concept->distance;
-			foreach ($concept -> getProperties() as $key => $property) {
-			  $item[$key] = $property;
-			}
-			//array_push($arr, $item);//TODO make javascript able to receive type: node
 			foreach ($relations as $key => $relation) {
 				foreach ($relation as $object) {
 					$item = array();
 					$item["type"] = $key;
-					$item["distance"] = $object->distance;//TODO if nodevalues are passed, this can be removed
 //file_put_contents('php://stderr', print_r($object -> getName().$key.$concept -> getName()."\n", TRUE));
 					switch (true) {					
 						case strpos($key, "broader") :

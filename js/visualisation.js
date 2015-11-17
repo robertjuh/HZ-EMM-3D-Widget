@@ -1,5 +1,5 @@
 console.log("en we gaan beginnen vent");
-console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the uri to be passed to QueryBuilder
+
 //var htmlElementID = 'canvasje';
 
 	
@@ -7,9 +7,13 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
 	var containerDivId = containerDiv[0][0].id;
 
 	//targetDivId kan een element op de mediawiki zijn.
-	//var targetDivId = 'catlinks';
-	var targetDivId = 'content';
+	var targetDivId = 'bodyContent'; //bodyContent
 	
+	console.log("target class ");
+	console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
+	
+	//set the position to inherit instead of relative, or the nodes won't be clickable	
+	d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
 	
 	//dat oranje stuk moet genormaliseerd worden
 	console.log(document.getElementById("content"));   //goed resultaat
@@ -24,6 +28,7 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
  var startVisualisation = (function(currentPageName){
+
 	 
 	 console.log("startvisualisation is opgeroepee");
 
@@ -141,7 +146,7 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
 			arrow.position.z = origin.z;
 
 			// Calculate new terminus vectors and set length
-			arrow.setLength(arrow.position.distanceTo(vectTarget) - 5, 10, 5);
+			arrow.setLength(arrow.position.distanceTo(vectTarget) - 5, 7, 3);
 			arrow.setDirection(new THREE.Vector3().subVectors(vectTarget, arrow.position).normalize());
 		}
 			
@@ -149,8 +154,9 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
 				// Cast function argument to Vector3 format
 				var newTarget = new THREE.Vector3(target.x, target.y, target.z);
 				
-				//Calculate new terminus vectors and set length
-				arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
+				//Calculate new terminus vectors and set length (initlal size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
+				arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 7, 3);
+				//arrow.setLength(55,4, 100);
 				arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
 		}
 		//end of functions for arrows -----======-----
@@ -158,14 +164,24 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
 			// Initializes calculations and spaces nodes according to a forced layout
 			//takes variables from the startvisualisation method
 		function initialiseConstraints(nodes, spheres, three_links) {
-			// set up the axes
-			var x = d3.scale.linear().domain([0, 300]).range([0, 10]),
-			    y = d3.scale.linear().domain([0, 300]).range([0, 10]),
-			    z = d3.scale.linear().domain([0, 300]).range([0, 10]);
+			//suggestion: depth of nodes determines the range: domain[10(minimum distance of nodes), depth*50]
+			var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
+			    y = d3.scale.linear().domain([0, 300]).range([-1, 15]),
+			    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
 
 			for (var key in nodes) {
 				spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 				labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
+					
+				//spheres[key].position.set(x(nodes[key].x) * 20 - 20, y(nodes[key].y) * 20 - 20, z(nodes[key].z) * 20 - 20);
+				//labels[key].position.set(x(nodes[key].x) * 20 - 20, y(nodes[key].y) * 20 - 20, z(nodes[key].z) * 20 - 20);	
+				
+				//place current node in the center of the canvas
+				if(spheres[key].urlName == stringCurrentConcept){
+					spheres[key].position.set(0, 0, 0);
+					labels[key].position.set(0, 0, 0);	
+				}
+
 					
 				for (var j = 0; j < three_links.length; j++) {
 					var arrow = three_links[j];
@@ -176,18 +192,30 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
 					if (arrow.userData.target === key) {
 						vi = 1;
 					}
-					if (vi >= 0) {
-						if (vi == 0) {
+					if (vi >= 0 ) {
+						if (vi == 0 ) {
 							var vectOrigin = new THREE.Vector3(spheres[key].position.x, spheres[key].position.y, spheres[key].position.z);
 							setArrowOrigin(arrow, vectOrigin, spheres);
 						}
-						if (vi == 1) {
+						if (vi == 1 ) {
 							var vectTarget = new THREE.Vector3(spheres[key].position.x, spheres[key].position.y, spheres[key].position.z);
 							setArrowTarget(arrow, vectTarget);
 						}
 					}
 				}
+
 			}
+			
+								console.log("three_links:");
+					console.log(three_links);
+					
+					console.log("key in nodes");
+					console.log(key);
+					
+					console.log("nodes array");
+					console.log(nodes);
+			
+			
 			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
 		
@@ -204,9 +232,6 @@ console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the ur
 		//colors the ball that is being clicked, serves no real purpose yet.
 		function onDocumentMouseDown(event){
 			event.preventDefault();
-			
-console.log("SNAPT HIJ DIT NIETTTT");
-console.log(VisualisationJsModule.camera);
 			colorSelectedSphere(event, mouse); //Mouse and camera are global variables.
 		}
 		
@@ -221,7 +246,9 @@ console.log(VisualisationJsModule.camera);
 			
 		// Visualize RDF data
 		//will create nodes(spheres), labels and arrows and positions them.
-		function visualize(nodes, spheres, nodelinks, three_links) {
+		function visualize(nodes, nodelinks) {
+			var three_links = [];
+			var spheres = [];
 				// Create nodes and randomize default position
 				for (var key in nodes) {
 					if (nodes.hasOwnProperty(key)) {
@@ -237,7 +264,7 @@ console.log(VisualisationJsModule.camera);
 
 						// create the sphere's material and color
 						var sphereMaterial; //TODO onderstaande line zal aangepast moeten worden als deze op andere thesauri (dan tzw:) toegepast moet worden
-						if(nodes[key].name.removeSpecialCharacters().lowerCaseFirstLetter() === stringCurrentConcept.slice(4)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green
+						if("TZW:" + nodes[key].name.toString().compareStrings(stringCurrentConcept.slice(4), true, true)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green
 							sphereMaterial = new THREE.MeshPhongMaterial({
 								color : JSONStyleSheet.jsonStyle.THREEColourScheme.nodes.centerNode
 							});												
@@ -292,20 +319,101 @@ console.log(VisualisationJsModule.camera);
 		}
 	
 	function createArrows(three_links, nodelinks, nodes){
+							console.log(" nodelinks[i]");
+		console.log( nodelinks);
+		
+		
+		
 		for (var i = 0; i < nodelinks.length; i++) {
 				var origin = new THREE.Vector3(50, 100, 50);
 				var terminus = new THREE.Vector3(75, 75, 75);
 				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 				var distance = origin.distanceTo(terminus);
-				var arrow = new THREE.ArrowHelper(direction, origin, distance, JSONStyleSheet.jsonStyle.THREEColourScheme.arrows.defaultArrow);
-				arrow.userData = {
-					target : nodes[nodelinks[i].target.name].name,
-					source : nodes[nodelinks[i].source.name].name
+				
+				
+				if(nodelinks[i].type === "Eigenschap-3ASkos-3Arelated"){
+					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.related').style('color')); //TODO	
+					setArrowData(three_links, direction, origin, distance, "grey", nodes, nodelinks[i]);
+					
+				}                             
+				else if((nodelinks[i].type === "Eigenschap-3ASkosem-3Abroader") && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
+					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.broader').style('color')); //TODO		
+					console.log(' deze pijl is broader dan de center node');	
+					setArrowData(three_links, direction, origin, distance, "blue", nodes, nodelinks[i]);			
+				}				 //if(nodelinks[i].type === "Eigenschap-3ASkosem-3Anarrower"  &&& nodelinks[i].source.name == currentPageName);
+				else if((nodelinks[i].type.compareStrings("Eigenschap-3ASkosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
+					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.narrower').style('color')); //TODO		
+					console.log(' deze pijl is narrower dan de center node');
+					setArrowData(three_links, direction, origin, distance, "red", nodes, nodelinks[i]);
+				}
+				else{
+					console.log("ik heb geen nodelinks kunnen vinden dus heb de errow geen kleurtje kunnen geven");
+					//var arrow = new THREE.ArrowHelper(direction, origin, distance, "green"); //TODO
+					return;
+					//setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);
 				};
 				
-				VisualisationJsModule.scene.add(arrow);
-				three_links.push(arrow);
-		}		
+		//console.log(" arrow![i]");
+		//console.log( arrow);
+		
+				
+				
+			console.log(' "TZW:" + nodelinks[i].source.name ');
+			//console.log("TZW:" + nodelinks[i].source.name.lowerCaseFirstCharacter()); //met hoohdletter
+			console.log(currentPageName); //zonder hlette
+
+			
+				//TODO js module = color gedefinieerd jsmodule.color.broaderarrow
+				
+				
+				
+				//TODO if (check relatie), stel source OF target in
+				//nodelinks[i].type = relatietype, zit hier broader of narrower in?
+				
+				//if narrower: draai target en source om?
+				
+				//if related: teken geen cone (maak geen userdata)
+//				arrow.userData = {
+//					target : nodes[nodelinks[i].target.name].name,
+//					source : nodes[nodelinks[i].source.name].name
+//				};
+				
+				
+//				var x = Math.floor((Math.random() * 10) + 1);
+//				if(x <= 7 ){					
+//					arrow.userData = {
+//						target : nodes[nodelinks[i].target.name].name,
+//						source : nodes[nodelinks[i].source.name].name
+//					};
+//					
+//					VisualisationJsModule.scene.add(arrow);			
+//					three_links.push(arrow);
+//				}else{return;};
+				
+				
+
+
+
+				
+		}	
+		
+				console.log(" thee linksi]");
+		console.log( three_links);
+
+		
+						
+	}
+	
+	//function for setting the data and creating the new arrow
+	function setArrowData(three_links, direction, origin, distance, arrowColor, nodes, currentNodeLink){
+		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); //TODO		
+		arrow.userData = {
+					target : nodes[currentNodeLink.target.name].name,
+					source : nodes[currentNodeLink.source.name].name
+		};
+		
+		VisualisationJsModule.scene.add(arrow);			
+		three_links.push(arrow);
 	}
 	
 	//adds lightsources to the scene, for aesthetic purposes
@@ -359,7 +467,7 @@ console.log(VisualisationJsModule.camera);
 		}
 		
 
-		var depth = typeof depth !== 'undefined' ? depth : 2 ;
+		var depth = typeof depth !== 'undefined' ? depth : 1 ;
 		
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
@@ -389,25 +497,17 @@ console.log(VisualisationJsModule.camera);
 	var drawNewObjectsWithAjaxData = function (result) {
 		console.log("DATA");
 		console.log(result);
-		//console.log(currentPageq);
-		console.log(currentPageName);
-	console.log(currentPage);
-		
-			// Create controls (orbitcontrols)		
-			//var controls = new THREE.OrbitControls(camera);		//TODO kan controls verplaatst worden? maak nu naar ieder call nieuwe controls..
-			//var controls = new THREE.OrthographicTrackballControls(camera);	
-			//var controls = new THREE.PointerLockControls(camera);	
-			
 			
 			// Create arrays for spheres and links
 			//var spheres = [], //Contains spheres
-			three_links = [];
+			
 			//Contains arrows
 			labels = [];
 			//Contains label sprites
 
-			var spheres = [];
+			
 			var nodelinks = JSON.parse(result);
+			
 			var nodes = [];
 
 			// Compute the distinct nodes from the links.
@@ -423,7 +523,7 @@ console.log(VisualisationJsModule.camera);
 			});
 
 			VisualisationJsModule.camera.updateProjectionMatrix();
-			visualize(nodes, spheres, nodelinks, three_links);
+			visualize(nodes, nodelinks);
 			animate(); 				
 			
 			// Animate the webGL objects for rendering
@@ -457,8 +557,11 @@ $(document).ready(function() {
 	function initialiseTHREEComponents(){ //current page name als concept meen
 		VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
 		console.log("initialise three components wordt hier aangeroepen");
+		//var containerHEIGHT = VisualisationJsModule.height;
+		//var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		var containerHEIGHT = VisualisationJsModule.height;
 		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
+		
 		
 		console.log("currentpage");		
 		console.log(currentPage);
@@ -470,9 +573,10 @@ $(document).ready(function() {
 		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
 		//the style of the canvas
-		d3.select("#" + containerDivId).style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.layout.backGround)
-			.style("width",containerWIDTH + "px")
-			.style("height",containerHEIGHT + "px");
+//		d3.select("#" + containerDivId).style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.layout.backGround)
+//			d3.select("#" + containerDivId)
+//			.style("width",containerWIDTH + "px")
+//			.style("height",containerHEIGHT + "px");
 		
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
@@ -519,6 +623,11 @@ $(document).ready(function() {
 		//depth = createSlider.HEIGHT;
 		//console.log(slidertje.sliderDepth);
 		
+
+
+	 
+		
+		
 		
 	}
 	
@@ -561,6 +670,51 @@ $(document).ready(function() {
 				strArray.splice(-1, 1); //remove last part of str
 				var joinedString = strArray.join("/")+"/";
 				return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
+			}
+			
+			//Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.
+			String.prototype.compareStrings = function (string2, ignoreCase, useLocale) {
+				var string1 = this;
+				if (ignoreCase) {
+					if (useLocale) {
+						string1 = string1.toLocaleLowerCase();
+						string2 = string2.toLocaleLowerCase();
+					}
+					else {
+						string1 = string1.toLowerCase();
+						string2 = string2.toLowerCase();
+					}
+				}
+				return string1 === string2;
+			}
+			
+			
+			function getStyle2(CLASSname) {
+					var styleSheets = window.document.styleSheets;
+					var styleSheetsLength = styleSheets.length;
+					for(var i = 0; i < styleSheetsLength; i++){
+						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
+						else { 
+							try {  if(!styleSheets[i].cssRules) {continue;} } 
+							//Note that SecurityError exception is specific to Firefox.
+							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
+							var classes = styleSheets[i].cssRules ;
+						}
+						for (var x = 0; x < classes.length; x++) {
+							if (classes[x].selectorText == CLASSname) {
+					 return classes[x];
+					 //console.log(classes[x]);
+					 //console.log(classes[x].style["font-family"]);
+					 //console.log(classes[x].style.color);
+					 //console.log(classes[x].style["font-size"]);
+								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
+								return ret;
+							}
+						}
+					}
+					return null;
+			
 			}
 	}		
 });
