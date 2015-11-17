@@ -30,6 +30,9 @@ $querybuilder = new QueryBuilder($depth, $concept,$SMWServer);
 $query = $querybuilder -> generateQuery($_POST["relations"]);
 
 //execute query
+//replace url-encoded chars. Problem: % has been replaced with -
+//this is a workaround. Possible problems occur with a %-sign.
+//TODO alternative is to replace -3A with :, and -2D with -
 $result =  str_replace("%", "-", urldecode ( str_replace("-", "%", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
 
 						file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
