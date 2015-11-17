@@ -30,10 +30,10 @@ $querybuilder = new QueryBuilder($depth, $concept,$SMWServer);
 $query = $querybuilder -> generateQuery($_POST["relations"]);
 
 //execute query
-$result = file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query));
+$result =  str_replace("%", "-", urldecode ( str_replace("-", "%", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
 
-						//file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
-						//file_put_contents('php://stderr', print_r($result, TRUE));
+						file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
+						file_put_contents('php://stderr', print_r($result, TRUE));
 
 // Parse data
 
