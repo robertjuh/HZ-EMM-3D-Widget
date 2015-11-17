@@ -1,13 +1,11 @@
-console.log("en we gaan beginnen vent");
+console.log("Het programma is gestart");
 
-//var htmlElementID = 'canvasje';
 
-	
+
+	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
+	var targetDivId = 'bodyContent'; //bodyContent
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
 	var containerDivId = containerDiv[0][0].id;
-
-	//targetDivId kan een element op de mediawiki zijn.
-	var targetDivId = 'bodyContent'; //bodyContent
 	
 	console.log("target class ");
 	console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
@@ -20,7 +18,7 @@ console.log("en we gaan beginnen vent");
 	console.log(document.getElementById("catlinks"));	//klikt niet goe
 	console.log(document.getElementById("firstheading"));	//niks
 	console.log(document.getElementById('mw-content-text'));	//werkt niet / scheve klik
-	console.log(document.getElementById('mw-navigation'));	//goed`! onderaan pagina
+	console.log(document.getElementById('mw-navigation'));	//goed! onderaan pagina
 /**
  * @author NJK @author robertjuh
  * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
@@ -30,18 +28,12 @@ console.log("en we gaan beginnen vent");
  var startVisualisation = (function(currentPageName){
 
 	 
-	 console.log("startvisualisation is opgeroepee");
+	 console.log("startvisualisation is opgeroepen");
 
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
 		var	mouse = new THREE.Vector2();
-		
-		//THREE drawing items
-		//var VisualisationJsModule.container;
-		//var scene;
-		//var renderer;
-		//var camera;		
 		
 		var currentPage = currentPageName;
 		
@@ -115,21 +107,11 @@ console.log("en we gaan beginnen vent");
 		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
-//				for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) {						
-//					//does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
-//					if(VisualisationJsModule.scene.children[i].geometry != null | VisualisationJsModule.scene.children[i].type == "Object3D"){
-//						VisualisationJsModule.scene.remove(VisualisationJsModule.scene.children[i]);	
-//					}
-//				};
 			clearCanvas();
 			//stringCurrentConcept = "TZW:" + conceptNameString.removeSpecialCharacters().lowerCaseFirstLetter(); //TODO formats so SPARQL can read, this is just for the testing environment
 			//currentConcept = stringCurrentConcept;
-
 			
 			 window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;			
-			//initialiseDrawingSequence(currentConcept); 
-			//initialiseDrawingSequence(window.location.href.getFirstPartOfUrl() + conceptNameString); 
-			
 			}		
 		}
 		
@@ -172,10 +154,7 @@ console.log("en we gaan beginnen vent");
 			for (var key in nodes) {
 				spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 				labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
-					
-				//spheres[key].position.set(x(nodes[key].x) * 20 - 20, y(nodes[key].y) * 20 - 20, z(nodes[key].z) * 20 - 20);
-				//labels[key].position.set(x(nodes[key].x) * 20 - 20, y(nodes[key].y) * 20 - 20, z(nodes[key].z) * 20 - 20);	
-				
+
 				//place current node in the center of the canvas
 				if(spheres[key].urlName == stringCurrentConcept){
 					spheres[key].position.set(0, 0, 0);
@@ -206,16 +185,12 @@ console.log("en we gaan beginnen vent");
 
 			}
 			
-								console.log("three_links:");
-					console.log(three_links);
-					
-					console.log("key in nodes");
-					console.log(key);
+					console.log("spheres");
+					console.log(spheres);
 					
 					console.log("nodes array");
 					console.log(nodes);
-			
-			
+						
 			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
 		
@@ -319,27 +294,23 @@ console.log("en we gaan beginnen vent");
 		}
 	
 	function createArrows(three_links, nodelinks, nodes){
-							console.log(" nodelinks[i]");
-		console.log( nodelinks);
-		
-		
+		console.log(" nodelinks array");
+		console.log( nodelinks);		
 		
 		for (var i = 0; i < nodelinks.length; i++) {
 				var origin = new THREE.Vector3(50, 100, 50);
 				var terminus = new THREE.Vector3(75, 75, 75);
 				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 				var distance = origin.distanceTo(terminus);
-				
-						
+										
 				if(nodelinks[i].type.compareStrings("Eigenschap-3ASkos-3Arelated", true, true)){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.related').style('color')); //TODO	
-					setArrowData(three_links, direction, origin, distance, "grey", nodes, nodelinks[i]);
-					
+					setArrowData(three_links, direction, origin, distance, "grey", nodes, nodelinks[i]);					
 				}                             
 				else if((nodelinks[i].type === "Eigenschap-3ASkosem-3Abroader") && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.broader').style('color')); //TODO		
 					console.log(' deze pijl is broader dan de center node');	
-					setArrowData(three_links, direction, origin, distance, "blue", nodes, nodelinks[i]);			
+					setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);			
 				}				 //if(nodelinks[i].type === "Eigenschap-3ASkosem-3Anarrower"  &&& nodelinks[i].source.name == currentPageName);
 				else if((nodelinks[i].type.compareStrings("Eigenschap-3ASkosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.narrower').style('color')); //TODO		
@@ -353,53 +324,28 @@ console.log("en we gaan beginnen vent");
 					//setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);
 				};
 				
-				
-			console.log(' "TZW:" + nodelinks[i].source.name ');
-			//console.log("TZW:" + nodelinks[i].source.name.lowerCaseFirstCharacter()); //met hoohdletter
-			console.log(currentPageName); //zonder hlette
-
-			
-				//TODO js module = color gedefinieerd jsmodule.color.broaderarrow
-				
-				
-				
 				//TODO if (check relatie), stel source OF target in
 				//nodelinks[i].type = relatietype, zit hier broader of narrower in?
 				
 				//if narrower: draai target en source om?
 				
-				//if related: teken geen cone (maak geen userdata)
-//				arrow.userData = {
-//					target : nodes[nodelinks[i].target.name].name,
-//					source : nodes[nodelinks[i].source.name].name
-//				};
-				
-				
-//				var x = Math.floor((Math.random() * 10) + 1);
-//				if(x <= 7 ){					
-//					arrow.userData = {
-//						target : nodes[nodelinks[i].target.name].name,
-//						source : nodes[nodelinks[i].source.name].name
-//					};
-//					
-//					VisualisationJsModule.scene.add(arrow);			
-//					three_links.push(arrow);
-//				}else{return;};
-				
-				
-
-
-
-				
+				//if related: teken geen cone (maak geen userdata)				
 		}	
 		
-				console.log(" thee linksi]");
+		console.log(" thee links");
 		console.log( three_links);
-
-		
 						
 	}
 	
+	
+	/*
+	* Function for adding arrows to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
+	* Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the three_links data.
+	*
+	* @param three_links: array which is used in initialiseconstraints() for determining the targets and sources of each arrow that is made here.
+	* @param direction, origin, distance, arrowColor: these are standart THREE.arrowhelper parameters for setting the data of the arrow.
+	* @param nodes: the array of nodes that will be searched and matches the current given node to produce the right target and source for the given node.
+	*/
 	//function for setting the data and creating the new arrow
 	function setArrowData(three_links, direction, origin, distance, arrowColor, nodes, currentNodeLink){
 		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); //TODO		

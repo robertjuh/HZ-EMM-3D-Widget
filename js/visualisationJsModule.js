@@ -18,36 +18,15 @@ var VisualisationJsModule = (function () {
 	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
 	d3.select('#classContainer').append('div').attr("class","sphere centersphere").style("display", "none");
 	
-	
-	
 		
 	d3.select('#classContainer').append('div').attr("class","slider").style("display", "none");	
 	
 	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
-	
-	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");	
-	
-	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");	
-	
-	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
-	
-	
 
 	
-//	var containerStyleAttributes = d3.select('.containerAttributes');
-//	var WIDTH=parseInt(containerStyleAttributes.style('width'));
-//	var HEIGHT=parseInt(containerStyleAttributes.style('height'));
-	
 
-
-var WIDTH=parseInt(d3.select('.containerAttributes').style('width'));
-var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'));
-	
-
-
-console.log(d3.select('.containerAttributes').style('colorNarrower'));	
-console.log(d3.select('.containerAttributes').style('colorNarrower'));	
-
+	var WIDTH=parseInt(d3.select('.containerAttributes').style('width'));
+	var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'));
 
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
@@ -59,16 +38,7 @@ console.log(d3.select('.containerAttributes').style('colorNarrower'));
 	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
-	
-	
-//	var heyaa = d3.select("div").append("div:div");
-//	console.log("heyaaa=");
-//	console.log(heyaa);	
-	//"private" method:
-	var myPrivateMethod = function () {
-		console.log("I can be accessed only from within YAHOO.myProject.myModule");
-	}
-	
+		
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
 		height : HEIGHT,
