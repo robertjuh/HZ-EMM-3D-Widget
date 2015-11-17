@@ -18,7 +18,12 @@ class NodeMapVisitor extends Visitor {
 			foreach ($concept -> getProperties() as $key => $property) {
 			  $item[$key] = $property;
 			}
-			array_push($this -> nodedata, $item);
+			$item["url"] = $concept -> getProperty("page");
+			$source = $item["name"];
+					//name : link.source,
+					//url : link.urlsource
+			//array_push($this -> nodedata, array($source  => $item));
+			$this -> nodedata[$source]=$item;
 			//TODO make javascript able to receive type: node
 			//in visualisation.js add
 			//line 302: 		if (nodelinks[i].source)
@@ -66,11 +71,28 @@ class NodeMapVisitor extends Visitor {
 
 	function getUsableJSON() {
 		$nodeitem=array();
-		$nodeitem["nodes"]=$this -> nodedata;
 
 		//TODO make javascript able to receive type: node
 		//then uncomment next line
-		//array_push($this -> data, $nodeitem);
+		//$this -> data["relations"]=$this -> data;
+		//$this -> data["nodes"]=$this -> nodedata;
+//code in javascript can become:
+/*
+			var jsonResult = JSON.parse(result);
+			var nodes = jsonResult.nodes;
+			var nodelinks = jsonResult.relations;
+
+			// replace the description of the source and target of the links with the actual nodes.
+			nodelinks.forEach(function(link) {
+			  {
+				link.source = nodes[link.source] ;
+				link.target = nodes[link.target];
+			  }
+			});
+			VisualisationJsModule.camera.updateProjectionMatrix();
+			visualize(nodes, [], nodelinks, []);
+
+*/
 		return json_encode($this -> data);
 	}
 

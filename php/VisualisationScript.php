@@ -17,8 +17,6 @@ $fusekiDataset='http://localhost:3030/ds';
 //$wgEM3DNavigatorUri='http://192.168.238.133/index.php/Speciaal:URIResolver';
 //$wgFusekiDataset='http://localhost:3030/ds';
 
-//@Robert: vervang met je eigen server-gegevens!?$SMWServer = "http://192.168.238.133/index.php/Speciaal:URIResolver";
-
 //replace with parameter from calling script, if passed
 if (isset($_POST['uri']))
   $SMWServer=$_POST['uri'];
