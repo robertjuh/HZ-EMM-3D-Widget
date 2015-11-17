@@ -440,7 +440,7 @@ console.log("Het programma is gestart");
 		//gets called after the ajax call
 	var drawNewObjectsWithAjaxData = function (result) {
 		console.log("DATA");
-		console.log(result);
+		//console.log(result);
 			
 			// Create arrays for spheres and links
 			//var spheres = [], //Contains spheres
@@ -450,20 +450,19 @@ console.log("Het programma is gestart");
 			//Contains label sprites
 
 			
-			var nodelinks = JSON.parse(result);
-			
-			var nodes = [];
+			var jsonResult = JSON.parse(result);
+			var nodes = jsonResult.nodes;
+			var nodelinks = jsonResult.relations;
+			console.log(jsonResult);
+			console.log(nodes);
+			console.log(nodelinks);
 
-			// Compute the distinct nodes from the links.
+			// replace the description of the source and target of the links with the actual nodes.
 			nodelinks.forEach(function(link) {
-				link.source = nodes[link.source] || (nodes[link.source] = {
-					name : link.source,
-					url : link.urlsource
-				});
-				link.target = nodes[link.target] || (nodes[link.target] = {
-					name : link.target,
-					url : link.urltarget
-				});
+			  {
+				link.source = nodes[link.source] ;
+				link.target = nodes[link.target];
+			  }
 			});
 
 			VisualisationJsModule.camera.updateProjectionMatrix();

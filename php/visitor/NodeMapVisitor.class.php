@@ -7,29 +7,22 @@ class NodeMapVisitor extends Visitor {
 	private $nodedata = array();
 
 	function visit(SKOSConcept $concept) {
+		//first add node-info to nodedata
+		$arr = array();
+		$item = array();
+		//$item["type"] = "node";
+		$item["name"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
+		$item["distance"] = $concept->distance;
+		foreach ($concept -> getProperties() as $key => $property) {
+		  $item[$key] = $property;
+		}
+		$item["url"] = $concept -> getProperty("page");
+		$source = $item["name"];
+		$this -> nodedata[$source]=$item;
+		//now add relation-info to data
 		$relations = $concept -> getRelations();
 		if (count($relations) != 0) {
-			//first add node-info to nodedata
-			$arr = array();
-			$item = array();
-			//$item["type"] = "node";
-			$item["name"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
-			$item["distance"] = $concept->distance;
-			foreach ($concept -> getProperties() as $key => $property) {
-			  $item[$key] = $property;
-			}
-			$item["url"] = $concept -> getProperty("page");
-			$source = $item["name"];
-					//name : link.source,
-					//url : link.urlsource
-			//array_push($this -> nodedata, array($source  => $item));
-			$this -> nodedata[$source]=$item;
-			//TODO make javascript able to receive type: node
-			//in visualisation.js add
-			//line 302: 		if (nodelinks[i].source)
-			//line 415 (or 416 if previous line added):if (link.source)
 
-			//now add relation-info to data
 			foreach ($relations as $key => $relation) {
 				foreach ($relation as $object) 
 				    if (!strpos($key, "narrower")){//omit narrower because always broader equivalnet present
@@ -70,13 +63,11 @@ class NodeMapVisitor extends Visitor {
 	}
 
 	function getUsableJSON() {
-		$nodeitem=array();
+		$temparray=array();
 
-		//TODO make javascript able to receive type: node
-		//then uncomment next line
-		//$this -> data["relations"]=$this -> data;
-		//$this -> data["nodes"]=$this -> nodedata;
-//code in javascript can become:
+		$temparray["relations"]=$this -> data;
+		$temparray["nodes"]=$this -> nodedata;
+//code in javascript that processes this structure
 /*
 			var jsonResult = JSON.parse(result);
 			var nodes = jsonResult.nodes;
@@ -93,7 +84,7 @@ class NodeMapVisitor extends Visitor {
 			visualize(nodes, [], nodelinks, []);
 
 */
-		return json_encode($this -> data);
+		return json_encode($temparray);
 	}
 
 }
