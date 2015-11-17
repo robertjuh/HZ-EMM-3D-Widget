@@ -28,7 +28,6 @@ class NodeMapVisitor extends Visitor {
 				    if (!strpos($key, "narrower")){//omit narrower because always broader equivalnet present
 					$item = array();
 					$item["type"] = $key;
-					$item["distance"] = $object->distance;//TODO if nodevalues are passed, this can be removed
 					switch (true) {					
 						case strpos($key, "broader") :
 							$item["urlsource"] = $concept -> getProperty("page");
