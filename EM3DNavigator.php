@@ -19,7 +19,7 @@ $wgResourceModules['ext.EM3DNavigator'] = array(
 
 
 $wgAutoloadClasses['VisualisationScript'] = __DIR__.'/php/VisualisationScript.php';
-$wgAutoloadClasses['EM3DNavigatorHooks'] = __DIR__.'/php/EM3DNavigator.Hooks.php';
+$wgAutoloadClasses['EM3DNavigatorHooks'] = __DIR__.'/EM3DNavigator.Hooks.php';
 global $wgEM3DNavigatorUri;
 
 $wgEM3DNavigatorUri='http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver';

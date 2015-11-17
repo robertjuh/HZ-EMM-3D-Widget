@@ -4,6 +4,8 @@ include_once (__DIR__ . '/DataParser.class.php');
 include_once (__DIR__ . '/visitor/NodeMapVisitor.class.php');
 include_once (__DIR__ . '/ChromePhp.php');
 
+$concept=$_POST["concept"];
+
 //called by javascript. Started in mediawiki-page by: {{#widget:EM3DNavigator| currentPageName={{PAGENAME}}}}
 
 // Load data
@@ -25,7 +27,7 @@ if (isset($_POST['fusekidataset']))
 //TODO:check sanity of parameters depth,concept and relations
 //otherwise use default values
 $depth=intval ($_POST["depth"]);
-$querybuilder = new QueryBuilder($depth, $_POST["concept"],$SMWServer);
+$querybuilder = new QueryBuilder($depth, $concept,$SMWServer);
 
 $query = $querybuilder -> generateQuery($_POST["relations"]);
 
@@ -41,6 +43,7 @@ $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
 //file_put_contents('php://stderr', print_r(json_decode($result, true), TRUE));
 
+$parser -> calcDistances($parser -> getStart($concept,$objects));
 // Handle data
 $visitor = new NodeMapVisitor();
 foreach ($objects as $object) {

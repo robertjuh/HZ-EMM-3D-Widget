@@ -4,6 +4,10 @@ require (__DIR__ . '/Concept.class.php');
 class SKOSConcept extends Concept {
 
 	//Global Variables
+//TODO make visited,parent and distance private
+	public $visited;
+	public $parent;
+	public $distance=1000000;
 	private $relations = array();
 	private $properties = array();
 	private $name;
@@ -44,6 +48,13 @@ class SKOSConcept extends Concept {
 			$this -> relations[$relationName] = array($relationValue);
 	}
 	
+	/**
+	 * Returns an array of all properties
+	 */
+	public function getProperties() {
+		return $this->properties;
+	}
+
 	/**
 	 * Returns an array of all relations
 	 */

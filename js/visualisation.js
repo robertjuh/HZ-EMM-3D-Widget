@@ -261,10 +261,10 @@ console.log("en we gaan beginnen vent");
 						var radius = 5,
 						    segments = 32,
 						    rings = 32;
-
+	
 						// create the sphere's material and color
 						var sphereMaterial; //TODO onderstaande line zal aangepast moeten worden als deze op andere thesauri (dan tzw:) toegepast moet worden
-						if("TZW:" + nodes[key].name.toString().compareStrings(stringCurrentConcept.slice(4), true, true)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green
+						if(nodes[key].name.compareStrings(stringCurrentConcept.slice(4), true, true)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green //TODO split.pop(:)?
 							sphereMaterial = new THREE.MeshPhongMaterial({
 								color : JSONStyleSheet.jsonStyle.THREEColourScheme.nodes.centerNode
 							});												
@@ -330,8 +330,8 @@ console.log("en we gaan beginnen vent");
 				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 				var distance = origin.distanceTo(terminus);
 				
-				
-				if(nodelinks[i].type === "Eigenschap-3ASkos-3Arelated"){
+						
+				if(nodelinks[i].type.compareStrings("Eigenschap-3ASkos-3Arelated", true, true)){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.related').style('color')); //TODO	
 					setArrowData(three_links, direction, origin, distance, "grey", nodes, nodelinks[i]);
 					
@@ -352,10 +352,6 @@ console.log("en we gaan beginnen vent");
 					return;
 					//setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);
 				};
-				
-		//console.log(" arrow![i]");
-		//console.log( arrow);
-		
 				
 				
 			console.log(' "TZW:" + nodelinks[i].source.name ');

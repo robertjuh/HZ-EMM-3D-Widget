@@ -1,6 +1,15 @@
 <?php
 require_once (__DIR__ . '/visitor/SKOSConcept.class.php');
 
+class PriorityQueue extends SplPriorityQueue
+{
+    public function compare($a, $b)
+    {
+        if ($a === $b) return 0;
+        return $a > $b ? -1 : 1;
+    }
+}
+ 
 class DataParser {
 	private $data;
 
@@ -108,5 +117,51 @@ class DataParser {
 		// });
 	}
 
+	function calcDistances($start)
+	{
+	    // define an empty queue
+	    $q = new PriorityQueue();
+	
+	    // push the starting vertex into the queue
+	    $q->insert($start, 0);
+	    $q->rewind();
+	
+	    // mark the distance to it 0
+	    $start->distance = 0;
+	
+	    while ($q->valid()) {
+		$t = $q->extract();
+		$t->visited = 1;
+	
+	    foreach ($t->getRelations() as $key => $relation) {
+		foreach ($relation as $object) {
+		    if (!$object->visited) {
+			if ($object->distance > $t->distance + 1) {
+			    $object->distance = $t->distance + 1;
+			    $object->parent = $t;
+			}
+	
+	
+			$q->insert($object, $object->distance);
+		    }
+		}
+	      }
+	      $q->recoverFromCorruption();
+	      $q->rewind();
+	    }
+	}
+	/*
+	get starting node of list of objects
+	*/
+	function getStart($concept,$objects){
+	    $start=null;
+	    foreach ($objects as $item) {
+	      $itemName=str_replace("-3A",":",$item->getName());
+	      if(strpos($itemName,$concept)>0)
+	      $start=$item;
+	    }
+	    
+	    return $start;
+	}
 }
 ?>
