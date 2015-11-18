@@ -416,6 +416,9 @@ console.log("Het programma is gestart");
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
+		console.log("het concept is");
+		console.log(concept);
+		
 		$.ajax({
 			type : "POST",
 			cache : false,
