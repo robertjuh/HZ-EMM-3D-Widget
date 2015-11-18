@@ -6,25 +6,28 @@
 
 /* container represents the div that everything is being drawn on*/
 .containerAttributes{
-	color: rgb(100,2,31) ;
-	background-color: rgb(29,22,235) ;
+
 	height: 456px;
 	width: 456px;
-	
-
+	font: Bold 35px Arial;
+	/* font: Bold 30px Open_Sans; */
 
 }
 
 
 
-
-
-
-.slider{
-	color: rgb(210,2,35) ;
+.sliderAttributes.background{
+	background: rgb(229,222,205);
 }
 
+.sliderAttributes.sliderButton{
+	color: rgb(10,24,111);
+}
 
+.sliderAttributes.sliderPolygon{
+	color: rgb(29,20,205);
+	background: rgb(229,200,205);
+}
 
 
 .sphere{
@@ -52,4 +55,10 @@
 
 .arrow.related{
 	color: steelblue;
+}
+
+
+
+.nodeTextLabel{
+	color: black;
 }

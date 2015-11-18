@@ -31,14 +31,13 @@ console.log(sliderDiv);
 var svgContainer = d3.select("#sliderDiv").append("svg")
 	.attr("width", containerWidth)
 	.attr("height", containerHeight)
-	.style("background", JSONStyleSheet.jsonStyle.THREEColourScheme.slider.backGround);
+	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
 	
 console.log(svgContainer);
 
 var depthScale = d3.scale.linear()
         .domain([0,5])
         .range([0,100]);
-console.log(depthScale(3)); //TODO dit levert 60 op, ik kan hier de slider length gebruiken en threshholds maken
 
 //de "volume" driehoek
 var vis = d3.select("svg").append("svg")
@@ -59,13 +58,9 @@ vis.selectAll("polygon")
   .enter().append("polygon")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
-    .attr("fill", JSONStyleSheet.jsonStyle.THREEColourScheme.slider.polygonColor)
-    .attr("stroke",JSONStyleSheet.jsonStyle.THREEColourScheme.slider.sliderBorderColor)
+    .attr("fill",  VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.background )
+    .attr("stroke", VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.color )
     .attr("stroke-width",2);
-
-
-
-
 
 
   
@@ -80,7 +75,7 @@ vis.selectAll("polygon")
 
 //de sliderbutton
 var sliderAttr = [
-  { "rx": sliderOffsetSides/2, "ry": containerHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides),  "color" : JSONStyleSheet.jsonStyle.THREEColourScheme.slider.sliderColour }];	
+  { "rx": sliderOffsetSides/2, "ry": containerHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides)}];	
 	
 //naar boven plaatsen??????????????????
 var sliderRect = svgContainer.selectAll("rect")
@@ -96,7 +91,7 @@ var rectangleAttributes = sliderRect
                           .attr("y", function (d) { return d.ry; })
                           .attr("height", function (d) { return d.height; })
                           .attr("width", function (d) { return d.width; })
-                         .style("fill", "steelblue");
+                         .style("fill", VisualisationJsModule.getStyle(".sliderAttributes.sliderButton").style.color );
 	
 
 

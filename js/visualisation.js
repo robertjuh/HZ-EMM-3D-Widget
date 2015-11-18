@@ -264,10 +264,9 @@ console.log("Het programma is gestart");
 						// Create label mesh //TODO functie maken
 						var canvas1 = document.createElement('canvas');
 						var context1 = canvas1.getContext('2d');
-						context1.font = JSONStyleSheet.jsonStyle.THREEColourScheme.layout.nodeLabelFont2;
-						//context1.fillStyle = "rba(0,0,0,0.95)";
-						context1.fillStyle = JSONStyleSheet.jsonStyle.THREEColourScheme.layout.labelTextColor;
-						context1.fillText(nodes[key].name, 0, 20);
+						context1.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
+						context1.fillStyle = VisualisationJsModule.getStyle(".nodeTextLabel").style.color;
+						context1.fillText(nodes[key].name, 10, 30);
 						var texture1 = new THREE.Texture(canvas1);
 						texture1.needsUpdate = true;
 						texture1.magFilter = THREE.NearestFilter;
@@ -278,12 +277,21 @@ console.log("Het programma is gestart");
 							side : THREE.DoubleSide
 						});
 						material1.transparent = true;
-						var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(40, 15), material1);						
+						var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
 						
 						labels[key] = mesh1;
 						VisualisationJsModule.scene.add(mesh1);						
 						
-						createCallbackFunctionForSphere(sphere); 						
+						createCallbackFunctionForSphere(sphere); 		
+
+						//TODO is this another way for label?
+						var spritey = makeTextSprite( " ander labeltje ", 
+							{ fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } );
+						spritey.position.set(0,10,0);
+						VisualisationJsModule.scene.add( spritey );
+
+
+						
 					}
 				}
 
@@ -294,6 +302,85 @@ console.log("Het programma is gestart");
 				VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
 		}
+		
+		
+		
+	//hoort bij ander labeltje	
+	function makeTextSprite( message, parameters ){
+		if ( parameters === undefined ) parameters = {};
+		
+		var fontface = parameters.hasOwnProperty("fontface") ? 
+			parameters["fontface"] : "Arial";
+		
+		var fontsize = parameters.hasOwnProperty("fontsize") ? 
+			parameters["fontsize"] : 18;
+		
+		var borderThickness = parameters.hasOwnProperty("borderThickness") ? 
+			parameters["borderThickness"] : 4;
+		
+		var borderColor = parameters.hasOwnProperty("borderColor") ?
+			parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+		
+		var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
+			parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+			
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext('2d');
+		context.font = "Bold " + fontsize + "px " + fontface;
+		
+		// get size data (height depends only on font size)
+		var metrics = context.measureText( message );
+		var textWidth = metrics.width;
+		
+		// background color
+		context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+									  + backgroundColor.b + "," + backgroundColor.a + ")";
+		// border color
+		context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
+									  + borderColor.b + "," + borderColor.a + ")";
+
+		context.lineWidth = borderThickness;
+		roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.2 + borderThickness, 3);
+		// 1.4 is extra height factor for text below baseline: g,j,p,q.
+		
+		// text color
+		context.fillStyle = "rgba(0, 0, 0, 1.0)";
+
+		context.fillText( message, borderThickness, fontsize + borderThickness);
+		
+		// canvas contents will be used for a texture
+		var texture = new THREE.Texture(canvas) 
+		texture.needsUpdate = true;
+
+		var spriteMaterial = new THREE.SpriteMaterial( 
+			{ map: texture, side : THREE.DoubleSide } );
+			spriteMaterial.transparant = true;
+		var sprite = new THREE.Sprite( spriteMaterial );
+		sprite.scale.set(50,25,1.0);
+		return sprite;	
+	}
+		
+	function roundRect(ctx, x, y, w, h, r){
+			ctx.beginPath();
+			ctx.moveTo(x+r, y);
+			ctx.lineTo(x+w-r, y);
+			ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+			ctx.lineTo(x+w, y+h-r);
+			ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+			ctx.lineTo(x+r, y+h);
+			ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+			ctx.lineTo(x, y+r);
+			ctx.quadraticCurveTo(x, y, x+r, y);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();   
+	}
+		
+		
+		
+		
+		
+		
 	
 	function createArrows(three_links, nodelinks, nodes){
 		console.log(" nodelinks array");
@@ -307,17 +394,18 @@ console.log("Het programma is gestart");
 										
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.related').style('color')); //TODO	
-					setArrowData(three_links, direction, origin, distance, "grey", nodes, nodelinks[i]);					
+					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.related").style.color, nodes, nodelinks[i]);					
 				}                             
 				else if((nodelinks[i].type === "Eigenschap:Skosem:broader") && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.broader').style('color')); //TODO		
 					console.log(' deze pijl is broader dan de center node');	
-					setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);			
+					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.broader").style.color, nodes, nodelinks[i]);			
 				}				 //if(nodelinks[i].type === "Eigenschap:Skosem:narrower"  &&& nodelinks[i].source.name == currentPageName);
+				//TODO onderstaande code werkt niet meer sinds de implementatie van Anton, andere oplossing?
 				else if((nodelinks[i].type.compareStrings("Eigenschap:Skosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.narrower').style('color')); //TODO		
 					console.log(' deze pijl is narrower dan de center node');
-					setArrowData(three_links, direction, origin, distance, "red", nodes, nodelinks[i]);
+					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.narrower").style.color , nodes, nodelinks[i]);
 				}
 				else{
 					console.log("ik heb geen nodelinks kunnen vinden dus heb de errow geen kleurtje kunnen geven");
@@ -325,13 +413,7 @@ console.log("Het programma is gestart");
 					return;
 					//setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);
 				};
-				
-				//TODO if (check relatie), stel source OF target in
-				//nodelinks[i].type = relatietype, zit hier broader of narrower in?
-				
-				//if narrower: draai target en source om?
-				
-				//if related: teken geen cone (maak geen userdata)				
+			
 		}	
 		
 		console.log(" thee links");

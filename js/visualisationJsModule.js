@@ -8,22 +8,6 @@
 
 var VisualisationJsModule = (function () {
 	d3.select('body').append('div').attr("class","containerAttributes").attr("id", "classContainer").style("display", "none");
-	
-	d3.select('#classContainer').append('div').attr("class","arrow narrower").style("display", "none");	
-	d3.select('#classContainer').append('div').attr("class","arrow broader").style("display", "none");	
-	d3.select('#classContainer').append('div').attr("class","arrow related").style("display", "none");
-	d3.select('#classContainer').append('div').attr("class","arrow default").style("display", "none");
-	
-	
-	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
-	d3.select('#classContainer').append('div').attr("class","sphere centersphere").style("display", "none");
-	
-		
-	d3.select('#classContainer').append('div').attr("class","slider").style("display", "none");	
-	
-	d3.select('#classContainer').append('div').attr("class","sphere").style("display", "none");
-
-	
 
 	var WIDTH=parseInt(d3.select('.containerAttributes').style('width'));
 	var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'));
@@ -53,6 +37,7 @@ var VisualisationJsModule = (function () {
 			return size;			
 		},
 
+		//can ask CSS propertys in code as: VisualisationJsModule.getStyle(".className").style.color;
 		getStyle: function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;
