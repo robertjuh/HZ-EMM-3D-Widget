@@ -225,7 +225,7 @@ console.log("Het programma is gestart");
 		//will create nodes(spheres), labels and arrows and positions them.
 		function visualize(nodes, nodelinks) {
 		  //grootte = grootte scherm
-		  /*var grootte=50;
+		  var grootte=200;
 		  //nodes =array met nodes
 
 		  //- bepaal het maximum niveau van alle nodes
@@ -271,16 +271,16 @@ console.log("Het programma is gestart");
 			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
-		  }*/
+		  }
 			var three_links = [];
 			var spheres = [];
 				// Create nodes and randomize default position
 				for (var key in nodes) {
 					if (nodes.hasOwnProperty(key)) {
 						var val = nodes[key];
-						nodes[key].x = Math.floor((Math.random() * 100) + 1);
-						nodes[key].y = Math.floor((Math.random() * 100) + 1);
-						nodes[key].z = Math.floor((Math.random() * 100) + 1);
+						//nodes[key].x = Math.floor((Math.random() * 100) + 1);
+						//nodes[key].y = Math.floor((Math.random() * 100) + 1);
+						//nodes[key].z = Math.floor((Math.random() * 100) + 1);
 						
 						// set up the sphere vars
 						var radius = 5,
