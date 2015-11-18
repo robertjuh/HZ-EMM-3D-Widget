@@ -225,7 +225,7 @@ console.log("Het programma is gestart");
 		//will create nodes(spheres), labels and arrows and positions them.
 		function visualize(nodes, nodelinks) {
 		  //grootte = grootte scherm
-		  var grootte=100;
+		  /*var grootte=50;
 		  //nodes =array met nodes
 
 		  //- bepaal het maximum niveau van alle nodes
@@ -254,33 +254,33 @@ console.log("Het programma is gestart");
 			nodes[key].x=v3.x;
 			nodes[key].y=v3.y;
 			nodes[key].z=v3.z;
-		    }
-		  }
 			//voor alle relaties verbonden met node
+			var opponent=null;
 			nodelinks.forEach(function(link) {
 			  {
-			    var opponent=null;
 			    //zoek in de lijst een node met niveau < currentniveau (die is er!)
 			    if ((link.source==nodes[key])&&(link.target.distance==currentniveau-1))opponent=link.target;
 			    if ((link.target==nodes[key])&&(link.source.distance==currentniveau-1))opponent=link.source;
-			    if (opponent!=null){
-			      //tel bij de x/y/z van vector v de gevonden x/y/z (van die gevonden node) op  -->xn,yn,zn
-			      //ken die xn/yn/zn toe aan huidige node
-			      nodes[key].x=nodes[key].x+opponent.x;
-			      nodes[key].y=nodes[key].y+opponent.y;
-			      nodes[key].z=nodes[key].z+opponent.z;
-			    }
 			  }
 			});
+			if (opponent!=null){
+			  //tel bij de x/y/z van vector v de gevonden x/y/z (van die gevonden node) op  -->xn,yn,zn
+			  //ken die xn/yn/zn toe aan huidige node
+			  nodes[key].x=Math.floor(nodes[key].x+opponent.x);
+			  nodes[key].y=Math.floor(nodes[key].y+opponent.y);
+			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
+			} else console.log(nodes[key],"toch niet gevonden!");
+		    }
+		  }*/
 			var three_links = [];
 			var spheres = [];
 				// Create nodes and randomize default position
 				for (var key in nodes) {
 					if (nodes.hasOwnProperty(key)) {
 						var val = nodes[key];
-						//nodes[key].x = Math.floor((Math.random() * 100) + 1);
-						//nodes[key].y = Math.floor((Math.random() * 100) + 1);
-						//nodes[key].z = Math.floor((Math.random() * 100) + 1);
+						nodes[key].x = Math.floor((Math.random() * 100) + 1);
+						nodes[key].y = Math.floor((Math.random() * 100) + 1);
+						nodes[key].z = Math.floor((Math.random() * 100) + 1);
 						
 						// set up the sphere vars
 						var radius = 5,
