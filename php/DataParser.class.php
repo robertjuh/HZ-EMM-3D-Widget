@@ -156,7 +156,8 @@ class DataParser {
 	function getStart($concept,$objects){
 	    $start=null;
 	    foreach ($objects as $item) {
-	      $itemName=str_replace("uri:","",str_replace("-3A",":",$item->getName()));
+	      //uri is at start of itemName; remove it
+	      $itemName=str_replace("uri:","",str_replace("-3A",":",$item->getName()));//TODO -3A does not have to be replaced anymore; done already at start
 	      if((strcmp($itemName,$concept)==0))
 	      $start=$item;
 	    }

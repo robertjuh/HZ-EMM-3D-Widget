@@ -305,16 +305,16 @@ console.log("Het programma is gestart");
 				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 				var distance = origin.distanceTo(terminus);
 										
-				if(nodelinks[i].type.compareStrings("Eigenschap-3ASkos-3Arelated", true, true)){
+				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.related').style('color')); //TODO	
 					setArrowData(three_links, direction, origin, distance, "grey", nodes, nodelinks[i]);					
 				}                             
-				else if((nodelinks[i].type === "Eigenschap-3ASkosem-3Abroader") && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
+				else if((nodelinks[i].type === "Eigenschap:Skosem:broader") && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.broader').style('color')); //TODO		
 					console.log(' deze pijl is broader dan de center node');	
 					setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);			
-				}				 //if(nodelinks[i].type === "Eigenschap-3ASkosem-3Anarrower"  &&& nodelinks[i].source.name == currentPageName);
-				else if((nodelinks[i].type.compareStrings("Eigenschap-3ASkosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
+				}				 //if(nodelinks[i].type === "Eigenschap:Skosem:narrower"  &&& nodelinks[i].source.name == currentPageName);
+				else if((nodelinks[i].type.compareStrings("Eigenschap:Skosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.narrower').style('color')); //TODO		
 					console.log(' deze pijl is narrower dan de center node');
 					setArrowData(three_links, direction, origin, distance, "red", nodes, nodelinks[i]);
@@ -416,9 +416,6 @@ console.log("Het programma is gestart");
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
-		console.log("het concept is");
-		console.log(concept);
-		
 		$.ajax({
 			type : "POST",
 			cache : false,

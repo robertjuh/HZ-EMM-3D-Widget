@@ -11,7 +11,7 @@ class NodeMapVisitor extends Visitor {
 		$arr = array();
 		$item = array();
 		//$item["type"] = "node";
-		$item["name"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
+		$item["name"] = ucfirst(str_replace("uri:TZW:", "", $concept -> getName()));
 		$item["distance"] = $concept->distance;
 		foreach ($concept -> getProperties() as $key => $property) {
 		  $item[$key] = $property;
@@ -28,25 +28,24 @@ class NodeMapVisitor extends Visitor {
 				    if (!strpos($key, "narrower")){//omit narrower because always broader equivalnet present
 					$item = array();
 					$item["type"] = $key;
-					$item["distance"] = $object->distance;//TODO if nodevalues are passed, this can be removed
 					switch (true) {					
 						case strpos($key, "broader") :
 							$item["urlsource"] = $concept -> getProperty("page");
 							$item["urltarget"] = $object -> getProperty("page");
-							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
-							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
+							$item["source"] = ucfirst(str_replace("uri:TZW:", "", $concept -> getName()));
+							$item["target"] = ucfirst(str_replace("uri:TZW:", "", $object -> getName()));
 							break;
 						case strpos($key, "narrower") ://TODO omit next lines; never reached, because narrower relations are omitted
 							$item["urlsource"] = $object -> getProperty("page");
 							$item["urltarget"] = $concept -> getProperty("page");
-							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
-							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
+							$item["source"] = ucfirst(str_replace("uri:TZW:", "", $object -> getName()));
+							$item["target"] = ucfirst(str_replace("uri:TZW:", "", $concept -> getName()));
 							break;
 						case strpos($key, "related") :
 							$item["urlsource"] = $object -> getProperty("page");
 							$item["urltarget"] = $concept -> getProperty("page");
-							$item["source"] = ucfirst(str_replace("uri:TZW-3A", "", $object -> getName()));
-							$item["target"] = ucfirst(str_replace("uri:TZW-3A", "", $concept -> getName()));
+							$item["source"] = ucfirst(str_replace("uri:TZW:", "", $object -> getName()));
+							$item["target"] = ucfirst(str_replace("uri:TZW:", "", $concept -> getName()));
 							break;		
 									//narrower is toegevoegd maar functioneert niet;Anton: volgens mij nu wel!
 
