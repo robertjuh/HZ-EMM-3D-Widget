@@ -571,12 +571,8 @@ $(document).ready(function() {
 				return this.charAt(0).toLowerCase() + this.slice(1);
 			}
 
-			String.prototype.removeSpecialCharacters = function() {
-				return this.replace(/[_-]/g, " ");
-			}
-			
 			String.prototype.getLastPartOfUrl= function() {
-				return this.replace(/[_-]/g, " ").split("/").pop();
+				return this.split("/").pop();
 			}		
 			
 			String.prototype.getFirstPartOfUrl= function() {
