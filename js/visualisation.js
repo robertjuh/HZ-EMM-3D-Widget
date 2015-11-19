@@ -166,7 +166,7 @@ console.log("Het programma is gestart");
 		function initialiseConstraints(nodes, spheres, three_links) {
 			//generates a scale for nodes
 			var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
-			    y = d3.scale.linear().domain([0, 300]).range([-1, 15]),
+			    y = d3.scale.linear().domain([0, 300]).range([1, 10]),
 			    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
 				
 			allocateNodeLocations(nodes);
@@ -246,7 +246,7 @@ console.log("Het programma is gestart");
 		//will create nodes(spheres), labels and arrows and positions them.
 		function visualize(nodes, nodelinks) {
 		  //grootte = grootte scherm
-		  var grootte=200;
+		  var grootte=VisualisationJsModule.height/2;
 		  //nodes =array met nodes
 
 		  //- bepaal het maximum niveau van alle nodes
