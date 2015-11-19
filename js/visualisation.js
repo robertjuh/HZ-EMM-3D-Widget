@@ -143,19 +143,39 @@ console.log("Het programma is gestart");
 		}
 		//end of functions for arrows -----======-----
 		
+		
+		function allocateNodeLocations(nodes){
+			var depthArrayOfArrays = new Array();
+			
+			for (var key in nodes) {
+				if(depthArrayOfArrays[nodes[key].distance] == undefined){			
+					depthArrayOfArrays[nodes[key].distance] = new Array(nodes[key]); //kan nodes[key].x en andere attr hier kiezen			
+				}else if(depthArrayOfArrays[nodes[key].distance] != undefined){
+					depthArrayOfArrays[nodes[key].distance].push(nodes[key]);						
+				}				
+			} 
+				console.log("nodes");
+				console.log(nodes);
+				console.log("depthArrayOfArrays");
+				console.log(depthArrayOfArrays);			
+		}
+		
+		
 			// Initializes calculations and spaces nodes according to a forced layout
 			//takes variables from the startvisualisation method
 		function initialiseConstraints(nodes, spheres, three_links) {
-			//suggestion: depth of nodes determines the range: domain[10(minimum distance of nodes), depth*50]
+			//generates a scale for nodes
 			var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
 			    y = d3.scale.linear().domain([0, 300]).range([-1, 15]),
 			    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
 				
+			allocateNodeLocations(nodes);
 			
-
+			
+			//allocate node positions
 			for (var key in nodes) {
 				spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
-				labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
+				 labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 
 				//place current node in the center of the canvas
 				if(spheres[key].urlName == stringCurrentConcept){
@@ -219,6 +239,7 @@ console.log("Het programma is gestart");
 		}
 		//end of functions for mouseEvents -----======-----
 		
+
 		
 			
 		// Visualize RDF data
@@ -284,17 +305,18 @@ console.log("Het programma is gestart");
 						
 						createCallbackFunctionForSphere(sphere); 		
 
+						
+					}
+				}
+
+				
 						//TODO is this another way for label?
 						var spritey = makeTextSprite( " ander labeltje ", 
 							{ fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } );
 						spritey.position.set(0,10,0);
 						VisualisationJsModule.scene.add( spritey );
-
-
-						
-					}
-				}
-
+				
+				
 				createArrows(three_links, nodelinks, nodes);
 				initialiseConstraints(nodes, spheres, three_links);
 				
@@ -354,10 +376,16 @@ console.log("Het programma is gestart");
 
 		var spriteMaterial = new THREE.SpriteMaterial( 
 			{ map: texture, side : THREE.DoubleSide } );
-			spriteMaterial.transparant = true;
+			spriteMaterial.transparent = true;
 		var sprite = new THREE.Sprite( spriteMaterial );
 		sprite.scale.set(50,25,1.0);
+		
+		console.log("VisualisationJsModule.scene");
+console.log(VisualisationJsModule.scene);
+console.log(sprite);		
+		
 		return sprite;	
+		
 	}
 		
 	function roundRect(ctx, x, y, w, h, r){
@@ -679,7 +707,9 @@ $(document).ready(function() {
 				}
 				return string1 === string2;
 			}
-	}		
+	}
+
+
 });
-//hallo
+
 });
