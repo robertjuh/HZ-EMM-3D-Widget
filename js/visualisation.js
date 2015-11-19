@@ -245,15 +245,63 @@ console.log("Het programma is gestart");
 		// Visualize RDF data
 		//will create nodes(spheres), labels and arrows and positions them.
 		function visualize(nodes, nodelinks) {
+		  //grootte = grootte scherm
+		  var grootte=200;
+		  //nodes =array met nodes
+
+		  //- bepaal het maximum niveau van alle nodes
+		  var root=null;
+		  var max=0;
+		  for (var key in nodes) {
+		    if(nodes[key].distance>max)max=nodes[key].distance;
+		  //- zoek op node met niveau 0 (er is er maar 1!)
+		    if(nodes[key].distance==0)root=nodes[key];
+		  }
+		  //zet root in het midden
+		  root.x=grootte/2;root.y=grootte/2;root.z=grootte/2;
+		  //- voor alle niveaus (van 1 tot max):
+		  for (var currentniveau=1;currentniveau<max+1;currentniveau++) {
+		    //volgend niveau staat iedere keer minder dan de helft verder weg
+		    grootte=Math.floor(grootte/2);
+		    for (var key in nodes) 
+		    if (nodes[key].distance==currentniveau){
+			//genereer een random vector v van lengte = grootte
+			var x = Math.floor((Math.random() * 100) + 1-50);
+			var y = Math.floor((Math.random() * 100) + 1-50);
+			var z = Math.floor((Math.random() * 100) + 1-50);
+			var v1 = new THREE.Vector3(x, y, z);
+			v1=v1.normalize ();//vector is now size 1
+			var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
+			nodes[key].x=v3.x;
+			nodes[key].y=v3.y;
+			nodes[key].z=v3.z;
+			//voor alle relaties verbonden met node
+			var opponent=null;
+			nodelinks.forEach(function(link) {
+			  {
+			    //zoek in de lijst een node met niveau < currentniveau (die is er!)
+			    if ((link.source==nodes[key])&&(link.target.distance==currentniveau-1))opponent=link.target;
+			    if ((link.target==nodes[key])&&(link.source.distance==currentniveau-1))opponent=link.source;
+			  }
+			});
+			if (opponent!=null){
+			  //tel bij de x/y/z van vector v de gevonden x/y/z (van die gevonden node) op  -->xn,yn,zn
+			  //ken die xn/yn/zn toe aan huidige node
+			  nodes[key].x=Math.floor(nodes[key].x+opponent.x);
+			  nodes[key].y=Math.floor(nodes[key].y+opponent.y);
+			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
+			} else console.log(nodes[key],"toch niet gevonden!");
+		    }
+		  }
 			var three_links = [];
 			var spheres = [];
 				// Create nodes and randomize default position
 				for (var key in nodes) {
 					if (nodes.hasOwnProperty(key)) {
 						var val = nodes[key];
-						nodes[key].x = Math.floor((Math.random() * 100) + 1);
-						nodes[key].y = Math.floor((Math.random() * 100) + 1);
-						nodes[key].z = Math.floor((Math.random() * 100) + 1);
+						//nodes[key].x = Math.floor((Math.random() * 100) + 1);
+						//nodes[key].y = Math.floor((Math.random() * 100) + 1);
+						//nodes[key].z = Math.floor((Math.random() * 100) + 1);
 						
 						// set up the sphere vars
 						var radius = 5,
