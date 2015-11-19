@@ -647,8 +647,9 @@ console.log(sprite);
 
 			VisualisationJsModule.camera.updateProjectionMatrix();
 			visualize(nodes, nodelinks);
-			animate(); 				
-			
+			animate();
+			console.log("initialized all");
+			changeDepth(null, 1);//initial position in depth-slider is 1
 			// Animate the webGL objects for rendering
 			function animate() {
 				requestAnimationFrame(animate);
