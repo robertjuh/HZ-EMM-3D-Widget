@@ -325,11 +325,11 @@ console.log("Het programma is gestart");
 						var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 						sphere.name = nodes[key].name;
 						sphere.urlName = nodes[key].url.getLastPartOfUrl();
-						sphere.distance=nodes[key].distance;
+						VisualisationJsModule.add3DObjectSphere(key,sphere,nodes[key].distance);
 						spheres[key] = sphere;						
 
 						// add the sphere to the scene
-						VisualisationJsModule.scene.add(sphere);				
+						VisualisationJsModule.scene.add(sphere);
 
 						// Create label mesh //TODO functie maken
 						var canvas1 = document.createElement('canvas');
@@ -348,7 +348,7 @@ console.log("Het programma is gestart");
 						});
 						material1.transparent = true;
 						var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
-						mesh1.distance=nodes[key].distance;
+						VisualisationJsModule.add3DObjectMesh(key,mesh1,nodes[key].distance);
 						
 						labels[key] = mesh1;
 						VisualisationJsModule.scene.add(mesh1);						
@@ -358,8 +358,6 @@ console.log("Het programma is gestart");
 						
 					}
 				}
-				VisualisationJsModule.spheres=spheres;
-				VisualisationJsModule.labels=labels;
 
 				
 						//TODO is this another way for label?
@@ -371,7 +369,6 @@ console.log("Het programma is gestart");
 				
 				createArrows(three_links, nodelinks, nodes);
 				initialiseConstraints(nodes, spheres, three_links);
-				VisualisationJsModule.three_links=three_links;
 				
 				VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -513,12 +510,12 @@ console.log(sprite);
 	*/
 	//function for setting the data and creating the new arrow
 	function setArrowData(three_links, direction, origin, distance, arrowColor, nodes, currentNodeLink){
-		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); //TODO		
+		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); 		
 		arrow.userData = {
 					target : nodes[currentNodeLink.target.name].name,
-					source : nodes[currentNodeLink.source.name].name,
-					distance: currentNodeLink.distance
+					source : nodes[currentNodeLink.source.name].name
 		};
+		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
 		
 		VisualisationJsModule.scene.add(arrow);			
 		three_links.push(arrow);
@@ -563,16 +560,17 @@ console.log(sprite);
 			};			
 	}	
 	function changeDepth(concept, depth){
-	  var spheres=VisualisationJsModule.spheres;
-	  for (var key in spheres) 
-		    spheres[key].visible=spheres[key].distance<=depth;
-	  var labels=VisualisationJsModule.labels;
+	  //make objects visible yes/no depending on depth
+	  var links=VisualisationJsModule.threeDObjects
+	  links.forEach(function(link){
+	    link.visible=link.distance<=depth;
+	  });
+	  var labels=VisualisationJsModule.threeDObjectsMesh;
 	  for (var key in labels) 
 		    labels[key].visible=labels[key].distance<=depth;
-	  var links=VisualisationJsModule.three_links;
-	  links.forEach(function(link){
-	    link.visible=link.userData.distance<=depth;
-	  });
+	  var spheres=VisualisationJsModule.threeDObjectsSphere;
+	  for (var key in spheres) 
+		    spheres[key].visible=spheres[key].distance<=depth;
 	}
 			
 	function initialiseDrawingSequence(concept, depth){ //can pass "currentconcept" with this
@@ -615,6 +613,7 @@ console.log(sprite);
 		
 		//gets called after the ajax call
 	var drawNewObjectsWithAjaxData = function (result) {
+	  VisualisationJsModule.init3DObjects();
 		console.log("DATA");
 		//console.log(result);
 			
@@ -642,8 +641,6 @@ console.log(sprite);
 				if (link.distance<link.target.distance) link.distance=link.target.distance;
 			  }
 			});
-			VisualisationJsModule.nodes=nodes;
-			VisualisationJsModule.nodelinks=nodelinks;
 
 			VisualisationJsModule.camera.updateProjectionMatrix();
 			visualize(nodes, nodelinks);
