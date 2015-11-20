@@ -192,8 +192,9 @@ console.log("Het programma is gestart");
 
 				//place current node in the center of the canvas
 				if(spheres[key].urlName == stringCurrentConcept){
-					spheres[key].position.set(0, 0, 0);
-					labels[key].position.set(0, 0, 0);	
+				  //commented out by anton. concept niveau 0 set already in center
+					//spheres[key].position.set(0, 0, 0);
+					//labels[key].position.set(0, 0, 0);	
 				}
 
 					
@@ -267,11 +268,11 @@ console.log("Het programma is gestart");
 		    if(nodes[key].distance==0)root=nodes[key];
 		  }
 		  //zet root in het midden
-		  root.x=grootte/2;root.y=grootte/2;root.z=grootte/2;
+		  grootte=Math.floor(grootte/2);
+		  root.x=grootte;root.y=grootte;root.z=grootte;
 		  //- voor alle niveaus (van 1 tot max):
 		  for (var currentniveau=1;currentniveau<max+1;currentniveau++) {
 		    //volgend niveau staat iedere keer minder dan de helft verder weg
-		    grootte=Math.floor(grootte/2);
 		    for (var key in nodes) 
 		    if (nodes[key].distance==currentniveau){
 			//genereer een random vector v van lengte = grootte
@@ -312,6 +313,8 @@ console.log("Het programma is gestart");
 			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
+		    if (currentniveau<4)//otherwise spheres get too close
+		    grootte=Math.floor(grootte/2);
 		  }
 		}
 		
