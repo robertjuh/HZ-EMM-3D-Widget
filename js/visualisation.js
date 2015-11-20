@@ -360,7 +360,7 @@ console.log("Het programma is gestart");
 						// add the sphere to the scene
 						VisualisationJsModule.scene.add(sphere);
 
-						createLabel(key);
+						createLabel(key,nodes[key].distance);
 						
 						createCallbackFunctionForSphere(sphere); 		
 					}
@@ -382,7 +382,7 @@ console.log("Het programma is gestart");
 		}
 		
 		
-	function createLabel(key){
+	function createLabel(key,distance){
 			var canvas1 = document.createElement('canvas');
 			var context1 = canvas1.getContext('2d');
 			context1.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
@@ -402,6 +402,7 @@ console.log("Het programma is gestart");
 			
 			labels[key] = mesh1;
 			VisualisationJsModule.scene.add(mesh1);	
+			VisualisationJsModule.add3DObject(mesh1,distance);
 	}
 		
 		
@@ -607,7 +608,7 @@ console.log(sprite);
 		}
 		
 
-		var depth = typeof depth !== 'undefined' ? depth : 2 ;
+		var depth = typeof depth !== 'undefined' ? depth : 3 ;
 		
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
