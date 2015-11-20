@@ -126,8 +126,7 @@ console.log("Het programma is gestart");
 			arrow.position.x = origin.x;
 			arrow.position.y = origin.y;
 			arrow.position.z = origin.z;
-console.log("raadius");
-console.log(spheres[arrow.userData.target].geometry.boundingSphere.radius);
+
 			// Calculate new terminus vectors and set length
 			arrow.setLength(arrow.position.distanceTo(vectTarget) - spheres[arrow.userData.target].geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
 			arrow.setDirection(new THREE.Vector3().subVectors(vectTarget, arrow.position).normalize());
@@ -175,12 +174,9 @@ console.log(spheres[arrow.userData.target].geometry.boundingSphere.radius);
 			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]);
 				
 			allocateNodeLocations(nodes); //TODO KAN WEG?			
-var wtfarray = new Array();
 			
 			//allocate node positions
 			for (var key in nodes) {
-				wtfarray.push(nodes[key].x);
-							console.log("x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40");
 			//console.log(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 			console.log(xScale(nodes[key].x));
 			console.log(console.log(nodes[key].x));
@@ -230,9 +226,7 @@ var wtfarray = new Array();
 					console.log("nodes array");
 					console.log(nodes);
 					
-										console.log("wtfarray");
-					console.log(wtfarray);
-						
+	
 			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
 		
@@ -258,13 +252,7 @@ var wtfarray = new Array();
 			filterFirstSpheregeometryWithRay(event, mouse);
 		}
 		//end of functions for mouseEvents -----======-----
-		
-
-		
-			
-		// Visualize RDF data
-		//will create nodes(spheres), labels and arrows and positions them.
-		function visualize(nodes, nodelinks) {
+		function setCoordinatesSpheres(nodes,nodelinks) {
 		  //grootte = grootte scherm
 		  //var grootte=Math.round(VisualisationJsModule.height*0.4);
 		  var grootte= VisualisationJsModule.height;
@@ -301,8 +289,7 @@ var wtfarray = new Array();
 			v1=v1.normalize ();//vector is now size 1
 			
 			
-			console.log("vector NA HET NORMALISERE VENT");
-			console.log(v1);			
+			
 			
 			var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
 			nodes[key].x=v3.x;
@@ -326,6 +313,15 @@ var wtfarray = new Array();
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
 		  }
+		}
+		
+
+		
+			
+		// Visualize RDF data
+		//will create nodes(spheres), labels and arrows and positions them.
+		function visualize(nodes, nodelinks) {
+		  setCoordinatesSpheres(nodes,nodelinks);
 			var three_links = [];
 			var spheres = [];
 				// Create nodes and randomize default position
@@ -358,12 +354,14 @@ var wtfarray = new Array();
 						var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 						sphere.name = nodes[key].name;
 						sphere.urlName = nodes[key].url.getLastPartOfUrl();
+						VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
 						spheres[key] = sphere;						
 
 						// add the sphere to the scene
-						VisualisationJsModule.scene.add(sphere);				
+						VisualisationJsModule.scene.add(sphere);
 
-						createLabel(nodes[key].name, key);
+						createLabel(key);
+						
 						createCallbackFunctionForSphere(sphere); 		
 					}
 				}
@@ -516,7 +514,7 @@ console.log(sprite);
 					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.narrower").style.color , nodes, nodelinks[i]);
 				}
 				else{
-					console.log("ik heb geen nodelinks kunnen vinden dus heb de errow geen kleurtje kunnen geven");
+					console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, "green"); //TODO
 					return;
 					//setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);
@@ -540,11 +538,12 @@ console.log(sprite);
 	*/
 	//function for setting the data and creating the new arrow
 	function setArrowData(three_links, direction, origin, distance, arrowColor, nodes, currentNodeLink){
-		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); //TODO		
+		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); 		
 		arrow.userData = {
 					target : nodes[currentNodeLink.target.name].name,
 					source : nodes[currentNodeLink.source.name].name
 		};
+		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
 		
 		VisualisationJsModule.scene.add(arrow);			
 		three_links.push(arrow);
@@ -588,6 +587,13 @@ console.log(sprite);
 				}
 			};			
 	}	
+	function changeDepth(concept, depth){
+	  //make objects visible yes/no depending on depth
+	  var links=VisualisationJsModule.threeDObjects
+	  links.forEach(function(link){
+	    link.visible=link.distance<=depth;
+	  });
+	}
 			
 	function initialiseDrawingSequence(concept, depth){ //can pass "currentconcept" with this
 	clearCanvas();
@@ -601,7 +607,7 @@ console.log(sprite);
 		}
 		
 
-		var depth = typeof depth !== 'undefined' ? depth : 1 ;
+		var depth = typeof depth !== 'undefined' ? depth : 2 ;
 		
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
@@ -629,6 +635,7 @@ console.log(sprite);
 		
 		//gets called after the ajax call
 	var drawNewObjectsWithAjaxData = function (result) {
+	  VisualisationJsModule.init3DObjects();
 		console.log("DATA");
 		//console.log(result);
 			
@@ -651,14 +658,17 @@ console.log(sprite);
 			nodelinks.forEach(function(link) {
 			  {
 				link.source = nodes[link.source] ;
+				link.distance=link.source.distance;
 				link.target = nodes[link.target];
+				if (link.distance<link.target.distance) link.distance=link.target.distance;
 			  }
 			});
 
 			VisualisationJsModule.camera.updateProjectionMatrix();
 			visualize(nodes, nodelinks);
-			animate(); 				
-			
+			animate();
+			console.log("initialized all");
+			changeDepth(null, 1);//initial position in depth-slider is 1
 			// Animate the webGL objects for rendering
 			function animate() {
 				requestAnimationFrame(animate);
@@ -732,7 +742,7 @@ $(document).ready(function() {
 		
 		initialiseDrawingSequence(currentPageName);
 		
-		createSlider(containerHEIGHT, initialiseDrawingSequence, stringCurrentConcept); //creates the slider for the depth	
+		createSlider(containerHEIGHT, /*initialiseDrawingSequence*/changeDepth, stringCurrentConcept); //creates the slider for the depth	
 	}
 	
 
