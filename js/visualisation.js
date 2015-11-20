@@ -238,13 +238,7 @@ console.log("Het programma is gestart");
 			filterFirstSpheregeometryWithRay(event, mouse);
 		}
 		//end of functions for mouseEvents -----======-----
-		
-
-		
-			
-		// Visualize RDF data
-		//will create nodes(spheres), labels and arrows and positions them.
-		function visualize(nodes, nodelinks) {
+		function setCoordinatesSpheres(nodes,nodelinks) {
 		  //grootte = grootte scherm
 		  var grootte=VisualisationJsModule.height/2;
 		  //nodes =array met nodes
@@ -293,6 +287,15 @@ console.log("Het programma is gestart");
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
 		  }
+		}
+		
+
+		
+			
+		// Visualize RDF data
+		//will create nodes(spheres), labels and arrows and positions them.
+		function visualize(nodes, nodelinks) {
+		  setCoordinatesSpheres(nodes,nodelinks);
 			var three_links = [];
 			var spheres = [];
 				// Create nodes and randomize default position
