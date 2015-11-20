@@ -160,40 +160,24 @@ console.log("Het programma is gestart");
 			var xcomp=xScale(0),
 			    ycomp=yScale(0),
 			    zcomp=yScale(0);
-					console.log("three_links");
-					console.log(three_links);
 					
 			for (var key in nodes) {
 			
 				spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
 				nodes[key].position=spheres[key].position;
 				labels[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );				
-				
-					
-				for (var j = 0; j < three_links.length; j++) {
-				  
-					var arrow = three_links[j];
-					var vi = null;
-					if (arrow.userData.source === key) {
-							vi = 0;
-					}
-					if (arrow.userData.target === key) {
-						vi = 1;
-					}
-					if (vi >= 0 ) {
-						if (vi == 0 ) {
-							var vectOrigin = new THREE.Vector3(spheres[key].position.x, spheres[key].position.y, spheres[key].position.z);
-							setArrowOrigin(arrow, vectOrigin, spheres, nodes[key].distance);
-						}
-						if (vi == 1 ) {
-							var vectTarget = new THREE.Vector3(spheres[key].position.x, spheres[key].position.y, spheres[key].position.z);
-							setArrowTarget(arrow, vectTarget, nodes[key].distance, spheres);
-						}
-					}
-				}
-
 			}
 			
+			//three_links is copy of nodelinks, so they also contain source and target of relation, and distance.
+			
+			for (var j = 0; j < three_links.length; j++) {
+			  
+				var arrow = three_links[j];
+				var vectOrigin = new THREE.Vector3(arrow.source.position.x, arrow.source.position.y, arrow.source.position.z);
+				setArrowOrigin(arrow, vectOrigin, spheres, nodes[key].distance);
+				var vectTarget = new THREE.Vector3(arrow.target.position.x, arrow.target.position.y, arrow.target.position.z);
+				setArrowTarget(arrow, vectTarget, arrow.distance, spheres);
+			}
 					console.log("spheres");
 					console.log(spheres);
 					
@@ -523,6 +507,9 @@ console.log(sprite);
 					target : nodes[currentNodeLink.target.name].name,
 					source : nodes[currentNodeLink.source.name].name
 		};
+		arrow.source=currentNodeLink.source;
+		arrow.target=currentNodeLink.target;
+		arrow.distance=currentNodeLink.distance;
 		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
 		
 		VisualisationJsModule.scene.add(arrow);			
