@@ -118,26 +118,27 @@ console.log("Het programma is gestart");
 
 		
 		//functions for arrows
-		function setArrowOrigin(arrow, origin, spheres) {
+		function setArrowOrigin(arrow, origin, spheres, relationDepth) {
 			//Get current position from sphere array
-			vectTarget = spheres[arrow.userData.target].position;
+			var vectTarget = spheres[arrow.userData.target].position;
 
 			// Set arrow origin 
 			arrow.position.x = origin.x;
 			arrow.position.y = origin.y;
 			arrow.position.z = origin.z;
-
+console.log("raadius");
+console.log(spheres[arrow.userData.target].geometry.boundingSphere.radius);
 			// Calculate new terminus vectors and set length
-			arrow.setLength(arrow.position.distanceTo(vectTarget) - 5, 7, 3);
+			arrow.setLength(arrow.position.distanceTo(vectTarget) - spheres[arrow.userData.target].geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
 			arrow.setDirection(new THREE.Vector3().subVectors(vectTarget, arrow.position).normalize());
 		}
 			
-		function setArrowTarget(arrow, target) {
+		function setArrowTarget(arrow, target, relationDepth, spheres) {
 				// Cast function argument to Vector3 format
 				var newTarget = new THREE.Vector3(target.x, target.y, target.z);
 				
 				//Calculate new terminus vectors and set length (initlal size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
-				arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 7, 3);
+				arrow.setLength(arrow.position.distanceTo(newTarget) - spheres[arrow.userData.target].geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
 				//arrow.setLength(55,4, 100);
 				arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
 		}
@@ -165,17 +166,33 @@ console.log("Het programma is gestart");
 			//takes variables from the startvisualisation method
 		function initialiseConstraints(nodes, spheres, three_links) {
 			//generates a scale for nodes
-			var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
-			    y = d3.scale.linear().domain([0, 300]).range([1, 10]),
-			    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
+			//var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
+			//    y = d3.scale.linear().domain([0, 300]).range([1, 10]),
+			//    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
 				
-			allocateNodeLocations(nodes);
-			
+			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]),
+			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]),
+			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]);
+				
+			allocateNodeLocations(nodes); //TODO KAN WEG?			
+var wtfarray = new Array();
 			
 			//allocate node positions
 			for (var key in nodes) {
-				spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
-				 labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
+				wtfarray.push(nodes[key].x);
+							console.log("x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40");
+			//console.log(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
+			console.log(xScale(nodes[key].x));
+			console.log(console.log(nodes[key].x));
+			
+			
+			console.log(nodes[key].x * 40 - 40);
+			
+				spheres[key].position.set(xScale(nodes[key].x), yScale(nodes[key].y) , zScale(nodes[key].z) );
+				 labels[key].position.set(xScale(nodes[key].x), yScale(nodes[key].y) , zScale(nodes[key].z) );				
+				
+				//spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
+				// labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 
 				//place current node in the center of the canvas
 				if(spheres[key].urlName == stringCurrentConcept){
@@ -196,11 +213,11 @@ console.log("Het programma is gestart");
 					if (vi >= 0 ) {
 						if (vi == 0 ) {
 							var vectOrigin = new THREE.Vector3(spheres[key].position.x, spheres[key].position.y, spheres[key].position.z);
-							setArrowOrigin(arrow, vectOrigin, spheres);
+							setArrowOrigin(arrow, vectOrigin, spheres, nodes[key].distance);
 						}
 						if (vi == 1 ) {
 							var vectTarget = new THREE.Vector3(spheres[key].position.x, spheres[key].position.y, spheres[key].position.z);
-							setArrowTarget(arrow, vectTarget);
+							setArrowTarget(arrow, vectTarget, nodes[key].distance, spheres);
 						}
 					}
 				}
@@ -212,6 +229,9 @@ console.log("Het programma is gestart");
 					
 					console.log("nodes array");
 					console.log(nodes);
+					
+										console.log("wtfarray");
+					console.log(wtfarray);
 						
 			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
@@ -246,7 +266,8 @@ console.log("Het programma is gestart");
 		//will create nodes(spheres), labels and arrows and positions them.
 		function visualize(nodes, nodelinks) {
 		  //grootte = grootte scherm
-		  var grootte=VisualisationJsModule.height/2;
+		  //var grootte=Math.round(VisualisationJsModule.height*0.4);
+		  var grootte= VisualisationJsModule.height;
 		  //nodes =array met nodes
 
 		  //- bepaal het maximum niveau van alle nodes
@@ -266,11 +287,23 @@ console.log("Het programma is gestart");
 		    for (var key in nodes) 
 		    if (nodes[key].distance==currentniveau){
 			//genereer een random vector v van lengte = grootte
-			var x = Math.floor((Math.random() * 100) + 1-50);
-			var y = Math.floor((Math.random() * 100) + 1-50);
-			var z = Math.floor((Math.random() * 100) + 1-50);
+			var x = Math.floor((Math.random() * 100) + 1);
+			var y = Math.floor((Math.random() * 100) + 1);
+			var z = Math.floor((Math.random() * 100) + 1);
+			//var x = Math.floor((Math.random() * 100) + 1-50);
+			//var y = Math.floor((Math.random() * 100) + 1-50);
+			//var z = Math.floor((Math.random() * 100) + 1-50);
 			var v1 = new THREE.Vector3(x, y, z);
+			
+			console.log("vector 1 v1");
+			console.log(v1);
+			
 			v1=v1.normalize ();//vector is now size 1
+			
+			
+			console.log("vector NA HET NORMALISERE VENT");
+			console.log(v1);			
+			
 			var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
 			nodes[key].x=v3.x;
 			nodes[key].y=v3.y;
@@ -304,7 +337,7 @@ console.log("Het programma is gestart");
 						//nodes[key].z = Math.floor((Math.random() * 100) + 1);
 						
 						// set up the sphere vars
-						var radius = 5,
+						var radius = 5 - (nodes[key].distance)*0.93, //nodes get smaller as their depth increases
 						    segments = 32,
 						    rings = 32;
 	
@@ -330,36 +363,13 @@ console.log("Het programma is gestart");
 						// add the sphere to the scene
 						VisualisationJsModule.scene.add(sphere);				
 
-						// Create label mesh //TODO functie maken
-						var canvas1 = document.createElement('canvas');
-						var context1 = canvas1.getContext('2d');
-						context1.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
-						context1.fillStyle = VisualisationJsModule.getStyle(".nodeTextLabel").style.color;
-						context1.fillText(nodes[key].name, 10, 30);
-						var texture1 = new THREE.Texture(canvas1);
-						texture1.needsUpdate = true;
-						texture1.magFilter = THREE.NearestFilter;
-						texture1.minFilter = THREE.LinearMipMapLinearFilter;
-						texture1.minFilter = THREE.NearestFilter;
-						var material1 = new THREE.MeshBasicMaterial({
-							map : texture1,
-							side : THREE.DoubleSide
-						});
-						material1.transparent = true;
-						var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
-						
-						labels[key] = mesh1;
-						VisualisationJsModule.scene.add(mesh1);						
-						
+						createLabel(nodes[key].name, key);
 						createCallbackFunctionForSphere(sphere); 		
-
-						
 					}
 				}
-
 				
 						//TODO is this another way for label?
-						var spritey = makeTextSprite( " ander labeltje ", 
+						var spritey = createLabelWithSprite( " ander labeltje ", 
 							{ fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } );
 						spritey.position.set(0,10,0);
 						VisualisationJsModule.scene.add( spritey );
@@ -374,9 +384,31 @@ console.log("Het programma is gestart");
 		}
 		
 		
+	function createLabel(key){
+			var canvas1 = document.createElement('canvas');
+			var context1 = canvas1.getContext('2d');
+			context1.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
+			context1.fillStyle = VisualisationJsModule.getStyle(".nodeTextLabel").style.color;
+			context1.fillText(key, 10, 30);
+			var texture1 = new THREE.Texture(canvas1);
+			texture1.needsUpdate = true;
+			texture1.magFilter = THREE.NearestFilter;
+			texture1.minFilter = THREE.LinearMipMapLinearFilter;
+			texture1.minFilter = THREE.NearestFilter;
+			var material1 = new THREE.MeshBasicMaterial({
+				map : texture1,
+				side : THREE.DoubleSide
+			});
+			material1.transparent = true;
+			var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
+			
+			labels[key] = mesh1;
+			VisualisationJsModule.scene.add(mesh1);	
+	}
+		
 		
 	//hoort bij ander labeltje	
-	function makeTextSprite( message, parameters ){
+	function createLabelWithSprite( message, parameters ){
 		if ( parameters === undefined ) parameters = {};
 		
 		var fontface = parameters.hasOwnProperty("fontface") ? 
