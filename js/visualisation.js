@@ -276,12 +276,12 @@ console.log("Het programma is gestart");
 		    for (var key in nodes) 
 		    if (nodes[key].distance==currentniveau){
 			//genereer een random vector v van lengte = grootte
-			var x = Math.floor((Math.random() * 100) + 1);
-			var y = Math.floor((Math.random() * 100) + 1);
-			var z = Math.floor((Math.random() * 100) + 1);
-			//var x = Math.floor((Math.random() * 100) + 1-50);
-			//var y = Math.floor((Math.random() * 100) + 1-50);
-			//var z = Math.floor((Math.random() * 100) + 1-50);
+			//var x = Math.floor((Math.random() * 100) + 1);
+			//var y = Math.floor((Math.random() * 100) + 1);
+			//var z = Math.floor((Math.random() * 100) + 1);
+			var x = Math.floor((Math.random() * 100) + 1-50);
+			var y = Math.floor((Math.random() * 100) + 1-50);
+			var z = Math.floor((Math.random() * 100) + 1-50);
 			var v1 = new THREE.Vector3(x, y, z);
 			
 			console.log("vector 1 v1");
@@ -313,7 +313,7 @@ console.log("Het programma is gestart");
 			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
-		    if (currentniveau<4)//otherwise spheres get too close
+		    if (currentniveau<3)//otherwise spheres get too close
 		    grootte=Math.floor(grootte/2);
 		  }
 		}
