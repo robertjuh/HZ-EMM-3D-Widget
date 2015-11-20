@@ -144,75 +144,34 @@ console.log("Het programma is gestart");
 		//end of functions for arrows -----======-----
 		
 		
-		function allocateNodeLocations(nodes){
-			var depthArrayOfArrays = new Array();
-			
-			for (var key in nodes) {
-				if(depthArrayOfArrays[nodes[key].distance] == undefined){			
-					depthArrayOfArrays[nodes[key].distance] = new Array(nodes[key]); //kan nodes[key].x en andere attr hier kiezen			
-				}else if(depthArrayOfArrays[nodes[key].distance] != undefined){
-					depthArrayOfArrays[nodes[key].distance].push(nodes[key]);						
-				}				
-			} 
-				console.log("nodes");
-				console.log(nodes);
-				console.log("depthArrayOfArrays");
-				console.log(depthArrayOfArrays);			
-		}
-		
-		
 			// Initializes calculations and spaces nodes according to a forced layout
 			//takes variables from the startvisualisation method
 		function initialiseConstraints(nodes, spheres, three_links) {
-			//generates a scale for nodes
-			//var x = d3.scale.linear().domain([0, 300]).range([1, 10]),
-			//    y = d3.scale.linear().domain([0, 300]).range([1, 10]),
-			//    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
+
+			var min=-100;
+			var max=50;
+			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
+			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
+			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);
 				
-			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-100, 50]),
-			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-100, 50]),
-			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-100, 50]);
-				
-			allocateNodeLocations(nodes); //TODO KAN WEG?			
-			
 			//allocate node positions
 			
-			//first see what the new position of base-node will be
-			var xcomp,ycomp,zcomp;
+			//first see what the new position of base-node will be, because that is positioned on 0,0,0
+			var xcomp=xScale(0),
+			    ycomp=yScale(0),
+			    zcomp=yScale(0);
+					console.log("three_links");
+					console.log(three_links);
+					
 			for (var key in nodes) {
-				if(spheres[key].urlName == stringCurrentConcept){
-				  var oldposition=spheres[key].position;
-					spheres[key].position.set(0, 0, 0);
-					labels[key].position.set(0, 0, 0);	
-				  var newposition=spheres[key].position;
-				  xcomp=newposition.x-oldposition.x;
-				  ycomp=newposition.y-oldposition.y;
-				  zcomp=newposition.z-oldposition.z;
-				}
-			}
-			for (var key in nodes) {
-			//console.log(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
-			console.log(xScale(nodes[key].x));
-			console.log(console.log(nodes[key].x));
 			
-			
-			console.log(nodes[key].x * 40 - 40);
-			
-				spheres[key].position.set(xScale(nodes[key].x)+xcomp, yScale(nodes[key].y)+ycomp , zScale(nodes[key].z)+zcomp );
-				 labels[key].position.set(xScale(nodes[key].x)+xcomp, yScale(nodes[key].y)+ycomp , zScale(nodes[key].z)+zcomp );				
+				spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
+				nodes[key].position=spheres[key].position;
+				labels[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );				
 				
-				//spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
-				// labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
-
-				//place current node in the center of the canvas
-				if(spheres[key].urlName == stringCurrentConcept){
-				  //commented out by anton. concept niveau 0 set already in center
-					spheres[key].position.set(0, 0, 0);
-					labels[key].position.set(0, 0, 0);	
-				}
-
 					
 				for (var j = 0; j < three_links.length; j++) {
+				  
 					var arrow = three_links[j];
 					var vi = null;
 					if (arrow.userData.source === key) {
@@ -279,12 +238,12 @@ console.log("Het programma is gestart");
 		  for (var key in nodes) {
 		    if(nodes[key].distance>max)max=nodes[key].distance;
 		  //- zoek op node met niveau 0 (er is er maar 1!)
-		    if(nodes[key].distance==0)root=nodes[key];
+		    if(nodes[key].distance==0)root=key;
 		  }
 		  //range is van -200 tot 100
 		  //zet root in het midden
 		  grootte=Math.floor(grootte/2);
-		  root.x=grootte;root.y=grootte;root.z=grootte;
+		  nodes[root].x=0;nodes[root].y=0;nodes[root].z=0;
 		  //- voor alle niveaus (van 1 tot max):
 		  for (var currentniveau=1;currentniveau<max+1;currentniveau++) {
 		    //volgend niveau staat iedere keer minder dan de helft verder weg
@@ -300,8 +259,8 @@ console.log("Het programma is gestart");
 			var z = Math.floor((Math.random() * 100) + 1-50);
 			var v1 = new THREE.Vector3(x, y, z);
 			
-			console.log("vector 1 v1");
-			console.log(v1);
+			//console.log("vector 1 v1");
+			//console.log(v1);
 			
 			v1=v1.normalize ();//vector is now size 1
 			
