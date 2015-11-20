@@ -169,13 +169,27 @@ console.log("Het programma is gestart");
 			//    y = d3.scale.linear().domain([0, 300]).range([1, 10]),
 			//    z = d3.scale.linear().domain([0, 300]).range([1, 10]);
 				
-			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]),
-			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]),
-			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-200, 100]);
+			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-100, 50]),
+			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-100, 50]),
+			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([-100, 50]);
 				
 			allocateNodeLocations(nodes); //TODO KAN WEG?			
 			
 			//allocate node positions
+			
+			//first see what the new position of base-node will be
+			var xcomp,ycomp,zcomp;
+			for (var key in nodes) {
+				if(spheres[key].urlName == stringCurrentConcept){
+				  var oldposition=spheres[key].position;
+					spheres[key].position.set(0, 0, 0);
+					labels[key].position.set(0, 0, 0);	
+				  var newposition=spheres[key].position;
+				  xcomp=newposition.x-oldposition.x;
+				  ycomp=newposition.y-oldposition.y;
+				  zcomp=newposition.z-oldposition.z;
+				}
+			}
 			for (var key in nodes) {
 			//console.log(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 			console.log(xScale(nodes[key].x));
@@ -184,8 +198,8 @@ console.log("Het programma is gestart");
 			
 			console.log(nodes[key].x * 40 - 40);
 			
-				spheres[key].position.set(xScale(nodes[key].x), yScale(nodes[key].y) , zScale(nodes[key].z) );
-				 labels[key].position.set(xScale(nodes[key].x), yScale(nodes[key].y) , zScale(nodes[key].z) );				
+				spheres[key].position.set(xScale(nodes[key].x)+xcomp, yScale(nodes[key].y)+ycomp , zScale(nodes[key].z)+zcomp );
+				 labels[key].position.set(xScale(nodes[key].x)+xcomp, yScale(nodes[key].y)+ycomp , zScale(nodes[key].z)+zcomp );				
 				
 				//spheres[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
 				// labels[key].position.set(x(nodes[key].x) * 40 - 40, y(nodes[key].y) * 40 - 40, z(nodes[key].z) * 40 - 40);
@@ -193,8 +207,8 @@ console.log("Het programma is gestart");
 				//place current node in the center of the canvas
 				if(spheres[key].urlName == stringCurrentConcept){
 				  //commented out by anton. concept niveau 0 set already in center
-					//spheres[key].position.set(0, 0, 0);
-					//labels[key].position.set(0, 0, 0);	
+					spheres[key].position.set(0, 0, 0);
+					labels[key].position.set(0, 0, 0);	
 				}
 
 					
@@ -267,6 +281,7 @@ console.log("Het programma is gestart");
 		  //- zoek op node met niveau 0 (er is er maar 1!)
 		    if(nodes[key].distance==0)root=nodes[key];
 		  }
+		  //range is van -200 tot 100
 		  //zet root in het midden
 		  grootte=Math.floor(grootte/2);
 		  root.x=grootte;root.y=grootte;root.z=grootte;
@@ -279,6 +294,7 @@ console.log("Het programma is gestart");
 			//var x = Math.floor((Math.random() * 100) + 1);
 			//var y = Math.floor((Math.random() * 100) + 1);
 			//var z = Math.floor((Math.random() * 100) + 1);
+		      //anton: possible negative values give better dispersion
 			var x = Math.floor((Math.random() * 100) + 1-50);
 			var y = Math.floor((Math.random() * 100) + 1-50);
 			var z = Math.floor((Math.random() * 100) + 1-50);
@@ -512,6 +528,7 @@ console.log(sprite);
 					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.broader").style.color, nodes, nodelinks[i]);			
 				}				 //if(nodelinks[i].type === "Eigenschap:Skosem:narrower"  &&& nodelinks[i].source.name == currentPageName);
 				//TODO onderstaande code werkt niet meer sinds de implementatie van Anton, andere oplossing?
+				//anton: dat dit niet werkt is correct, omdat er geen narrower-relaties meer zijn. Die worden nu in PHP eruit gefilterd
 				else if((nodelinks[i].type.compareStrings("Eigenschap:Skosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
 					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.narrower').style('color')); //TODO		
 					console.log(' deze pijl is narrower dan de center node');
