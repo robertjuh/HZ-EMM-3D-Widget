@@ -23,8 +23,6 @@ var VisualisationJsModule = (function () {
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
-	var threeDObjectsMesh=[];
-	var threeDObjectsSphere=[];
 		
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
@@ -37,8 +35,6 @@ var VisualisationJsModule = (function () {
 		//three arrays to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,
-		threeDObjectsMesh: threeDObjectsMesh,
-		threeDObjectsSphere: threeDObjectsSphere,
 		
 		getContainerSize: function () {
 			var size = [WIDTH,HEIGHT]
@@ -49,21 +45,11 @@ var VisualisationJsModule = (function () {
 		
 		init3DObjects: function(){
 		  threeDObjects=[];
-		  threeDObjectsMesh=[];
-		  threeDObjectsSphere=[];
 		},
 		//functions to set distance for visible yes/no
 		add3DObject(object,distance){
 		  object.distance=distance;
 		  this.threeDObjects.push(object);
-		},
-		add3DObjectMesh(key,object,distance){
-		  object.distance=distance;
-		  this.threeDObjectsMesh[key]=object;
-		},
-		add3DObjectSphere(key,object,distance){
-		  object.distance=distance;
-		  this.threeDObjectsSphere[key]=object;
 		},
 		getStyle: function(CLASSname) {
 					var styleSheets = window.document.styleSheets;

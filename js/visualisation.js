@@ -325,7 +325,7 @@ console.log("Het programma is gestart");
 						var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 						sphere.name = nodes[key].name;
 						sphere.urlName = nodes[key].url.getLastPartOfUrl();
-						VisualisationJsModule.add3DObjectSphere(key,sphere,nodes[key].distance);
+						VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
 						spheres[key] = sphere;						
 
 						// add the sphere to the scene
@@ -348,7 +348,7 @@ console.log("Het programma is gestart");
 						});
 						material1.transparent = true;
 						var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
-						VisualisationJsModule.add3DObjectMesh(key,mesh1,nodes[key].distance);
+						VisualisationJsModule.add3DObject(mesh1,nodes[key].distance);
 						
 						labels[key] = mesh1;
 						VisualisationJsModule.scene.add(mesh1);						
@@ -565,12 +565,6 @@ console.log(sprite);
 	  links.forEach(function(link){
 	    link.visible=link.distance<=depth;
 	  });
-	  var labels=VisualisationJsModule.threeDObjectsMesh;
-	  for (var key in labels) 
-		    labels[key].visible=labels[key].distance<=depth;
-	  var spheres=VisualisationJsModule.threeDObjectsSphere;
-	  for (var key in spheres) 
-		    spheres[key].visible=spheres[key].distance<=depth;
 	}
 			
 	function initialiseDrawingSequence(concept, depth){ //can pass "currentconcept" with this
