@@ -118,6 +118,7 @@ console.log("Het programma is gestart");
 
 		
 		//functions for arrows
+		//TODO anton: obsolete, can be removed
 		function setArrowOrigin(arrow, origin, spheres, relationDepth) {
 			//Get current position from sphere array
 			var vectTarget = spheres[arrow.userData.target].position;
@@ -132,12 +133,18 @@ console.log("Het programma is gestart");
 			arrow.setDirection(new THREE.Vector3().subVectors(vectTarget, arrow.position).normalize());
 		}
 			
-		function setArrowTarget(arrow, target, relationDepth, spheres) {
+		function setArrowSourceTarget(arrow) {
+				var relationDepth=arrow.distance;
+				var origin = new THREE.Vector3(arrow.source.position.x, arrow.source.position.y, arrow.source.position.z);
+				var target = new THREE.Vector3(arrow.target.position.x, arrow.target.position.y, arrow.target.position.z);
+				arrow.position.x = origin.x;
+				arrow.position.y = origin.y;
+				arrow.position.z = origin.z;
 				// Cast function argument to Vector3 format
 				var newTarget = new THREE.Vector3(target.x, target.y, target.z);
-				
+				console.log(arrow);
 				//Calculate new terminus vectors and set length (initlal size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
-				arrow.setLength(arrow.position.distanceTo(newTarget) - spheres[arrow.userData.target].geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
+				arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
 				//arrow.setLength(55,4, 100);
 				arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
 		}
@@ -172,11 +179,7 @@ console.log("Het programma is gestart");
 			
 			for (var j = 0; j < three_links.length; j++) {
 			  
-				var arrow = three_links[j];
-				var vectOrigin = new THREE.Vector3(arrow.source.position.x, arrow.source.position.y, arrow.source.position.z);
-				setArrowOrigin(arrow, vectOrigin, spheres, nodes[key].distance);
-				var vectTarget = new THREE.Vector3(arrow.target.position.x, arrow.target.position.y, arrow.target.position.z);
-				setArrowTarget(arrow, vectTarget, arrow.distance, spheres);
+				setArrowSourceTarget(three_links[j]);
 			}
 					console.log("spheres");
 					console.log(spheres);
@@ -316,6 +319,7 @@ console.log("Het programma is gestart");
 						var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 						sphere.name = nodes[key].name;
 						sphere.node = nodes[key];
+						nodes[key].sphere=sphere;
 						sphere.urlName = nodes[key].url.getLastPartOfUrl();
 						VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
 						spheres[key] = sphere;						
@@ -460,8 +464,8 @@ console.log(sprite);
 					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.related").style.color, nodelinks[i]));					
 				}
 				else if((nodelinks[i].type === "Eigenschap:Skosem:broader"))//
-				  //TODO anton: ik heb dit weg gecomment omdat het me onduidelijk is waarom deze voorwaarde erin zit.
-				  //Bovendien is dit erg versie-afhaneklijk, omdat het afhangt van hoe een naam van een node is (met TZW ervoor)
+				  //TODO anton: ik heb de volgende regel weg gecomment omdat het me onduidelijk is waarom deze voorwaarde erin zit.
+				  //Bovendien is dit erg versie-afhankelijk, omdat het afhangt van hoe een naam van een node geschreven is (met TZW ervoor)
 				  //&& ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true)))
 					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.broader").style.color, nodelinks[i]));			
 				//TODO onderstaande code werkt niet meer sinds de implementatie van Anton, andere oplossing?
@@ -480,7 +484,7 @@ console.log(sprite);
 	
 	
 	/*
-	* Function for adding arrows to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
+	* Function for adding an arrow to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
 	* Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the three_links data.
 	*
 	*/
