@@ -118,31 +118,16 @@ console.log("Het programma is gestart");
 
 		
 		//functions for arrows
-		//TODO anton: obsolete, can be removed
-		function setArrowOrigin(arrow, origin, spheres, relationDepth) {
-			//Get current position from sphere array
-			var vectTarget = spheres[arrow.userData.target].position;
-
-			// Set arrow origin 
-			arrow.position.x = origin.x;
-			arrow.position.y = origin.y;
-			arrow.position.z = origin.z;
-
-			// Calculate new terminus vectors and set length
-			arrow.setLength(arrow.position.distanceTo(vectTarget) - spheres[arrow.userData.target].geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
-			arrow.setDirection(new THREE.Vector3().subVectors(vectTarget, arrow.position).normalize());
-		}
 			
 		function setArrowSourceTarget(arrow) {
 		  var relationDepth=arrow.distance;
-		  var origin = new THREE.Vector3(arrow.source.sphere.position.x, arrow.source.sphere.position.y, arrow.source.sphere.position.z);
-		  var target = new THREE.Vector3(arrow.target.sphere.position.x, arrow.target.sphere.position.y, arrow.target.sphere.position.z);
-		  arrow.position.x = origin.x;
-		  arrow.position.y = origin.y;
-		  arrow.position.z = origin.z;
+		  //copy position of sphere connected to source to position of arrow
+		  var originPosition=arrow.source.sphere.position;
+		  arrow.position.set(originPosition.x,originPosition.y,originPosition.z);
 		  // Cast function argument to Vector3 format
-		  var newTarget = new THREE.Vector3(target.x, target.y, target.z);
-		  //Calculate new terminus vectors and set length (initlal size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
+		  var targetPosition=arrow.target.sphere.position;
+		  var newTarget = new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
+		  //Calculate new terminus vectors and set length (initial size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
 		  arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
 		  //arrow.setLength(55,4, 100);
 		  arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
@@ -150,8 +135,8 @@ console.log("Het programma is gestart");
 		//end of functions for arrows -----======-----
 		
 		
-			// Initializes calculations and spaces nodes according to a forced layout
-			//takes variables from the startvisualisation method
+		// Initializes calculations and spaces nodes according to a forced layout
+		//takes variables from the startvisualisation method
 		function initialiseConstraints(nodes, spheres, three_links) {
 
 			var min=-100;
@@ -182,12 +167,6 @@ console.log("Het programma is gestart");
 			  
 				setArrowSourceTarget(three_links[j]);
 			}
-					console.log("spheres");
-					console.log(spheres);
-					
-					console.log("nodes array");
-					console.log(nodes);
-					
 	
 			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
@@ -514,29 +493,19 @@ console.log(sprite);
 	function createLightingForScene() {
 		// Instantiate light sources
 		var pointLight1 = new THREE.PointLight(0xFFFFFF);
-		pointLight1.position.x = 0;
-		pointLight1.position.y = 50;
-		pointLight1.position.z = 500;
+		pointLight1.position.set(0,50,500);
 		VisualisationJsModule.scene.add(pointLight1);
 		var pointLight2 = new THREE.PointLight(0xFFFFFF);
-		pointLight2.position.x = 0;
-		pointLight2.position.y = 500;
-		pointLight2.position.z = -500;
+		pointLight2.position.set(0,500,-500);
 		VisualisationJsModule.scene.add(pointLight2);
 		var pointLight3 = new THREE.PointLight(0xFFFFFF);
-		pointLight3.position.x = 500;
-		pointLight3.position.y = 500;
-		pointLight3.position.z = 0;
+		pointLight3.position.set(500,500,0);
 		VisualisationJsModule.scene.add(pointLight3);
 		var pointLight4 = new THREE.PointLight(0xFFFFFF);
-		pointLight4.position.x = -500;
-		pointLight4.position.y = 50;
-		pointLight4.position.z = 0;
+		pointLight4.position.set(-500,50,0);
 		VisualisationJsModule.scene.add(pointLight4);
 		var pointLight5 = new THREE.PointLight(0xFFFFFF);
-		pointLight5.position.x = 0;
-		pointLight5.position.y = -100;
-		pointLight5.position.z = 0;
+		pointLight5.position.set(0,-100,0);
 		VisualisationJsModule.scene.add(pointLight5);
 	}
 
