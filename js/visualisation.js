@@ -134,19 +134,18 @@ console.log("Het programma is gestart");
 		}
 			
 		function setArrowSourceTarget(arrow) {
-				var relationDepth=arrow.distance;
-				var origin = new THREE.Vector3(arrow.source.position.x, arrow.source.position.y, arrow.source.position.z);
-				var target = new THREE.Vector3(arrow.target.position.x, arrow.target.position.y, arrow.target.position.z);
-				arrow.position.x = origin.x;
-				arrow.position.y = origin.y;
-				arrow.position.z = origin.z;
-				// Cast function argument to Vector3 format
-				var newTarget = new THREE.Vector3(target.x, target.y, target.z);
-				console.log(arrow);
-				//Calculate new terminus vectors and set length (initlal size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
-				arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
-				//arrow.setLength(55,4, 100);
-				arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
+		  var relationDepth=arrow.distance;
+		  var origin = new THREE.Vector3(arrow.source.sphere.position.x, arrow.source.sphere.position.y, arrow.source.sphere.position.z);
+		  var target = new THREE.Vector3(arrow.target.sphere.position.x, arrow.target.sphere.position.y, arrow.target.sphere.position.z);
+		  arrow.position.x = origin.x;
+		  arrow.position.y = origin.y;
+		  arrow.position.z = origin.z;
+		  // Cast function argument to Vector3 format
+		  var newTarget = new THREE.Vector3(target.x, target.y, target.z);
+		  //Calculate new terminus vectors and set length (initlal size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
+		  arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
+		  //arrow.setLength(55,4, 100);
+		  arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
 		}
 		//end of functions for arrows -----======-----
 		
@@ -164,16 +163,17 @@ console.log("Het programma is gestart");
 			//allocate node positions
 			
 			//first see what the new position of base-node will be, because that is positioned on 0,0,0
+			//base for translation of nodes
 			var xcomp=xScale(0),
 			    ycomp=yScale(0),
 			    zcomp=yScale(0);
 					
 			for (var key in nodes) {
+				//scale to new location and do a translation to place nodes in the middle
 			
 				spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
 				//copy new position of spheres back to nodes
 				var p=spheres[key].position;
-				nodes[key].position=p;
 				labels[key].position.set(p.x, p.y , p.z );				
 			}
 			
