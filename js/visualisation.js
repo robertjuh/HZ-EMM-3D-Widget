@@ -171,8 +171,10 @@ console.log("Het programma is gestart");
 			for (var key in nodes) {
 			
 				spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
-				nodes[key].position=spheres[key].position;
-				labels[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );				
+				//copy new position of spheres back to nodes
+				var p=spheres[key].position;
+				nodes[key].position=p;
+				labels[key].position.set(p.x, p.y , p.z );				
 			}
 			
 			//three_links is copy of nodelinks, so they also contain source and target of relation, and distance.
