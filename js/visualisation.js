@@ -172,7 +172,6 @@ console.log("Het programma is gestart");
 				//scale to new location and do a translation to place nodes in the middle
 			
 				spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
-				//copy new position of spheres back to nodes
 				var p=spheres[key].position;
 				labels[key].position.set(p.x, p.y , p.z );				
 			}
