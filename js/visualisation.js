@@ -315,6 +315,7 @@ console.log("Het programma is gestart");
 						//create the sphere
 						var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 						sphere.name = nodes[key].name;
+						sphere.node = nodes[key];
 						sphere.urlName = nodes[key].url.getLastPartOfUrl();
 						VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
 						spheres[key] = sphere;						
@@ -335,7 +336,7 @@ console.log("Het programma is gestart");
 						VisualisationJsModule.scene.add( spritey );
 				
 				
-				createArrows(three_links, nodelinks, nodes);
+				createArrows(three_links, nodelinks);
 				initialiseConstraints(nodes, spheres, three_links);
 				
 				VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -451,44 +452,30 @@ console.log(sprite);
 		
 		
 	
-	function createArrows(three_links, nodelinks, nodes){
-		console.log(" nodelinks array");
-		console.log( nodelinks);		
+	function createArrows(three_links, nodelinks){
 		
 		for (var i = 0; i < nodelinks.length; i++) {
-				var origin = new THREE.Vector3(50, 100, 50);
-				var terminus = new THREE.Vector3(75, 75, 75);
-				var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
-				var distance = origin.distanceTo(terminus);
 										
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
-					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.related').style('color')); //TODO	
-					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.related").style.color, nodes, nodelinks[i]);					
-				}                             
-				else if((nodelinks[i].type === "Eigenschap:Skosem:broader") && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
-					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.broader').style('color')); //TODO		
-					console.log(' deze pijl is broader dan de center node');	
-					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.broader").style.color, nodes, nodelinks[i]);			
-				}				 //if(nodelinks[i].type === "Eigenschap:Skosem:narrower"  &&& nodelinks[i].source.name == currentPageName);
+					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.related").style.color, nodelinks[i]));					
+				}
+				else if((nodelinks[i].type === "Eigenschap:Skosem:broader"))//
+				  //TODO anton: ik heb dit weg gecomment omdat het me onduidelijk is waarom deze voorwaarde erin zit.
+				  //Bovendien is dit erg versie-afhaneklijk, omdat het afhangt van hoe een naam van een node is (met TZW ervoor)
+				  //&& ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true)))
+					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.broader").style.color, nodelinks[i]));			
 				//TODO onderstaande code werkt niet meer sinds de implementatie van Anton, andere oplossing?
 				//anton: dat dit niet werkt is correct, omdat er geen narrower-relaties meer zijn. Die worden nu in PHP eruit gefilterd
 				else if((nodelinks[i].type.compareStrings("Eigenschap:Skosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
-					//var arrow = new THREE.ArrowHelper(direction, origin, distance, d3.select('.arrow.narrower').style('color')); //TODO		
-					console.log(' deze pijl is narrower dan de center node');
-					setArrowData(three_links, direction, origin, distance, VisualisationJsModule.getStyle(".arrow.narrower").style.color , nodes, nodelinks[i]);
+					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.narrower").style.color , nodelinks[i]));
 				}
 				else{
 					console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
-					//var arrow = new THREE.ArrowHelper(direction, origin, distance, "green"); //TODO
 					return;
-					//setArrowData(three_links, direction, origin, distance, "orange", nodes, nodelinks[i]);
 				};
 			
 		}	
 		
-		console.log(" thee links");
-		console.log( three_links);
-						
 	}
 	
 	
@@ -496,24 +483,26 @@ console.log(sprite);
 	* Function for adding arrows to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
 	* Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the three_links data.
 	*
-	* @param three_links: array which is used in initialiseconstraints() for determining the targets and sources of each arrow that is made here.
-	* @param direction, origin, distance, arrowColor: these are standart THREE.arrowhelper parameters for setting the data of the arrow.
-	* @param nodes: the array of nodes that will be searched and matches the current given node to produce the right target and source for the given node.
 	*/
 	//function for setting the data and creating the new arrow
-	function setArrowData(three_links, direction, origin, distance, arrowColor, nodes, currentNodeLink){
+	function setArrowData(arrowColor, currentNodeLink){
+		var origin = new THREE.Vector3(50, 100, 50);
+		var terminus = new THREE.Vector3(75, 75, 75);
+		var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
+		var distance = origin.distanceTo(terminus);
 		var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); 		
 		arrow.userData = {
-					target : nodes[currentNodeLink.target.name].name,
-					source : nodes[currentNodeLink.source.name].name
+					target : currentNodeLink.target.name,
+					source : currentNodeLink.source.name
 		};
 		arrow.source=currentNodeLink.source;
 		arrow.target=currentNodeLink.target;
 		arrow.distance=currentNodeLink.distance;
+		currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
 		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
 		
-		VisualisationJsModule.scene.add(arrow);			
-		three_links.push(arrow);
+		VisualisationJsModule.scene.add(arrow);	
+		return arrow;
 	}
 	
 	//adds lightsources to the scene, for aesthetic purposes
