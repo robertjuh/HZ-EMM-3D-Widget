@@ -35,12 +35,6 @@ console.log("Het programma is gestart");
 		var	raycaster = new THREE.Raycaster();
 		var	mouse = new THREE.Vector2();
 		
-		var currentPage = currentPageName;
-		
-		//data
-		var stringCurrentConcept = currentPage; //TODO vast op dit moment, maar moet opgehaald worden uit de huidige wiki pagina later
-		
-					
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 		function filterFirstSpheregeometryWithRay(event, mouse){			
 			normalizeCurrentMouseCoordinates(event, mouse);						
@@ -283,8 +277,8 @@ console.log("Het programma is gestart");
 						    rings = 32;
 	
 						// create the sphere's material and color
-						var sphereMaterial; //TODO onderstaande line zal aangepast moeten worden als deze op andere thesauri (dan tzw:) toegepast moet worden
-						if(nodes[key].name.compareStrings(stringCurrentConcept.slice(4), true, true)){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green //TODO split.pop(:)?
+						var sphereMaterial;
+						if(nodes[key].distance==0){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green 
 							sphereMaterial = new THREE.MeshPhongMaterial({
 								color : VisualisationJsModule.getStyle(".sphere.centersphere").style.color
 							});												
@@ -634,9 +628,6 @@ $(document).ready(function() {
 		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		
 		
-		console.log("currentpage");		
-		console.log(currentPage);
-
 		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
 		
@@ -672,7 +663,7 @@ $(document).ready(function() {
 		
 		initialiseDrawingSequence(currentPageName);
 		
-		createSlider(containerHEIGHT, /*initialiseDrawingSequence*/changeDepth, stringCurrentConcept); //creates the slider for the depth	
+		createSlider(containerHEIGHT, /*initialiseDrawingSequence*/changeDepth, currentPageName); //creates the slider for the depth	
 	}
 	
 
