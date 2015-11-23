@@ -24,14 +24,15 @@ var sliderDiv = d3.select('#' + targetDivId).append("div")
 	.attr("width", containerWidth)
 	.attr("position", "fixed")
 	.attr("height", containerHeight)
-	.style("display", "inline-block");
+	.style("display", "inline-block")
+	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
+	
 	
 console.log("sliderDiv");
 console.log(sliderDiv);
 var svgContainer = d3.select("#sliderDiv").append("svg")
 	.attr("width", containerWidth)
-	.attr("height", containerHeight)
-	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
+	.attr("height", containerHeight);
 	
 console.log(svgContainer);
 
