@@ -7,13 +7,12 @@
 /* container represents the div that everything is being drawn on*/
 .containerAttributes{
 
-	height: 800px;
-	width: 800px;
+	height: 700px;
+	width: 700px;
 	font: Bold 35px Arial;
 	/* font: Bold 30px Open_Sans; */
 
 }
-
 
 
 .sliderAttributes.background{
@@ -61,4 +60,9 @@
 
 .nodeTextLabel{
 	color: black;
+}
+
+
+.maxDepth{
+	height: 2;
 }

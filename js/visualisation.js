@@ -1,6 +1,3 @@
-console.log("Het programma is gestart");
-
-
 
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
 	var targetDivId = 'bodyContent'; //bodyContent
@@ -13,12 +10,6 @@ console.log("Het programma is gestart");
 	//set the position to inherit instead of relative, or the nodes won't be clickable	
 	d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
 	
-	//dat oranje stuk moet genormaliseerd worden
-	console.log(document.getElementById("content"));   //goed resultaat
-	console.log(document.getElementById("catlinks"));	//klikt niet goe
-	console.log(document.getElementById("firstheading"));	//niks
-	console.log(document.getElementById('mw-content-text'));	//werkt niet / scheve klik
-	console.log(document.getElementById('mw-navigation'));	//goed! onderaan pagina
 /**
  * @author NJK @author robertjuh
  * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
@@ -26,10 +17,6 @@ console.log("Het programma is gestart");
  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
  var startVisualisation = (function(currentPageName){
-
-	 
-	 console.log("startvisualisation is opgeroepen");
-
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
@@ -102,17 +89,11 @@ console.log("Het programma is gestart");
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
 			clearCanvas();
-			//stringCurrentConcept = "TZW:" + conceptNameString.removeSpecialCharacters().lowerCaseFirstLetter(); //TODO formats so SPARQL can read, this is just for the testing environment
-			//currentConcept = stringCurrentConcept;
-			
-			 window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;			
+			window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;			
 			}		
 		}
-		
-
-		
-		//functions for arrows
-			
+				
+		//functions for arrows			
 		function setArrowSourceTarget(arrow) {
 		  var relationDepth=arrow.distance;
 		  //copy position of sphere connected to source to position of arrow
@@ -123,14 +104,13 @@ console.log("Het programma is gestart");
 		  var newTarget = new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
 		  //Calculate new terminus vectors and set length (initial size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
 		  arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
-		  //arrow.setLength(55,4, 100);
 		  arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
 		}
 		//end of functions for arrows -----======-----
 		
 		
 		// Initializes calculations and spaces nodes according to a forced layout
-		//takes variables from the startvisualisation method
+		// takes variables from the startvisualisation method
 		function initialiseConstraints(nodes, spheres, three_links) {
 
 			var min=-100;
@@ -139,7 +119,6 @@ console.log("Het programma is gestart");
 			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
 			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);
 				
-			//allocate node positions
 			
 			//first see what the new position of base-node will be, because that is positioned on 0,0,0
 			//base for translation of nodes
@@ -157,8 +136,7 @@ console.log("Het programma is gestart");
 			
 			//three_links is copy of nodelinks, so they also contain source and target of relation, and distance.
 			
-			for (var j = 0; j < three_links.length; j++) {
-			  
+			for (var j = 0; j < three_links.length; j++) {			  
 				setArrowSourceTarget(three_links[j]);
 			}
 	
@@ -187,11 +165,10 @@ console.log("Het programma is gestart");
 			filterFirstSpheregeometryWithRay(event, mouse);
 		}
 		//end of functions for mouseEvents -----======-----
+		
 		function setCoordinatesSpheres(nodes,nodelinks) {
-		  //grootte = grootte scherm
-		  //var grootte=Math.round(VisualisationJsModule.height*0.4);
-		  var grootte= VisualisationJsModule.height;
-		  //nodes =array met nodes
+		  var grootte= Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/2)*0.9 ;
+		  //var grootte= VisualisationJsModule.height ; // zo was het eerst
 
 		  //- bepaal het maximum niveau van alle nodes
 		  var root=null;
@@ -220,12 +197,7 @@ console.log("Het programma is gestart");
 			var z = Math.floor((Math.random() * 100) + 1-50);
 			var v1 = new THREE.Vector3(x, y, z);
 			
-			//console.log("vector 1 v1");
-			//console.log(v1);
-			
 			v1=v1.normalize ();//vector is now size 1
-			
-			
 			
 			
 			var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
@@ -254,8 +226,6 @@ console.log("Het programma is gestart");
 		  }
 		}
 		
-
-		
 			
 		// Visualize RDF data
 		//will create nodes(spheres), labels and arrows and positions them.
@@ -267,9 +237,6 @@ console.log("Het programma is gestart");
 				for (var key in nodes) {
 					if (nodes.hasOwnProperty(key)) {
 						var val = nodes[key];
-						//nodes[key].x = Math.floor((Math.random() * 100) + 1);
-						//nodes[key].y = Math.floor((Math.random() * 100) + 1);
-						//nodes[key].z = Math.floor((Math.random() * 100) + 1);
 						
 						// set up the sphere vars
 						var radius = 5 - (nodes[key].distance)*0.93, //nodes get smaller as their depth increases
@@ -424,36 +391,20 @@ console.log(sprite);
 			ctx.stroke();   
 	}
 		
-		
-		
-		
-		
-		
 	
-	function createArrows(three_links, nodelinks){
-		
+	function createArrows(three_links, nodelinks){		
 		for (var i = 0; i < nodelinks.length; i++) {
 										
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
 					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.related").style.color, nodelinks[i]));					
 				}
-				else if((nodelinks[i].type === "Eigenschap:Skosem:broader"))//
-				  //TODO anton: ik heb de volgende regel weg gecomment omdat het me onduidelijk is waarom deze voorwaarde erin zit.
-				  //Bovendien is dit erg versie-afhankelijk, omdat het afhangt van hoe een naam van een node geschreven is (met TZW ervoor)
-				  //&& ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true)))
+				else if((nodelinks[i].type === "Eigenschap:Skosem:broader"))
 					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.broader").style.color, nodelinks[i]));			
-				//TODO onderstaande code werkt niet meer sinds de implementatie van Anton, andere oplossing?
-				//anton: dat dit niet werkt is correct, omdat er geen narrower-relaties meer zijn. Die worden nu in PHP eruit gefilterd
-				else if((nodelinks[i].type.compareStrings("Eigenschap:Skosem-3Narrower", true, true)) && ("TZW:" + nodelinks[i].source.name.compareStrings(currentPageName, true, true))){
-					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.narrower").style.color , nodelinks[i]));
-				}
 				else{
 					console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
 					return;
-				};
-			
-		}	
-		
+				};			
+		}			
 	}
 	
 	
@@ -520,19 +471,13 @@ console.log(sprite);
 	}
 			
 	function initialiseDrawingSequence(concept, depth){ //can pass "currentconcept" with this
-	clearCanvas();
-	  //TODO:clear het canvas
-	  //geef zoveel mogelijk parameters door via ajaxCall(.......), en documenteer hier vervolgens van welke andere globale variabelen gebruik wordt gemaakt.
-		//var concept = stringCurrentConcept;
-		//var concept = stringCurrentConcept;
-				
+		clearCanvas();
+			
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
-		}
-		
+		}		
 
-		var depth = typeof depth !== 'undefined' ? depth : 3 ;
-		
+		var depth = typeof depth !== 'undefined' ? depth : 2 ;		
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
@@ -560,16 +505,12 @@ console.log(sprite);
 		//gets called after the ajax call
 	var drawNewObjectsWithAjaxData = function (result) {
 	  VisualisationJsModule.init3DObjects();
-		console.log("DATA");
+		//console.log("DATA");
 		//console.log(result);
 			
-			// Create arrays for spheres and links
-			//var spheres = [], //Contains spheres
-			
-			//Contains arrows
-			labels = [];
-			//Contains label sprites
 
+			//Contains arrows
+			labels = []; //Contains label sprites			
 			
 			var jsonResult = JSON.parse(result);
 			var nodes = jsonResult.nodes;
@@ -610,9 +551,7 @@ console.log(sprite);
 
 			}
 		}
-		
-		console.log("visualisationJsModule print");
-				console.log(VisualisationJsModule);
+
 		
 //Wait for document to finish loading		
 $(document).ready(function() {
@@ -645,7 +584,8 @@ $(document).ready(function() {
 		});
 
 		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
-		VisualisationJsModule.camera.position.x = containerWIDTH/2;					
+		VisualisationJsModule.camera.position.x = containerWIDTH/2;			
+		VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
 		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
 				
 
@@ -653,11 +593,6 @@ $(document).ready(function() {
 		renderer.setSize(containerWIDTH, containerHEIGHT);		
 		VisualisationJsModule.container.appendChild(renderer.domElement);
 				
-
-		
-		//controls = new THREE.OrbitControls(camera);	
-		
-		
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
@@ -719,8 +654,6 @@ $(document).ready(function() {
 				return string1 === string2;
 			}
 	}
-
-
 });
 
 });
