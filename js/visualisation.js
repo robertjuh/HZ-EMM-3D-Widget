@@ -47,49 +47,45 @@ console.log("qqqqqqqqqqq");
 		
 		
 		function checkGeometryTypeAndSlice(intersects, urlname){
+			var intersectLength = intersects.length;
 				//If there is an intersection, and it is a sphere, apply click event.
-			if ( intersects.length > 0 ) {					
+			//if ( intersects.length > 0 && intersects[0].object.geometry.type != null ) {
+			//if ( intersects[0].object.geometry.type != null ) {
 				//Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
-				for (var i = 0; i <= intersects.length; i++) {	
+				for (var i = 0; i <= intersectLength; i++) {
+
+				if(intersects == 0 || intersects[0].object.geometry.type == null){	
+					return;
+				}else{				
 						switch(intersects[0].object.geometry.type){
 							case 'SphereGeometry':
 								intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
 								
-								if(urlname != null){
-									intersects[0].object.callback(intersects[0].object.urlName);
-								}
+									if(urlname != null){
+										intersects[0].object.callback(intersects[0].object.urlName);
+									}
 								
 								console.log("je heb geklikt op een geometry:");
 								console.log(intersects[0].object.geometry.type);
 								return;
 								//break;
 							case 'PlaneGeometry':
-								console.log("je heb geklikt op een geometry:plane");
-								console.log(intersects[0].object.geometry.type);		
 								intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere								
 								break;
 							case 'BufferGeometry':
-								console.log("je heb geklikt op een geometry:buffer");
-								console.log(intersects[0].object.geometry.type);		
-								console.log(intersects);
 								intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
-								console.log(intersects);
 								break;
 							case 'CylinderGeometry':
-								console.log("je heb geklikt op een geometry:cylinder");
-								//console.log(intersects[0].object.geometry.type);	
-								console.log(intersects);
 								intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere		
 							    break;
-							default:
-						console.log("je hebt niet op een geometry geklikt: DIT IS DEFAULT");
-						console.log(intersects);						
+							default:					
 						}
+					}
 				}
 			}
 			
 			
-		}
+		
 		
 		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
 		//uses the mouse variable which is a THREE.Vector2
