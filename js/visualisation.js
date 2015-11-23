@@ -1,4 +1,4 @@
-
+console.log("qqqqqqqqqqq");
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
 	var targetDivId = 'bodyContent'; //bodyContent
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
@@ -22,58 +22,72 @@
 		var	raycaster = new THREE.Raycaster();
 		var	mouse = new THREE.Vector2();
 		
+		
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
-		function filterFirstSpheregeometryWithRay(event, mouse){			
+	function filterFirstSpheregeometryWithRay(event, mouse){			
 			normalizeCurrentMouseCoordinates(event, mouse);						
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
 
 			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 
-			
-			//If there is an intersection, and it is a sphere, apply click event.
-			if ( intersects.length > 0 ) {					
-				//Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
-				for (var i = 0; i < intersects.length; i++) {	
-					switch(intersects[0].object.geometry.type){
-						case 'SphereGeometry':
-						intersects[0].object.material.color.setHex( Math.random() * 0xffffff ); 
-							intersects[0].object.callback(intersects[0].object.urlName); //calls the callback function on the chosen geometry item
-							console.log("de naam van het aangeklikte object = ");
-							console.log(intersects[0].object.urlName);
-							return;
-						case 'PlaneGeometry':
-							intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
-							break;
-						default:
-							break;
-					}
-				}
+
+			if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
+				checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
 			}			
 		}
 		
-		//Colors the selected sphere a random color, serves no real purpose yet. 
-		function colorSelectedSphere(event, mouse){
+	function colorSelectedSphere(event, mouse){
 			normalizeCurrentMouseCoordinates(event,mouse);
 			
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera );
 			
-			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 			
-			
-			//If there is an intersection, and it is a sphere, apply click event.
+			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 	
+
+			checkGeometryTypeAndSlice(intersects)	
+		}	
+		
+		
+		function checkGeometryTypeAndSlice(intersects, urlname){
+				//If there is an intersection, and it is a sphere, apply click event.
 			if ( intersects.length > 0 ) {					
 				//Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
-				for (var i = 0; i < intersects.length; i++) {	
+				for (var i = 0; i <= intersects.length; i++) {	
 						switch(intersects[0].object.geometry.type){
 							case 'SphereGeometry':
-							intersects[0].object.material.color.setHex( Math.random() * 0xffffff ); 
-								break;
+								intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
+								
+								if(urlname != null){
+									intersects[0].object.callback(intersects[0].object.urlName);
+								}
+								
+								console.log("je heb geklikt op een geometry:");
+								console.log(intersects[0].object.geometry.type);
+								return;
+								//break;
 							case 'PlaneGeometry':
+								console.log("je heb geklikt op een geometry:plane");
+								console.log(intersects[0].object.geometry.type);		
+								intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere								
+								break;
+							case 'BufferGeometry':
+								console.log("je heb geklikt op een geometry:buffer");
+								console.log(intersects[0].object.geometry.type);		
+								console.log(intersects);
 								intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
+								console.log(intersects);
 								break;
+							case 'CylinderGeometry':
+								console.log("je heb geklikt op een geometry:cylinder");
+								//console.log(intersects[0].object.geometry.type);	
+								console.log(intersects);
+								intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere		
+							    break;
 							default:
-								break;
+						console.log("je hebt niet op een geometry geklikt: DIT IS DEFAULT");
+						console.log(intersects);						
 						}
 				}
-			}	
+			}
+			
 			
 		}
 		
@@ -162,7 +176,7 @@
 		//calls the callback function on mouse up, on the appointed sphere. Mouse and camera are global variables.
 		function onDocumentMouseUp(event){
 			event.preventDefault();	
-			filterFirstSpheregeometryWithRay(event, mouse);
+			//filterFirstSpheregeometryWithRay(event, mouse);
 		}
 		//end of functions for mouseEvents -----======-----
 		
@@ -269,17 +283,20 @@
 						VisualisationJsModule.scene.add(sphere);
 
 						createLabel(key,nodes[key].distance);
+						//var spritey = createLabelWithSprite( key, { fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } , nodes[key].distance);
+						
 						
 						createCallbackFunctionForSphere(sphere); 		
 					}
 				}
 				
-						//TODO is this another way for label?
-						var spritey = createLabelWithSprite( " ander labeltje ", 
-							{ fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } );
-						spritey.position.set(0,10,0);
-						VisualisationJsModule.scene.add( spritey );
-				
+						////TODO is this another way for label?
+						//var spritey = createLabelWithSprite( " ander labeltje ", 
+						//	{ fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } );
+						//spritey.position.set(0,10,0);
+						//VisualisationJsModule.scene.add( spritey );
+				createLabelWithSprite( key, { fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } , nodes[key].distance);
+
 				
 				createArrows(three_links, nodelinks);
 				initialiseConstraints(nodes, spheres, three_links);
@@ -315,7 +332,8 @@
 		
 		
 	//hoort bij ander labeltje	
-	function createLabelWithSprite( message, parameters ){
+	function createLabelWithSprite( key, parameters, distance ){
+
 		if ( parameters === undefined ) parameters = {};
 		
 		var fontface = parameters.hasOwnProperty("fontface") ? 
@@ -338,7 +356,7 @@
 		context.font = "Bold " + fontsize + "px " + fontface;
 		
 		// get size data (height depends only on font size)
-		var metrics = context.measureText( message );
+		var metrics = context.measureText( key );
 		var textWidth = metrics.width;
 		
 		// background color
@@ -355,7 +373,7 @@
 		// text color
 		context.fillStyle = "rgba(0, 0, 0, 1.0)";
 
-		context.fillText( message, borderThickness, fontsize + borderThickness);
+		context.fillText( key, borderThickness, fontsize + borderThickness);
 		
 		// canvas contents will be used for a texture
 		var texture = new THREE.Texture(canvas) 
@@ -369,9 +387,16 @@
 		
 		console.log("VisualisationJsModule.scene");
 console.log(VisualisationJsModule.scene);
-console.log(sprite);		
+console.log(sprite);
+
+
+			labels[key] = sprite;
+//VisualisationJsModule.add3DObject(sprite,distance); //mesh1 is wat ik toevoegde aan scene
+		sprite.position.set(10,10,0);
+		VisualisationJsModule.scene.add( sprite );
 		
-		return sprite;	
+		
+		//return sprite;	
 		
 	}
 		
