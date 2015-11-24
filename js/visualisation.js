@@ -28,7 +28,7 @@ console.log("qqqqqqqqqqq");
 			normalizeCurrentMouseCoordinates(event, mouse);						
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
 
-			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 
+			var intersects = raycaster.intersectObjects( VisualisationJsModule.spheres ); 
 
 			if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
 				checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
@@ -46,6 +46,7 @@ console.log("qqqqqqqqqqq");
 		}	
 		
 		
+		//TODO onderstaande functie volledig opschonen omdat er nu alleen nog spheres worden meegenomen in intersects (intersectable objects.
 		function checkGeometryTypeAndSlice(intersects, urlname){
 			var intersectLength = intersects.length;
 				//If there is an intersection, and it is a sphere, apply click event.
@@ -61,7 +62,7 @@ console.log("qqqqqqqqqqq");
 							case 'SphereGeometry':
 								intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
 								
-									if(urlname != null){
+									if(urlname != null){ //TODO deze check kan waarschijnlijk weg
 										intersects[0].object.callback(intersects[0].object.urlName);
 									}
 								
@@ -286,6 +287,11 @@ console.log("qqqqqqqqqqq");
 					}
 				}
 				
+				VisualisationJsModule.spheres=[]; //TODO deze kan hernoemd worden naar intersectable objects bijvoorbeeld EN kan verplaatst worden naar module (initialiseren).
+				for (var key in spheres){ 
+				VisualisationJsModule.spheres.push(spheres[key]);
+				}
+			
 						////TODO is this another way for label?
 						//var spritey = createLabelWithSprite( " ander labeltje ", 
 						//	{ fontsize: 24, borderColor: {r:11, g:41, b:23, a:1.0}, backgroundColor: {r:10, g:30, b:254, a:1.5} } );
