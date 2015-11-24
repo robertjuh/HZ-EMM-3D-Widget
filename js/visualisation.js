@@ -57,7 +57,7 @@ console.log("qqqqqqqqqqq");
 
 				if(intersects == 0 || intersects[0].object.geometry.type == null){	
 					return;
-				}else{				
+				}else{				 
 						switch(intersects[0].object.geometry.type){
 							case 'SphereGeometry':
 								intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
