@@ -28,7 +28,7 @@ console.log("qqqqqqqqqqq");
 			normalizeCurrentMouseCoordinates(event, mouse);						
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
 
-			var intersects = raycaster.intersectObjects( VisualisationJsModule.spheres ); 
+			var intersects = raycaster.intersectObjects( VisualisationJsModule.sphereArray ); 
 
 			if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
 				checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
@@ -287,9 +287,9 @@ console.log("qqqqqqqqqqq");
 					}
 				}
 				
-				VisualisationJsModule.spheres=[]; //TODO deze kan hernoemd worden naar intersectable objects bijvoorbeeld EN kan verplaatst worden naar module (initialiseren).
+				VisualisationJsModule.sphereArray=[]; //TODO deze kan hernoemd worden naar intersectable objects bijvoorbeeld EN kan verplaatst worden naar module (initialiseren).
 				for (var key in spheres){ 
-				VisualisationJsModule.spheres.push(spheres[key]);
+				VisualisationJsModule.sphereArray.push(spheres[key]);
 				}
 			
 						////TODO is this another way for label?
