@@ -278,7 +278,7 @@ console.log("qqqqqqqqqqq");
 						VisualisationJsModule.scene.add(sphere);
 						//TODO get fontsize and fontface from css
 
-						createLabelWithSprite( key, { fontsize: 24, fontface : "Times" } , nodes[key]);
+						createLabelWithSprite( key , nodes[key]);
 						
 						
 						createCallbackFunctionForSphere(sphere); 		
@@ -325,16 +325,7 @@ console.log("qqqqqqqqqqq");
 		
 		
 	//creates label and connect it to node	
-	function createLabelWithSprite( key, parameters, node ){
-
-		if ( parameters === undefined ) parameters = {};
-		
-		var fontface = parameters.hasOwnProperty("fontface") ? 
-			parameters["fontface"] : "Arial";
-		
-		var fontsize = parameters.hasOwnProperty("fontsize") ? 
-			parameters["fontsize"] : 18;
-		
+	function createLabelWithSprite( key, node ){
 
 		var canvas = document.createElement('canvas');
 		var context = canvas.getContext('2d');
@@ -342,13 +333,14 @@ console.log("qqqqqqqqqqq");
 		
 		var canvas = document.createElement('canvas');
 		//TODO make width of sprite dependant on width of text
-		var size = 250;
+		//size is now hard-coded!?
+		var size = 350;
 		canvas.width = size;
 		canvas.height = size;
 		var context = canvas.getContext('2d');
 		context.fillStyle = '#990000';
 		context.textAlign = 'center';
-		context.font = "Bold " + fontsize + "px " + fontface;
+		context.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
 		context.fillText(key, size / 2, size / 2);
 
 		var amap = new THREE.Texture(canvas);
