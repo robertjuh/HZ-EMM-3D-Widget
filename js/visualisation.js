@@ -454,7 +454,7 @@ console.log("qqqqqqqqqqq");
 				}
 			};			
 	}	
-	function changeDepth(concept, depth){
+	function changeDepth(depth){
 	  //make objects visible yes/no depending on depth
 	  var links=VisualisationJsModule.threeDObjects
 	  links.forEach(function(link){
@@ -472,7 +472,7 @@ console.log("qqqqqqqqqqq");
 
 		//var depth = typeof depth !== 'undefined' ? depth : 2 ;		
  		var mydepth = typeof newdepth !== 'undefined' ? newdepth : 1 ;	
-		VisualisationJsModule.newDepth=mydepth;
+		VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			

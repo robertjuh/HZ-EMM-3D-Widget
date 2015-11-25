@@ -139,7 +139,7 @@ var drag2 = d3.behavior.drag()
 			slideDepth=tempSliderDepthInt;
 			console.log(slideDepth); 
 			if (slideDepth<=depth)
-			  lowerDepthFunction(concept, slideDepth);
+			  lowerDepthFunction(slideDepth);
 			else
 			  higherFunction(concept, slideDepth,slideDepth);
 			if (slideDepth>depth) depth=slideDepth;
