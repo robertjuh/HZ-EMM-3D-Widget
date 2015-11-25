@@ -51,19 +51,20 @@ var VisualisationJsModule = (function () {
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
-	//var maxDepth = getStyle(".maxDepth").style.flex;
-	
-	
+	var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
+	var newDepth;
 	
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
 		height : HEIGHT,
 		width : WIDTH,
 		depth : DEPTH,
+		newDepth : newDepth,
 		scene : scene,
 		camera : camera,
 		controls : controls,
 		container : container,
+		sphereArray : sphereArray,
 		//three arrays to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,

@@ -104,7 +104,6 @@ var drag2 = d3.behavior.drag()
                
                 
                 var sliderY = d3.select(this).attr("y");
-               console.log(sliderY);
             switch (true) {
                 case (sliderY > 0 && sliderY < 50):
                     tempSliderDepthInt=4

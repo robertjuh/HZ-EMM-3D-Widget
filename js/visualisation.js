@@ -282,7 +282,6 @@ console.log("qqqqqqqqqqq");
 					}
 				}
 				
-				VisualisationJsModule.sphereArray=[]; //TODO deze kan hernoemd worden naar intersectable objects bijvoorbeeld EN kan verplaatst worden naar module (initialiseren).
 				for (var key in spheres){ 
 				  VisualisationJsModule.sphereArray.push(spheres[key]);
 				}
