@@ -5,11 +5,6 @@
 * @author Robert Walhout
 */
 var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, concept,depth){
-console.log("ja createslider is geropee he");
-
-var HEIGHT = divHeight; //TODO KAN WEG IN project?
-
-var containerHeight = HEIGHT;
 
 var containerWidth = 60;
 var slideDepth = 1;
@@ -23,7 +18,7 @@ var sliderDiv = d3.select('#' + targetDivId).append("div")
 	.attr("id", "sliderDiv")
 	.attr("width", containerWidth)
 	.attr("position", "fixed")
-	.attr("height", containerHeight)
+	.attr("height", divHeight)
 	.style("display", "inline-block")
 	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
 	
@@ -32,7 +27,7 @@ console.log("sliderDiv");
 console.log(sliderDiv);
 var svgContainer = d3.select("#sliderDiv").append("svg")
 	.attr("width", containerWidth)
-	.attr("height", containerHeight);
+	.attr("height", divHeight);
 	
 console.log(svgContainer);
 
@@ -43,7 +38,7 @@ var depthScale = d3.scale.linear()
 //de "volume" driehoek
 var vis = d3.select("svg").append("svg")
          .attr("width", containerWidth)
-         .attr("height", containerHeight),
+         .attr("height", divHeight),
 scaleX = d3.scale.linear()
         .domain([0,100])
         .range([0,100]),
@@ -52,7 +47,7 @@ scaleY = d3.scale.linear()
         .range([0,100]),
 poly = [{"x":sliderOffsetSides, "y":sliderOffsetTop},
         {"x":containerWidth-sliderOffsetSides,"y":sliderOffsetTop},
-        {"x":sliderOffsetSides,"y":containerHeight-sliderOffsetTop}];
+        {"x":sliderOffsetSides,"y":divHeight-sliderOffsetTop}];
 
 vis.selectAll("polygon")
     .data([poly])
@@ -76,16 +71,13 @@ vis.selectAll("polygon")
 
 //de sliderbutton
 var sliderAttr = [
-  { "rx": sliderOffsetSides/2, "ry": containerHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides)}];	
+  { "rx": sliderOffsetSides/2, "ry": divHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides)}];	
 	
-//naar boven plaatsen??????????????????
 var sliderRect = svgContainer.selectAll("rect")
                               .data(sliderAttr)
                               .enter()
                               .append("rect");
 
-	
-//TODO wat is dit 
 var rectangleAttributes = sliderRect
 .attr("id", "amountSlider")
                           .attr("x", function (d) { return d.rx; })
@@ -104,8 +96,7 @@ var drag2 = d3.behavior.drag()
             return {x: t.attr("x"), y: t.attr("y")};
         })
         .on("drag", function(d,i) {
-            //console.log(slideDepth);
-            if(d3.event.y < containerHeight-sliderOffsetTop && d3.event.y > containerHeight-(containerHeight-sliderOffsetTop)){            
+            if(d3.event.y < divHeight-sliderOffsetTop && d3.event.y > divHeight-(divHeight-sliderOffsetTop)){            
             	d3.select(this)
            		.attr("x", sliderOffsetSides/2)            
           	    .attr("y", d3.event.y);   
@@ -113,18 +104,18 @@ var drag2 = d3.behavior.drag()
                
                 
                 var sliderY = d3.select(this).attr("y");
-               
+               console.log(sliderY);
             switch (true) {
                 case (sliderY > 0 && sliderY < 50):
                     tempSliderDepthInt=4
                     break;
-                case (sliderY > 100 && sliderY < 150):
+                case (sliderY > 50 && sliderY < 100):
                    tempSliderDepthInt=3
                     break;
-                case (sliderY > 150 && sliderY < 200):
+                case (sliderY > (divHeight-divHeight/2) && sliderY < (divHeight-(divHeight/4))):
                    tempSliderDepthInt=2
                     break;
-                case (sliderY > 200 && sliderY < 300):
+                case (sliderY > (divHeight-(divHeight/4)) && sliderY < divHeight):
                     tempSliderDepthInt=1
                     break;
                 default:

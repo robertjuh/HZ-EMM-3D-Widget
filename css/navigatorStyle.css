@@ -62,7 +62,7 @@
 	color: black;
 }
 
-
+/* Order = the initial loaded depth in the visualisation, once the program is loaded and the user selected a higher depth, it will be reloaded */
 .maxDepth{
-	height: 3px;
+	order: 1;	
 }

@@ -7,15 +7,38 @@
 
 
 var VisualisationJsModule = (function () {
-  //TODO use getStyle to get DEPTH/WIDTH/.....
-  //TODO make maxDepth in css so that it does not have to be followed by px
   //TODO think about defaults for WIDTH and HEIGHT
 	d3.select('body').append('div').attr("class","containerAttributes").attr("id", "classContainer").style("display", "none");
-	d3.select('body').append('div').attr("class","maxDepth").attr("id", "maxDepth").style("display", "none");
 
-	var DEPTH=parseInt(d3.select('.maxDepth').style('height'))||2;
-	var WIDTH=parseInt(d3.select('.containerAttributes').style('width'))||400;
-	var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'))||400;
+	var getStyle = function(CLASSname) {
+					var styleSheets = window.document.styleSheets;
+					var styleSheetsLength = styleSheets.length;
+					for(var i = 0; i < styleSheetsLength; i++){
+						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
+						else { 
+							try {  if(!styleSheets[i].cssRules) {continue;} } 
+							//Note that SecurityError exception is specific to Firefox.
+							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
+							var classes = styleSheets[i].cssRules ;
+						}
+						for (var x = 0; x < classes.length; x++) {
+							if (classes[x].selectorText == CLASSname) {
+					 return classes[x];
+								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
+								return ret;
+							}
+						}
+					}
+					return null;			
+			}
+	
+	
+	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
+	var DEPTH=getStyle(".maxDepth").style.order;
+	var WIDTH=parseInt(getStyle('.containerAttributes').style.width)||400;
+	var HEIGHT=parseInt(getStyle('.containerAttributes').style.height)||400;	
+	
 
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
@@ -28,7 +51,10 @@ var VisualisationJsModule = (function () {
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
-		
+	//var maxDepth = getStyle(".maxDepth").style.flex;
+	
+	
+	
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
 		height : HEIGHT,
@@ -57,32 +83,7 @@ var VisualisationJsModule = (function () {
 		  object.distance=distance;
 		  this.threeDObjects.push(object);
 		},
-		getStyle: function(CLASSname) {
-					var styleSheets = window.document.styleSheets;
-					var styleSheetsLength = styleSheets.length;
-					for(var i = 0; i < styleSheetsLength; i++){
-						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
-						else { 
-							try {  if(!styleSheets[i].cssRules) {continue;} } 
-							//Note that SecurityError exception is specific to Firefox.
-							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
-							var classes = styleSheets[i].cssRules ;
-						}
-						for (var x = 0; x < classes.length; x++) {
-							if (classes[x].selectorText == CLASSname) {
-					 return classes[x];
-					 //console.log(classes[x]);
-					 //console.log(classes[x].style["font-family"]);
-					 //console.log(classes[x].style.color);
-					 //console.log(classes[x].style["font-size"]);
-								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
-								return ret;
-							}
-						}
-					}
-					return null;			
-			}
+		getStyle: getStyle
 	};
 	
 });

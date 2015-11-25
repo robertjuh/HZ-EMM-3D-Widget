@@ -60,10 +60,8 @@ console.log("qqqqqqqqqqq");
 				case 'SphereGeometry':
 					intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
 					
-						//if(urlname != null){ //TODO deze check kan waarschijnlijk weg
-							intersects[0].object.callback(intersects[0].object.urlName);
-						//}
-					
+						intersects[0].object.callback(intersects[0].object.urlName);
+
 					console.log("je heb geklikt op een geometry:");
 					console.log(intersects[0].object.geometry.type);
 					return;
@@ -473,7 +471,7 @@ console.log("qqqqqqqqqqq");
 		//var depth = typeof depth !== 'undefined' ? depth : 2 ;		
  		var mydepth = typeof newdepth !== 'undefined' ? newdepth : 1 ;	
 		VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
-		
+	  console.log("mydepth",mydepth);		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
 		$.ajax({
@@ -596,14 +594,6 @@ $(document).ready(function() {
 	}
 	
 
-	function load() {
-		$('.visualisationResult').append('<div class="bar"></div>'); //TODO is dit nog steeds nodig? uitzoeken wat dit doet? verschil tussen document.ready en function load
-		$bar = $('.bar');
-		$bar.animate({
-			width : '100%'
-		}, 600, "swing", function() {
-		});	
-	}
 	
 	//creates additional functions	
 	function createExtraFunctions(){
