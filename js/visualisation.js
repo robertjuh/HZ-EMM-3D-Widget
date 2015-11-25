@@ -592,7 +592,6 @@ $(document).ready(function() {
 		createLightingForScene();
 		
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
-		//TODO make it so that depth can be passed to working slider, so that it only activates getting data from store if depth is greater than data already present.
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 	}
 	
