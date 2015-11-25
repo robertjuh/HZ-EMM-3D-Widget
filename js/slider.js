@@ -4,7 +4,7 @@
 * -add functionality -remove public variables -
 * @author Robert Walhout
 */
-var createSlider = (function(divHeight, initialiseDrawingSequence, concept){
+var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, concept,depth){
 console.log("ja createslider is geropee he");
 
 var HEIGHT = divHeight; //TODO KAN WEG IN project?
@@ -136,9 +136,13 @@ var drag2 = d3.behavior.drag()
                 sliderInfo[0][0].textContent = "Depth: " + tempSliderDepthInt;
             }           
         }).on("dragend", function () {
-			slideDepth=tempSliderDepthInt; 
+			slideDepth=tempSliderDepthInt;
 			console.log(slideDepth); 
-			initialiseDrawingSequence(concept, slideDepth); 
+			if (slideDepth<=depth)
+			  lowerDepthFunction(slideDepth);
+			else
+			  higherFunction(concept, slideDepth,slideDepth);
+			if (slideDepth>depth) depth=slideDepth;
 			
 		}); //dragend should invoke the drawing sequence
 

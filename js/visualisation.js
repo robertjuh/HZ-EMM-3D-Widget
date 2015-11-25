@@ -454,7 +454,7 @@ console.log("qqqqqqqqqqq");
 				}
 			};			
 	}	
-	function changeDepth(concept, depth){
+	function changeDepth(depth){
 	  //make objects visible yes/no depending on depth
 	  var links=VisualisationJsModule.threeDObjects
 	  links.forEach(function(link){
@@ -462,14 +462,17 @@ console.log("qqqqqqqqqqq");
 	  });
 	}
 			
-	function initialiseDrawingSequence(concept, depth){ //can pass "currentconcept" with this
+	function initialiseDrawingSequence(concept, depth, newdepth){ //can pass "currentconcept" with this
+	  console.log("newdepth",newdepth);
 		clearCanvas();
 			
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
 		}		
 
-		var depth = typeof depth !== 'undefined' ? depth : 2 ;		
+		//var depth = typeof depth !== 'undefined' ? depth : 2 ;		
+ 		var mydepth = typeof newdepth !== 'undefined' ? newdepth : 1 ;	
+		VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
 		
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
@@ -525,7 +528,7 @@ console.log("qqqqqqqqqqq");
 			visualize(nodes, nodelinks);
 			animate();
 			console.log("initialized all");
-			changeDepth(null, 1);//initial position in depth-slider is 1
+			changeDepth(null, VisualisationJsModule.newDepth);//initial position in depth-slider is 1
 			// Animate the webGL objects for rendering
 			function animate() {
 				requestAnimationFrame(animate);
@@ -588,9 +591,8 @@ $(document).ready(function() {
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
-		initialiseDrawingSequence(currentPageName);
-		
-		createSlider(containerHEIGHT, /*initialiseDrawingSequence*/changeDepth, currentPageName); //creates the slider for the depth	
+		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
+		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 	}
 	
 
