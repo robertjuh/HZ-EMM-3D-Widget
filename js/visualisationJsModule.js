@@ -7,10 +7,15 @@
 
 
 var VisualisationJsModule = (function () {
+  //TODO use getStyle to get DEPTH/WIDTH/.....
+  //TODO make maxDepth in css so that it does not have to be followed by px
+  //TODO think about defaults for WIDTH and HEIGHT
 	d3.select('body').append('div').attr("class","containerAttributes").attr("id", "classContainer").style("display", "none");
+	d3.select('body').append('div').attr("class","maxDepth").attr("id", "maxDepth").style("display", "none");
 
-	var WIDTH=parseInt(d3.select('.containerAttributes').style('width'));
-	var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'));
+	var DEPTH=parseInt(d3.select('.maxDepth').style('height'))||2;
+	var WIDTH=parseInt(d3.select('.containerAttributes').style('width'))||400;
+	var HEIGHT=parseInt(d3.select('.containerAttributes').style('height'))||400;
 
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
@@ -28,6 +33,7 @@ var VisualisationJsModule = (function () {
 		//these properties can be asked by: VisualisationJsModule.propertyname
 		height : HEIGHT,
 		width : WIDTH,
+		depth : DEPTH,
 		scene : scene,
 		camera : camera,
 		controls : controls,
