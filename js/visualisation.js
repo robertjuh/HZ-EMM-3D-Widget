@@ -60,9 +60,9 @@ console.log("qqqqqqqqqqq");
 				case 'SphereGeometry':
 					intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
 					
-						if(urlname != null){ //TODO deze check kan waarschijnlijk weg
+						//if(urlname != null){ //TODO deze check kan waarschijnlijk weg
 							intersects[0].object.callback(intersects[0].object.urlName);
-						}
+						//}
 					
 					console.log("je heb geklikt op een geometry:");
 					console.log(intersects[0].object.geometry.type);
