@@ -528,7 +528,8 @@ console.log("qqqqqqqqqqq");
 			visualize(nodes, nodelinks);
 			animate();
 			console.log("initialized all");
-			changeDepth(null, VisualisationJsModule.newDepth);//initial position in depth-slider is 1
+			console.log("VisualisationJsModule.newDepth",VisualisationJsModule.newDepth);
+			changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
 			// Animate the webGL objects for rendering
 			function animate() {
 				requestAnimationFrame(animate);
