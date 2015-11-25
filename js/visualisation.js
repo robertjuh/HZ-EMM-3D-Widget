@@ -254,7 +254,7 @@ console.log("qqqqqqqqqqq");
 	
 						// create the sphere's material and color
 						var sphereMaterial;
-						if(nodes[key].distance==0){ //TODO color nodes according to their nodes[key].relationtype I.e: if relation = broader, color = red, currentnode=green 
+						if(nodes[key].distance==0){ 
 							sphereMaterial = new THREE.MeshPhongMaterial({
 								color : VisualisationJsModule.getStyle(".sphere.centersphere").style.color
 							});												
@@ -276,9 +276,8 @@ console.log("qqqqqqqqqqq");
 
 						// add the sphere to the scene
 						VisualisationJsModule.scene.add(sphere);
-						//TODO get fontsize and fontface from css
 
-						createLabelWithSprite( key , nodes[key]);
+						nodes[key].label=createLabelWithSprite( key , nodes[key].distance);
 						
 						
 						createCallbackFunctionForSphere(sphere); 		
@@ -325,7 +324,7 @@ console.log("qqqqqqqqqqq");
 		
 		
 	//creates label and connect it to node	
-	function createLabelWithSprite( key, node ){
+	function createLabelWithSprite( key, distance ){
 
 		var canvas = document.createElement('canvas');
 		var context = canvas.getContext('2d');
@@ -360,11 +359,11 @@ console.log("qqqqqqqqqqq");
 		labels[key] = sprite;
 		sprite.position.set(10,10,0);
 		VisualisationJsModule.scene.add( sprite );
-		VisualisationJsModule.add3DObject(sprite,node.distance);		
-		node.label=sprite;
+		VisualisationJsModule.add3DObject(sprite,distance);		
+		//node.label=sprite;
 		
 		
-		//return sprite;	
+		return sprite;	
 		
 	}
 		
