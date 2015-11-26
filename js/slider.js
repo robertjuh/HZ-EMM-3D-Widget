@@ -6,7 +6,8 @@
 */
 var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, concept,depth){
 
-var containerWidth = 60;
+var containerWidth = 45;
+//var containerWidth = 60;
 var slideDepth = 1;
 var tempSliderDepthInt=1;
 
@@ -101,17 +102,23 @@ var drag2 = d3.behavior.drag()
            		.attr("x", sliderOffsetSides/2)            
           	    .attr("y", d3.event.y);   
                 
-               
-                
+               //TODO:
+			   //divHeight - textheight en bodemstukje
+			   //resultaat verdelen in 4
+			   //hoeft geen case 
+                //sliderY / divheight*4 en daarna afronden
+				
+				//je hebt dus geen hoogte in nummers meer, maar 4 getallen, resultaat afronden
+				
                 var sliderY = d3.select(this).attr("y");
             switch (true) {
                 case (sliderY > 0 && sliderY < 50):
                     tempSliderDepthInt=4
                     break;
-                case (sliderY > 50 && sliderY < 100):
+                case (sliderY > 50 && (divHeight-(divHeight/4)*3) < (divHeight-(divHeight/4)*2)):
                    tempSliderDepthInt=3
                     break;
-                case (sliderY > (divHeight-divHeight/2) && sliderY < (divHeight-(divHeight/4))):
+                case (sliderY > (divHeight-(divHeight/4)*2) && sliderY < (divHeight-(divHeight/4))):
                    tempSliderDepthInt=2
                     break;
                 case (sliderY > (divHeight-(divHeight/4)) && sliderY < divHeight):

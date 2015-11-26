@@ -389,8 +389,9 @@ console.log("qqqqqqqqqqq");
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
 					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.related").style.color, nodelinks[i]));					
 				}
-				else if((nodelinks[i].type === "Eigenschap:Skosem:broader"))
+				else if(nodelinks[i].type.compareStrings("Eigenschap:Skosem:broader", true, true)){
 					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.broader").style.color, nodelinks[i]));			
+				}
 				else{
 					console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
 					return;
@@ -421,19 +422,19 @@ console.log("qqqqqqqqqqq");
 		currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
 		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
 		
-		
-		console.log("currentNodeLink");
-		console.log(currentNodeLink);
-		console.log(arrow);
-		
-		
+
+			
 		//sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
 		//This code become rudimentary if there are new types introduced
-			  if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){		
+			if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){		
 				arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
 				//arrow.children[1].material.color = new THREE.Color(VisualisationJsModule.getStyle(".arrow.narrower").style.color); //head
 				//arrow.children[0].material.color = new THREE.Color(VisualisationJsModule.getStyle(".arrow.narrower").style.color); //line
-			  }
+				
+				//console.log("currentNodeLink");
+				//console.log(currentNodeLink);
+				//console.log(arrow);
+			}
 		
 		
 		VisualisationJsModule.scene.add(arrow);	
@@ -476,7 +477,7 @@ console.log("qqqqqqqqqqq");
 	  });
 	}
 			
-	function initialiseDrawingSequence(concept, depth, newdepth){ //can pass "currentconcept" with this
+	function initialiseDrawingSequence(concept, depth, newdepth){
 	  console.log("newdepth",newdepth);
 		clearCanvas();
 			
@@ -613,6 +614,10 @@ $(document).ready(function() {
 		
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
+	
+	
+	console.log("VisualisationJsModule.scene.children");
+	console.log(VisualisationJsModule.scene.children);
 	}
 	
 
