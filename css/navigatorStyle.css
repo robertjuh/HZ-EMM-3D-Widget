@@ -10,7 +10,7 @@
 	height: 700px;
 	width: 700px;
 	/* font: Bold 35px Arial; */
-	font: Bold 30px Open_Sans;
+	font: 30px Open_Sans;
 
 }
 
@@ -64,5 +64,5 @@
 
 /* Order = the initial loaded depth in the visualisation, once the program is loaded and the user selected a higher depth, it will be reloaded */
 .maxDepth{
-	order: 1;	
+	order: 2;	
 }

@@ -108,6 +108,7 @@ console.log("qqqqqqqqqqq");
 		  arrow.position.set(originPosition.x,originPosition.y,originPosition.z);
 		  // Cast function argument to Vector3 format
 		  var targetPosition=arrow.target.sphere.position;
+		  
 		  var newTarget = new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
 		  //Calculate new terminus vectors and set length (initial size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
 		  arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
@@ -228,8 +229,9 @@ console.log("qqqqqqqqqqq");
 			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
-		    if (currentniveau<3)//otherwise spheres get too close
-		    grootte=Math.floor(grootte/2);
+		    if (currentniveau<3){//otherwise spheres get too close
+				//grootte=Math.floor(grootte/1.5); 
+			}
 		  }
 		}
 		
@@ -345,12 +347,12 @@ console.log("qqqqqqqqqqq");
 		var mat = new THREE.SpriteMaterial({
 		    map: amap,
 		    transparent: true,
-		    useScreenCoordinates: false,
+		    //useScreenCoordinates: false,
 		    color: 0x000000
 		});
 
 		var sprite = new THREE.Sprite(mat);
-		sprite.scale.set(50,25,1.0);
+		sprite.scale.set(50,50,1.2); //grootte van text
 		sprite.textWidth=textWidth;
 		
 		labels[key] = sprite;
@@ -418,6 +420,21 @@ console.log("qqqqqqqqqqq");
 		arrow.distance=currentNodeLink.distance;
 		currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
 		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
+		
+		
+		console.log("currentNodeLink");
+		console.log(currentNodeLink);
+		console.log(arrow);
+		
+		
+		//sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
+		//This code become rudimentary if there are new types introduced
+			  if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){		
+				arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
+				//arrow.children[1].material.color = new THREE.Color(VisualisationJsModule.getStyle(".arrow.narrower").style.color); //head
+				//arrow.children[0].material.color = new THREE.Color(VisualisationJsModule.getStyle(".arrow.narrower").style.color); //line
+			  }
+		
 		
 		VisualisationJsModule.scene.add(arrow);	
 		return arrow;
