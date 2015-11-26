@@ -8,7 +8,6 @@
 
 var VisualisationJsModule = (function () {
   //TODO think about defaults for WIDTH and HEIGHT
-	d3.select('body').append('div').attr("class","containerAttributes").attr("id", "classContainer").style("display", "none");
 
 	var getStyle = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
