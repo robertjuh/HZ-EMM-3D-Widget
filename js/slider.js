@@ -5,6 +5,8 @@
 * @author Robert Walhout
 */
 var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, concept,depth){
+  
+var MAXDEPTH=4;
 
 var containerWidth = 45;
 //var containerWidth = 60;
@@ -102,34 +104,11 @@ var drag2 = d3.behavior.drag()
            		.attr("x", sliderOffsetSides/2)            
           	    .attr("y", d3.event.y);   
                 
-               //TODO:
-			   //divHeight - textheight en bodemstukje
-			   //resultaat verdelen in 4
-			   //hoeft geen case 
-                //sliderY / divheight*4 en daarna afronden
-				
-				//je hebt dus geen hoogte in nummers meer, maar 4 getallen, resultaat afronden
 				
                 var sliderY = d3.select(this).attr("y");
-            switch (true) {
-                case (sliderY > 0 && sliderY < 50):
-                    tempSliderDepthInt=4
-                    break;
-                case (sliderY > 50 && (divHeight-(divHeight/4)*3) < (divHeight-(divHeight/4)*2)):
-                   tempSliderDepthInt=3
-                    break;
-                case (sliderY > (divHeight-(divHeight/4)*2) && sliderY < (divHeight-(divHeight/4))):
-                   tempSliderDepthInt=2
-                    break;
-                case (sliderY > (divHeight-(divHeight/4)) && sliderY < divHeight):
-                    tempSliderDepthInt=1
-                    break;
-                default:
-                   // alert("none");
-                    break;
-            }
-                
-         
+		tempSliderDepthInt=Math.floor((divHeight-sliderY)/divHeight*MAXDEPTH+1);
+
+		//TODO omit text if slider too small, only display number
                 sliderInfo[0][0].textContent = "Depth: " + tempSliderDepthInt;
             }           
         }).on("dragend", function () {
@@ -151,7 +130,7 @@ var drag2 = d3.behavior.drag()
 	sliderRect.call(drag2)
 
 
-        //this is only necesary if another class has to call the current depth
+        //this is only necessary if another class has to call the current depth
 		//return  {
 		////returns the property sliderdepth, can ba called with the name of this variable (createslider.sliderDepth)
 		//sliderDepth : tempSliderDepthInt
