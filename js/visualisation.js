@@ -471,6 +471,7 @@ console.log("qqqqqqqqqqq");
  		var mydepth = typeof newdepth !== 'undefined' ? newdepth : 1 ;	
 		VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
 	  console.log("mydepth",mydepth);		
+	   console.log("depth",depth);
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
 		$.ajax({
@@ -500,6 +501,10 @@ console.log("qqqqqqqqqqq");
 		//console.log("DATA");
 		//console.log(result);
 			
+			 var links2=VisualisationJsModule.threeDObjects
+
+	  	console.log("threedobjects links");
+		console.log(links2);
 
 			//Contains arrows
 			labels = []; //Contains label sprites			

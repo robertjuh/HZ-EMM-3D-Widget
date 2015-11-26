@@ -128,11 +128,15 @@ var drag2 = d3.behavior.drag()
         }).on("dragend", function () {
 			slideDepth=tempSliderDepthInt;
 			console.log(slideDepth); 
-			if (slideDepth<=depth)
+			if (slideDepth<=depth){
 			  lowerDepthFunction(slideDepth);
-			else
-			  higherFunction(concept, slideDepth,slideDepth);
-			if (slideDepth>depth) depth=slideDepth;
+		  console.log("lowerdepthfunction (changedepth)", slideDepth, depth);
+			}
+			else if (slideDepth>depth){ 
+				depth=slideDepth;
+				higherFunction(concept, slideDepth,slideDepth);
+				 console.log("higehrfunction (initdrawingsequence)", slideDepth, depth)
+			}
 			
 		}); //dragend should invoke the drawing sequence
 
