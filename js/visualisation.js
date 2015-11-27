@@ -240,11 +240,12 @@ console.log("qqqqqqqqqqq");
 		//will create nodes(spheres), labels and arrows and positions them.
 		function visualize(nodes, nodelinks) {
 		  setCoordinatesSpheres(nodes,nodelinks);
+			//TODO 21 only init when base-depth ==0
 			var three_links = [];
 			var spheres = [];
 				// Create nodes and randomize default position
 				for (var key in nodes) {
-					if (nodes.hasOwnProperty(key)) {
+					if (nodes.hasOwnProperty(key)) {//TODO 21  && nodes[key].distance>=base_depth
 						var val = nodes[key];
 						
 						// set up the sphere vars
@@ -285,6 +286,7 @@ console.log("qqqqqqqqqqq");
 				}
 				
 				for (var key in spheres){ 
+				  //TODO 21 if nodes[key].distance>=base_depth
 				  VisualisationJsModule.sphereArray.push(spheres[key]);
 				}
 			
@@ -492,7 +494,7 @@ console.log("qqqqqqqqqqq");
 	   console.log("depth",depth);
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 			
-		$.ajax({
+		$.ajax({//TODO 21 create function in which concept, depth and relations are stored 
 			type : "POST",
 			cache : false,
 			//url : "php/VisualisationScript.php",
@@ -515,6 +517,7 @@ console.log("qqqqqqqqqqq");
 		
 		//gets called after the ajax call
 	var drawNewObjectsWithAjaxData = function (result) {
+	  //TODO 21 only do this when no nodes exist yet, init base-level=0;
 	  VisualisationJsModule.init3DObjects();
 		//console.log("DATA");
 		//console.log(result);
@@ -533,6 +536,7 @@ console.log("qqqqqqqqqqq");
 			console.log(jsonResult);
 			console.log(nodes);
 			console.log(nodelinks);
+			//TODO 21 end init, else init partially only for equal depth, init base-level=depth
 
 			// replace the description of the source and target of the links with the actual nodes.
 			nodelinks.forEach(function(link) {
