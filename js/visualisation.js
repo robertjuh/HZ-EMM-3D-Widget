@@ -1,11 +1,10 @@
-console.log("qqqqqqqqqqq");
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
 	var targetDivId = 'bodyContent'; //bodyContent
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
 	var containerDivId = containerDiv[0][0].id;
 	
-	console.log("target class ");
-	console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
+	//console.log("target class ");
+	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
 	
 	//set the position to inherit instead of relative, or the nodes won't be clickable	
 	d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
@@ -111,7 +110,7 @@ console.log("qqqqqqqqqqq");
 		  
 		  var newTarget = new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
 		  //Calculate new terminus vectors and set length (initial size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
-		  arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (7 - (relationDepth*0.8)), (3-(relationDepth*0.8)));
+		  arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (10 - (relationDepth*0.8)), (5-(relationDepth*0.8)));
 		  arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
 		}
 		//end of functions for arrows -----======-----
@@ -174,7 +173,7 @@ console.log("qqqqqqqqqqq");
 		}
 		//end of functions for mouseEvents -----======-----
 		
-		function setCoordinatesSpheres(nodes,nodelinks) {
+		function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
 		  var grootte= Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/2)*0.9 ;
 		  //var grootte= VisualisationJsModule.height ; // zo was het eerst
 
@@ -190,16 +189,15 @@ console.log("qqqqqqqqqqq");
 		  //zet root in het midden
 		  grootte=Math.floor(grootte/2);
 		  nodes[root].x=0;nodes[root].y=0;nodes[root].z=0;
+		  //always skip node with distance 0, because it is already placed at the center
+		  if (baseLevel<1)baseLevel=1;
 		  //- voor alle niveaus (van 1 tot max):
-		  for (var currentniveau=1;currentniveau<max+1;currentniveau++) {
+		  for (var currentniveau=baseLevel;currentniveau<max+1;currentniveau++) {
 		    //volgend niveau staat iedere keer minder dan de helft verder weg
 		    for (var key in nodes) 
 		    if (nodes[key].distance==currentniveau){
 			//genereer een random vector v van lengte = grootte
-			//var x = Math.floor((Math.random() * 100) + 1);
-			//var y = Math.floor((Math.random() * 100) + 1);
-			//var z = Math.floor((Math.random() * 100) + 1);
-		      //anton: possible negative values give better dispersion
+		        //possible negative values give better dispersion
 			var x = Math.floor((Math.random() * 100) + 1-50);
 			var y = Math.floor((Math.random() * 100) + 1-50);
 			var z = Math.floor((Math.random() * 100) + 1-50);
@@ -230,7 +228,7 @@ console.log("qqqqqqqqqqq");
 			} else console.log(nodes[key],"toch niet gevonden!");
 		    }
 		    if (currentniveau<3){//otherwise spheres get too close
-				//grootte=Math.floor(grootte/1.5); 
+				grootte=Math.floor(grootte/1.5); 
 			}
 		  }
 		}
@@ -238,14 +236,20 @@ console.log("qqqqqqqqqqq");
 			
 		// Visualize RDF data
 		//will create nodes(spheres), labels and arrows and positions them.
-		function visualize(nodes, nodelinks) {
-		  setCoordinatesSpheres(nodes,nodelinks);
-			//TODO 21 only init when base-depth ==0
+		//will omit all nodes with distance < baseLevel
+		function visualize(baseLevel,nodes, nodelinks) {
+			setCoordinatesSpheres(baseLevel,nodes,nodelinks);
 			var three_links = [];
 			var spheres = [];
-				// Create nodes and randomize default position
+			if (baseLevel>0){
+			  //three_links and spheres have already been created
+			  //so get them from memory
+			  spheres = VisualisationJsModule.spheres;
+			  three_links = VisualisationJsModule.three_links;
+			}
+				// Create spheres based on nodes.
 				for (var key in nodes) {
-					if (nodes.hasOwnProperty(key)) {//TODO 21  && nodes[key].distance>=base_depth
+					if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
 						var val = nodes[key];
 						
 						// set up the sphere vars
@@ -273,7 +277,8 @@ console.log("qqqqqqqqqqq");
 						nodes[key].sphere=sphere;
 						sphere.urlName = nodes[key].url.getLastPartOfUrl();
 						VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
-						spheres[key] = sphere;						
+						spheres[key] = sphere;	
+						VisualisationJsModule.sphereArray.push(sphere);
 
 						// add the sphere to the scene
 						VisualisationJsModule.scene.add(sphere);
@@ -281,19 +286,16 @@ console.log("qqqqqqqqqqq");
 						nodes[key].label=createLabelWithSprite( key , nodes[key].distance);
 						
 						
-						createCallbackFunctionForSphere(sphere); 		
+						createCallbackFunctionForSphere(sphere); 
 					}
 				}
-				
-				for (var key in spheres){ 
-				  //TODO 21 if nodes[key].distance>=base_depth
-				  VisualisationJsModule.sphereArray.push(spheres[key]);
-				}
+				//save spheres to memory, so they can be recalled
+				VisualisationJsModule.spheres=spheres;
 			
 				
 				createArrows(three_links, nodelinks);
 				initialiseConstraints(nodes, spheres, three_links);
-				
+				VisualisationJsModule.three_links=three_links;
 				VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
@@ -385,7 +387,7 @@ console.log("qqqqqqqqqqq");
 	}
 		
 	
-	function createArrows(three_links, nodelinks){		
+	function createArrows(three_links, nodelinks){	
 		for (var i = 0; i < nodelinks.length; i++) {
 										
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
@@ -478,23 +480,27 @@ console.log("qqqqqqqqqqq");
 	    link.visible=link.distance<=depth;
 	  });
 	}
-			
+	
 	function initialiseDrawingSequence(concept, depth, newdepth){
-	  console.log("newdepth",newdepth);
-		clearCanvas();
 			
 		if ( typeof concept === 'undefined' || concept === '') {
 			throw "Concept is undefined";
 		}		
 
-		//var depth = typeof depth !== 'undefined' ? depth : 2 ;		
- 		var mydepth = typeof newdepth !== 'undefined' ? newdepth : 1 ;	
+		//var depth = typeof depth !== 'undefined' ? depth : 2 ;
+		var mydepth =1 ;	
+		if (typeof newdepth !== 'undefined'){
+		  mydepth = newdepth;
+		  VisualisationJsModule.depth=depth;
+		}
+		else
+		  clearCanvas();//first time, clear canvas
 		VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
-	  console.log("mydepth",mydepth);		
-	   console.log("depth",depth);
 		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
-			
-		$.ajax({//TODO 21 create function in which concept, depth and relations are stored 
+		//display loading icon before ajax-call
+		$("body").toggleClass("wait");	
+		$.ajax(
+		  {
 			type : "POST",
 			cache : false,
 			//url : "php/VisualisationScript.php",
@@ -509,7 +515,6 @@ console.log("qqqqqqqqqqq");
 			},
        success:function(result)//we got the response
        {
-		console.log("ajax is gelukt ");
        },
        error:function(exception){alert('Exeption: '+exception);}	   
 		}).done(drawNewObjectsWithAjaxData);
@@ -517,43 +522,76 @@ console.log("qqqqqqqqqqq");
 		
 		//gets called after the ajax call
 	var drawNewObjectsWithAjaxData = function (result) {
-	  //TODO 21 only do this when no nodes exist yet, init base-level=0;
-	  VisualisationJsModule.init3DObjects();
-		//console.log("DATA");
-		//console.log(result);
-			
-			 var links2=VisualisationJsModule.threeDObjects
-
-	  	console.log("threedobjects links");
-		console.log(links2);
-
-			//Contains arrows
-			labels = []; //Contains label sprites			
-			
+	  //end loading icon
+	  $("body").toggleClass("wait");
+			var baseLevel=0;
 			var jsonResult = JSON.parse(result);
-			var nodes = jsonResult.nodes;
-			var nodelinks = jsonResult.relations;
-			console.log(jsonResult);
-			console.log(nodes);
-			console.log(nodelinks);
-			//TODO 21 end init, else init partially only for equal depth, init base-level=depth
+			if (typeof VisualisationJsModule.nodes == 'undefined'){
+			  //first time to draw nodes and arrows.
+			  //init nodes, nodelinks and labels
+			      VisualisationJsModule.init3DObjects();
+				      
+			      //Contains arrows
+			      labels = []; //Contains label sprites			
+			      
+			      var nodes = jsonResult.nodes;
+			      var nodelinks = jsonResult.relations;
+			} else {
+			  //ajax called when nodes are already on useScreenCoordinates
+			  //so get nodes and nodelinks from memory
+				      var nodes=VisualisationJsModule.nodes;
+				      //depth calculated to largest distance of old ones
+				      var baseLevel=0;
+				      for (var key in nodes) {
+					if (baseLevel<nodes[key].distance)
+					  baseLevel=nodes[key].distance;
+				      }
+				      baseLevel++;
+				      var nodeFound=false;
+				      //add new nodes to old ones
+				      for (var key in jsonResult.nodes) {
+				      if ((jsonResult.nodes[key].distance>=baseLevel))
+					nodes[key]=jsonResult.nodes[key];
+					nodeFound=true;
+				      }
+				      if(!nodeFound)
+					baseLevel=VisualisationJsModule.depth;
+				      //add new nodelinks to old ones
+				      var nodelinks=VisualisationJsModule.nodelinks;
+				      jsonResult.relations.forEach(function(link) {
+					var found=false;
+					nodelinks.forEach(function(linkold) {
+					  if (link.type==linkold.type && link.urlsource==linkold.urlsource  && link.urltarget==linkold.urltarget)
+					    found=true;
+					});
+					if (!found)
+					  nodelinks.push(link);
+				      });
+			}
 
 			// replace the description of the source and target of the links with the actual nodes.
 			nodelinks.forEach(function(link) {
 			  {
+			    //check if link-desccription already replaced with corresponding object
+			    if (typeof link.source == "string"){
+			      //replace link-desccription with corresponding object
 				link.source = nodes[link.source] ;
 				link.distance=link.source.distance;
 				link.target = nodes[link.target];
+				//distance is smallest from target and source
 				if (link.distance<link.target.distance) link.distance=link.target.distance;
+			    }
 			  }
 			});
 
 			VisualisationJsModule.camera.updateProjectionMatrix();
-			visualize(nodes, nodelinks);
+			visualize(baseLevel,nodes, nodelinks);
 			animate();
-			console.log("initialized all");
-			console.log("VisualisationJsModule.newDepth",VisualisationJsModule.newDepth);
 			changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
+			console.log("initialized all");
+			VisualisationJsModule.nodes=nodes;
+			VisualisationJsModule.nodelinks=nodelinks;
+			
 			// Animate the webGL objects for rendering
 			function animate() {
 				requestAnimationFrame(animate);
@@ -582,7 +620,6 @@ $(document).ready(function() {
 	*/	
 	function initialiseTHREEComponents(){ //current page name als concept meen
 		VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
-		console.log("initialise three components wordt hier aangeroepen");
 		var containerHEIGHT = VisualisationJsModule.height;
 		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		
@@ -619,9 +656,6 @@ $(document).ready(function() {
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 	
-	
-	console.log("VisualisationJsModule.scene.children");
-	console.log(VisualisationJsModule.scene.children);
 	}
 	
 

@@ -66,3 +66,11 @@
 .maxDepth{
 	order: 2;	
 }
+
+body.wait, body.wait *{
+ cursor: wait !important;   
+}
+
+div{
+   cursor: pointer;   
+}

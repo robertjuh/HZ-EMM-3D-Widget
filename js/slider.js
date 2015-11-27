@@ -26,14 +26,10 @@ var sliderDiv = d3.select('#' + targetDivId).append("div")
 	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
 	
 	
-console.log("sliderDiv");
-console.log(sliderDiv);
 var svgContainer = d3.select("#sliderDiv").append("svg")
 	.attr("width", containerWidth)
 	.attr("height", divHeight);
 	
-console.log(svgContainer);
-
 var depthScale = d3.scale.linear()
         .domain([0,5])
         .range([0,100]);
@@ -113,15 +109,12 @@ var drag2 = d3.behavior.drag()
             }           
         }).on("dragend", function () {
 			slideDepth=tempSliderDepthInt;
-			console.log(slideDepth); 
 			if (slideDepth<=depth){
 			  lowerDepthFunction(slideDepth);
-		  console.log("lowerdepthfunction (changedepth)", slideDepth, depth);
 			}
 			else if (slideDepth>depth){ 
 				depth=slideDepth;
 				higherFunction(concept, slideDepth,slideDepth);
-				 console.log("higehrfunction (initdrawingsequence)", slideDepth, depth)
 			}
 			
 		}); //dragend should invoke the drawing sequence
