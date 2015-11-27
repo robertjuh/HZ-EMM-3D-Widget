@@ -67,6 +67,7 @@
 	order: 2;	
 }
 
+/*used to change cursor into wait while ajax-call busy*/
 body.wait, body.wait *{
  cursor: wait !important;   
 }

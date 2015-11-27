@@ -524,6 +524,7 @@
 	var drawNewObjectsWithAjaxData = function (result) {
 	  //end loading icon
 	  $("body").toggleClass("wait");
+-	  VisualisationJsModule.init3DObjects();
 			var baseLevel=0;
 			var jsonResult = JSON.parse(result);
 			if (typeof VisualisationJsModule.nodes == 'undefined'){
