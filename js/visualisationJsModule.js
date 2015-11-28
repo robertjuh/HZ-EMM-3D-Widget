@@ -3,10 +3,11 @@
 * all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
-
+var CSSmaxDepth_order="4";
+var CSScontainerAttributes_width=400;
+var CSScontainerAttributes_height=400;	
 
 var VisualisationJsModule = (function () {
-  //TODO think about defaults for WIDTH and HEIGHT
 	var getStyle = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;
@@ -29,22 +30,28 @@ var VisualisationJsModule = (function () {
 					}
 					return null;			
 			}
-	
+	/*
+	 * get attribute in style, if not available return defaultValue
+	 */ 
 	var getStyleAttr = function(CLASSname,attr,defaultValue) {
 	  try {
 	    var text=getStyle(CLASSname).cssText;
+	    //parse css, get text inbetween brackets
 	    var p=text.indexOf("{");
-	    text=text.substring(p);
-	    p=text.indexOf(attr);
-	    text=text.substring(p+attr.length);
-	    var f=text.substring(0,1);
-	    if (!((f==" ")|| (f==":"))) return defaultValue;
-	    //TODO check for other possible occurrences of attr, by using while
-	    p=text.indexOf(":");
 	    text=text.substring(p+1);
-	    p=text.indexOf(";");
-	    text=text.substring(0,p);
-	    if ( text.length>0) return text;else return defaultValue;
+	    var p=text.indexOf("}");
+	    text=text.substring(0,p-1);
+	    //split into parts
+	    var listattr = text.split(";");//list with all attributes
+	    var found=false;
+	    var value=null;
+	    for (var i = 0; i < listattr.length; i++) {
+		var attrn = listattr[i].split(":");//becomes key-value pair
+		var key=attrn[0].trim();
+		if (key==attr) {found=true;value=attrn[1].trim();}
+		//Do something
+	    }
+	    if (found) return value;else return defaultValue;
 	  }
 	  catch (e) {
 	    return defaultValue;
@@ -52,10 +59,22 @@ var VisualisationJsModule = (function () {
   
 	}
 	
+	/*
+	 * get attribute in style as in integer, if not available return defaultValue (must be int)
+	 */ 
+	var getStyleAttrInt = function(CLASSname,attr,defaultValue) {
+	  try {
+	    return parseInt(getStyleAttr(CLASSname,attr,""+defaultValue));
+	  }
+	  catch (e) {
+	    return defaultValue;
+	  }
+	  
+	}
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-	var DEPTH=getStyleAttr(".maxDepth","order","4");
-	var WIDTH=parseInt(getStyleAttr('.containerAttributes',"width","400"));
-	var HEIGHT=parseInt(getStyleAttr('.containerAttributes',"height","400"));	
+	var DEPTH=getStyleAttr(".maxDepth","order",CSSmaxDepth_order);
+	var WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+	var HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 	
 
 	// Set camera attributes and create camera
@@ -103,7 +122,8 @@ var VisualisationJsModule = (function () {
 		  this.threeDObjects.push(object);
 		},
 		getStyle: getStyle,
-		getStyleAttr:getStyleAttr
+		getStyleAttr:getStyleAttr,
+		getStyleAttrInt:getStyleAttrInt
 	};
 	
 });

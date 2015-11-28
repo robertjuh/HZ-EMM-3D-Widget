@@ -1,3 +1,10 @@
+var CSSarrow_related_color="red";
+var CSSsphere_color="orange";
+var CSScontainerAttributes_fontsize="20px";//font-weight: bold
+var CSScontainerAttributes_fontfamily="Times";
+var CSScontainerAttributes_fontweight="normal";
+var CSSarrow_related_color="red";
+var CSSarrow_broader_color="black";
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
 	var targetDivId = 'bodyContent'; //bodyContent
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
@@ -262,12 +269,12 @@
 						var sphereMaterial;
 						if(nodes[key].distance==0){ 
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : VisualisationJsModule.getStyle(".sphere.centersphere").style.color
+								color : VisualisationJsModule.getStyleAttr(".sphere.centersphere","color",CSSarrow_related_color)
 							});												
 						}
 						else{
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : VisualisationJsModule.getStyle(".sphere").style.color
+								color : VisualisationJsModule.getStyleAttr(".sphere","color",CSSsphere_color)
 							});
 						}
 
@@ -343,7 +350,9 @@
 		var context = canvas.getContext('2d');
 		context.fillStyle = '#990000';
 		context.textAlign = 'center';
-		context.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
+		context.font = VisualisationJsModule.getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
+		  VisualisationJsModule.getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
+		  VisualisationJsModule.getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
 		context.fillText(key, size / 2, size / 2);
 
 		var amap = new THREE.Texture(canvas);
@@ -392,10 +401,10 @@
 		for (var i = 0; i < nodelinks.length; i++) {
 										
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
-					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.related").style.color, nodelinks[i]));					
+					three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.related","color",CSSarrow_related_color), nodelinks[i]));					
 				}
 				else if(nodelinks[i].type.compareStrings("Eigenschap:Skosem:broader", true, true)){
-					three_links.push(setArrowData(VisualisationJsModule.getStyle(".arrow.broader").style.color, nodelinks[i]));			
+					three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.broader","color",CSSarrow_broader_color), nodelinks[i]));			
 				}
 				else{
 					console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
