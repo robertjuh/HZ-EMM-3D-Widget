@@ -192,41 +192,42 @@
 		  //always skip node with distance 0, because it is already placed at the center
 		  if (baseLevel<1)baseLevel=1;
 		  //- voor alle niveaus (van 1 tot max):
-		  for (var currentniveau=baseLevel;currentniveau<max+1;currentniveau++) {
+		  for (var currentniveau=1;currentniveau<max+1;currentniveau++) {
 		    //volgend niveau staat iedere keer minder dan de helft verder weg
-		    for (var key in nodes) 
-		    if (nodes[key].distance==currentniveau){
-			//genereer een random vector v van lengte = grootte
-		        //possible negative values give better dispersion
-			var x = Math.floor((Math.random() * 100) + 1-50);
-			var y = Math.floor((Math.random() * 100) + 1-50);
-			var z = Math.floor((Math.random() * 100) + 1-50);
-			var v1 = new THREE.Vector3(x, y, z);
-			
-			v1=v1.normalize ();//vector is now size 1
-			
-			
-			var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
-			nodes[key].x=v3.x;
-			nodes[key].y=v3.y;
-			nodes[key].z=v3.z;
-			//voor alle relaties verbonden met node
-			var opponent=null;
-			nodelinks.forEach(function(link) {
-			  {
-			    //zoek in de lijst een node met niveau < currentniveau (die is er!)
-			    if ((link.source==nodes[key])&&(link.target.distance==currentniveau-1))opponent=link.target;
-			    if ((link.target==nodes[key])&&(link.source.distance==currentniveau-1))opponent=link.source;
-			  }
-			});
-			if (opponent!=null){
-			  //tel bij de x/y/z van vector v de gevonden x/y/z (van die gevonden node) op  -->xn,yn,zn
-			  //ken die xn/yn/zn toe aan huidige node
-			  nodes[key].x=Math.floor(nodes[key].x+opponent.x);
-			  nodes[key].y=Math.floor(nodes[key].y+opponent.y);
-			  nodes[key].z=Math.floor(nodes[key].z+opponent.z);
-			} else console.log(nodes[key],"toch niet gevonden!");
-		    }
+		    if (currentniveau>=baseLevel)
+		      for (var key in nodes) 
+			if (nodes[key].distance==currentniveau){
+			    //genereer een random vector v van lengte = grootte
+			    //possible negative values give better dispersion
+			    var x = Math.floor((Math.random() * 100) + 1-50);
+			    var y = Math.floor((Math.random() * 100) + 1-50);
+			    var z = Math.floor((Math.random() * 100) + 1-50);
+			    var v1 = new THREE.Vector3(x, y, z);
+			    
+			    v1=v1.normalize ();//vector is now size 1
+			    
+			    
+			    var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
+			    nodes[key].x=v3.x;
+			    nodes[key].y=v3.y;
+			    nodes[key].z=v3.z;
+			    //voor alle relaties verbonden met node
+			    var opponent=null;
+			    nodelinks.forEach(function(link) {
+			      {
+				//zoek in de lijst een node met niveau < currentniveau (die is er!)
+				if ((link.source==nodes[key])&&(link.target.distance==currentniveau-1))opponent=link.target;
+				if ((link.target==nodes[key])&&(link.source.distance==currentniveau-1))opponent=link.source;
+			      }
+			    });
+			    if (opponent!=null){
+			      //tel bij de x/y/z van vector v de gevonden x/y/z (van die gevonden node) op  -->xn,yn,zn
+			      //ken die xn/yn/zn toe aan huidige node
+			      nodes[key].x=Math.floor(nodes[key].x+opponent.x);
+			      nodes[key].y=Math.floor(nodes[key].y+opponent.y);
+			      nodes[key].z=Math.floor(nodes[key].z+opponent.z);
+			    } else console.log(nodes[key],"toch niet gevonden!");
+			}
 		    if (currentniveau<3){//otherwise spheres get too close
 				grootte=Math.floor(grootte/1.5); 
 			}
@@ -513,19 +514,23 @@
 				uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
 				fusekidataset : mw.config.get('wgEM3DNavigator').eM3DFusekiDataset
 			},
-       success:function(result)//we got the response
-       {
-       },
-       error:function(exception){alert('Exeption: '+exception);}	   
-		}).done(drawNewObjectsWithAjaxData);
-	}
-		
-		//gets called after the ajax call
-	var drawNewObjectsWithAjaxData = function (result) {
-	  //end loading icon
-	  $("body").toggleClass("wait");
--	  VisualisationJsModule.init3DObjects();
+			success:function(result)//we got the response
+			{
+			},
+			error:function(exception){alert('Exeption: '+exception);}	   
+				  }).done(drawNewObjectsWithAjaxData);
+			  }
+				  
+			//TODO see if drawNewObjectsWithAjaxData can be transferred outside initialiseDrawingSequence	  
+			//gets called after the ajax call
+			var drawNewObjectsWithAjaxData = function (result) {
+			//end loading icon
+			$("body").toggleClass("wait");
+
+			VisualisationJsModule.init3DObjects();
+
 			var baseLevel=0;
+
 			var jsonResult = JSON.parse(result);
 			if (typeof VisualisationJsModule.nodes == 'undefined'){
 			  //first time to draw nodes and arrows.
@@ -538,36 +543,40 @@
 			      var nodes = jsonResult.nodes;
 			      var nodelinks = jsonResult.relations;
 			} else {
-			  //ajax called when nodes are already on useScreenCoordinates
-			  //so get nodes and nodelinks from memory
-				      var nodes=VisualisationJsModule.nodes;
-				      //depth calculated to largest distance of old ones
-				      var baseLevel=0;
-				      for (var key in nodes) {
-					if (baseLevel<nodes[key].distance)
-					  baseLevel=nodes[key].distance;
-				      }
-				      baseLevel++;
-				      var nodeFound=false;
-				      //add new nodes to old ones
-				      for (var key in jsonResult.nodes) {
-				      if ((jsonResult.nodes[key].distance>=baseLevel))
-					nodes[key]=jsonResult.nodes[key];
-					nodeFound=true;
-				      }
-				      if(!nodeFound)
-					baseLevel=VisualisationJsModule.depth;
-				      //add new nodelinks to old ones
-				      var nodelinks=VisualisationJsModule.nodelinks;
-				      jsonResult.relations.forEach(function(link) {
-					var found=false;
-					nodelinks.forEach(function(linkold) {
-					  if (link.type==linkold.type && link.urlsource==linkold.urlsource  && link.urltarget==linkold.urltarget)
-					    found=true;
-					});
-					if (!found)
-					  nodelinks.push(link);
-				      });
+			      //TODO put this part in separate function. Problem: multi variable return value
+			      //this part produces nodes, nodelinks and baseLevel when nodes are already on useScreenCoordinates
+			      //gets nodes and nodelinks from memory
+			      var nodes=VisualisationJsModule.nodes;
+
+			      //depth calculated to largest distance of old ones
+			      for (var key in nodes) {
+				if (baseLevel<nodes[key].distance)
+				  baseLevel=nodes[key].distance;
+			      }
+			      //baseLevel is 1 larger than largest of old ones
+			      baseLevel++;
+
+			      var nodeFound=false;
+			      //add new nodes to old ones
+			      for (var key in jsonResult.nodes) {
+			      if ((jsonResult.nodes[key].distance>=baseLevel))
+				nodes[key]=jsonResult.nodes[key];
+				nodeFound=true;
+			      }
+			      if(!nodeFound)
+				baseLevel=VisualisationJsModule.depth;
+
+			      //add new nodelinks to old ones
+			      var nodelinks=VisualisationJsModule.nodelinks;
+			      jsonResult.relations.forEach(function(link) {
+				var found=false;
+				nodelinks.forEach(function(linkold) {
+				  if (link.type==linkold.type && link.urlsource==linkold.urlsource  && link.urltarget==linkold.urltarget)
+				    found=true;
+				});
+				if (!found)
+				  nodelinks.push(link);
+			      });
 			}
 
 			// replace the description of the source and target of the links with the actual nodes.
