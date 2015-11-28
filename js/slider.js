@@ -8,6 +8,7 @@ var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, conc
   
 var MAXDEPTH=4;
 
+//TODO set width container in css
 var containerWidth = 45;
 //var containerWidth = 60;
 var slideDepth = 1;
