@@ -431,14 +431,11 @@
 			
 		//sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
 		//This code become rudimentary if there are new types introduced
-			if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){		
-				arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
-				//arrow.children[1].material.color = new THREE.Color(VisualisationJsModule.getStyle(".arrow.narrower").style.color); //head
-				//arrow.children[0].material.color = new THREE.Color(VisualisationJsModule.getStyle(".arrow.narrower").style.color); //line
-				
-				//console.log("currentNodeLink");
-				//console.log(currentNodeLink);
-				//console.log(arrow);
+			if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){	
+			  //commented out by anton
+			  //color red was arbitrarily added to some arrows
+			  //TODO: see what next line does. If not necessary: omit it!
+				//arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
 			}
 		
 		

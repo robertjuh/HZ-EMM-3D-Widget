@@ -59,13 +59,18 @@ vis.selectAll("polygon")
 
 
   
+var setSliderInfoText=function(width,value){
+  return ((width<40)?"":"Depth: ") + value;
+}
   //text boven de slider
-  sliderInfo = svgContainer.append('foreignObject')
+   sliderInfo = svgContainer.append('foreignObject')
                         .attr('x', 2)
                         .attr('y', 1)
-                        .attr('width', 150)
+			  //center text above slider
+			.style(    "text-align","center")
+                        .attr('width', containerWidth)
                         .attr('height', 100)
-    .text('Depth: ' + slideDepth);
+    .text(setSliderInfoText(containerWidth-(sliderOffsetSides), slideDepth));
 
 
 //de sliderbutton
@@ -87,7 +92,7 @@ var rectangleAttributes = sliderRect
 	
 
 
-
+			 
 //drag functionality
 var drag2 = d3.behavior.drag()
         .origin(function() { 
@@ -104,8 +109,7 @@ var drag2 = d3.behavior.drag()
                 var sliderY = d3.select(this).attr("y");
 		tempSliderDepthInt=Math.floor((divHeight-sliderY)/divHeight*MAXDEPTH+1);
 
-		//TODO omit text if slider too small, only display number
-                sliderInfo[0][0].textContent = "Depth: " + tempSliderDepthInt;
+                sliderInfo[0][0].textContent = setSliderInfoText(d.width,tempSliderDepthInt);
             }           
         }).on("dragend", function () {
 			slideDepth=tempSliderDepthInt;
