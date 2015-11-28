@@ -479,6 +479,43 @@
 	  });
 	}
 	
+	function getNodeAndNodelinksFromMemory(jsonResult,baseLevel) {
+	    //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
+	    //gets nodes and nodelinks from memory
+	    var nodes=VisualisationJsModule.nodes;
+
+	    //depth calculated to largest distance of old ones
+	    for (var key in nodes) {
+	      if (baseLevel<nodes[key].distance)
+		baseLevel=nodes[key].distance;
+	    }
+	    //baseLevel is 1 larger than largest of old ones
+	    baseLevel++;
+
+	    var nodeFound=false;
+	    //add new nodes to old ones
+	    for (var key in jsonResult.nodes) {
+	    if ((jsonResult.nodes[key].distance>=baseLevel))
+	      nodes[key]=jsonResult.nodes[key];
+	      nodeFound=true;
+	    }
+	    if(!nodeFound)
+	      baseLevel=VisualisationJsModule.depth;
+
+	    //add new nodelinks to old ones
+	    var nodelinks=VisualisationJsModule.nodelinks;
+	    jsonResult.relations.forEach(function(link) {
+	      var found=false;
+	      nodelinks.forEach(function(linkold) {
+		if (link.type==linkold.type && link.urlsource==linkold.urlsource  && link.urltarget==linkold.urltarget)
+		  found=true;
+	      });
+	      if (!found)
+		nodelinks.push(link);
+	    });
+	    //three return values
+	    return {nodes:nodes,nodelinks:nodelinks,baseLevel:baseLevel};
+	}
 	function initialiseDrawingSequence(concept, depth, newdepth){
 			
 		if ( typeof concept === 'undefined' || concept === '') {
@@ -540,40 +577,11 @@
 			      var nodes = jsonResult.nodes;
 			      var nodelinks = jsonResult.relations;
 			} else {
-			      //TODO put this part in separate function. Problem: multi variable return value
-			      //this part produces nodes, nodelinks and baseLevel when nodes are already on useScreenCoordinates
-			      //gets nodes and nodelinks from memory
-			      var nodes=VisualisationJsModule.nodes;
-
-			      //depth calculated to largest distance of old ones
-			      for (var key in nodes) {
-				if (baseLevel<nodes[key].distance)
-				  baseLevel=nodes[key].distance;
-			      }
-			      //baseLevel is 1 larger than largest of old ones
-			      baseLevel++;
-
-			      var nodeFound=false;
-			      //add new nodes to old ones
-			      for (var key in jsonResult.nodes) {
-			      if ((jsonResult.nodes[key].distance>=baseLevel))
-				nodes[key]=jsonResult.nodes[key];
-				nodeFound=true;
-			      }
-			      if(!nodeFound)
-				baseLevel=VisualisationJsModule.depth;
-
-			      //add new nodelinks to old ones
-			      var nodelinks=VisualisationJsModule.nodelinks;
-			      jsonResult.relations.forEach(function(link) {
-				var found=false;
-				nodelinks.forEach(function(linkold) {
-				  if (link.type==linkold.type && link.urlsource==linkold.urlsource  && link.urltarget==linkold.urltarget)
-				    found=true;
-				});
-				if (!found)
-				  nodelinks.push(link);
-			      });
+			  //read nodes from memory
+			  var ret=getNodeAndNodelinksFromMemory(jsonResult,baseLevel);
+			  //parse return value
+			  var nodes=ret.nodes,nodelinks=ret.nodelinks;
+			  baseLevel=ret.baseLevel;
 			}
 
 			// replace the description of the source and target of the links with the actual nodes.
