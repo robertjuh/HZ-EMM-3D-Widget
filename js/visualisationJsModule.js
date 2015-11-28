@@ -3,7 +3,7 @@
 * all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
-var CSSmaxDepth_order="4";
+var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
 
@@ -72,7 +72,7 @@ var VisualisationJsModule = (function () {
 	  
 	}
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-	var DEPTH=getStyleAttr(".maxDepth","order",CSSmaxDepth_order);
+	var DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
 	var WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
 	var HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 	
