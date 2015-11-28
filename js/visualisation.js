@@ -525,6 +525,77 @@ var CSSarrow_broader_color="black";
 	    //three return values
 	    return {nodes:nodes,nodelinks:nodelinks,baseLevel:baseLevel};
 	}
+
+      //gets called after the ajax call
+      var drawNewObjectsWithAjaxData = function (result) {
+	//end loading icon
+	$("body").toggleClass("wait");
+
+	VisualisationJsModule.init3DObjects();
+
+	var baseLevel=0;
+
+	var jsonResult = JSON.parse(result);
+	if (typeof VisualisationJsModule.nodes == 'undefined'){
+	  //first time to draw nodes and arrows.
+	  //init nodes, nodelinks and labels
+	      VisualisationJsModule.init3DObjects();
+		      
+	      //Contains arrows
+	      labels = []; //Contains label sprites			
+	      
+	      var nodes = jsonResult.nodes;
+	      var nodelinks = jsonResult.relations;
+	} else {
+	  //read nodes from memory
+	  var ret=getNodeAndNodelinksFromMemory(jsonResult,baseLevel);
+	  //parse return value
+	  var nodes=ret.nodes,nodelinks=ret.nodelinks;
+	  baseLevel=ret.baseLevel;
+	}
+
+	// replace the description of the source and target of the links with the actual nodes.
+	nodelinks.forEach(function(link) {
+	  {
+	    //check if link-desccription already replaced with corresponding object
+	    if (typeof link.source == "string"){
+	      //replace link-desccription with corresponding object
+		link.source = nodes[link.source] ;
+		link.distance=link.source.distance;
+		link.target = nodes[link.target];
+		//distance is smallest from target and source
+		if (link.distance<link.target.distance) link.distance=link.target.distance;
+	    }
+	  }
+	});
+
+	VisualisationJsModule.camera.updateProjectionMatrix();
+	visualize(baseLevel,nodes, nodelinks);
+	animate();
+	changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
+	console.log("initialized all");
+	VisualisationJsModule.nodes=nodes;
+	VisualisationJsModule.nodelinks=nodelinks;
+	
+	// Animate the webGL objects for rendering
+	function animate() {
+		requestAnimationFrame(animate);
+		renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
+		VisualisationJsModule.controls.update();
+
+		for (var label in labels) {
+			labels[label].lookAt(VisualisationJsModule.camera.position); //makes the labels spin around to try to look at the camera
+		}
+		render();
+	}
+
+	// Extension of default render function, runs continuously, add code here if needed
+	function render() {
+
+	}
+  }//drawNewObjectsWithAjaxData
+
+		
 	function initialiseDrawingSequence(concept, depth, newdepth){
 			
 		if ( typeof concept === 'undefined' || concept === '') {
@@ -561,80 +632,9 @@ var CSSarrow_broader_color="black";
 			{
 			},
 			error:function(exception){alert('Exeption: '+exception);}	   
-				  }).done(drawNewObjectsWithAjaxData);
-			  }
+		  }).done(drawNewObjectsWithAjaxData);
+	}//initialiseDrawingSequence
 				  
-			//TODO see if drawNewObjectsWithAjaxData can be transferred outside initialiseDrawingSequence	  
-			//gets called after the ajax call
-			var drawNewObjectsWithAjaxData = function (result) {
-			//end loading icon
-			$("body").toggleClass("wait");
-
-			VisualisationJsModule.init3DObjects();
-
-			var baseLevel=0;
-
-			var jsonResult = JSON.parse(result);
-			if (typeof VisualisationJsModule.nodes == 'undefined'){
-			  //first time to draw nodes and arrows.
-			  //init nodes, nodelinks and labels
-			      VisualisationJsModule.init3DObjects();
-				      
-			      //Contains arrows
-			      labels = []; //Contains label sprites			
-			      
-			      var nodes = jsonResult.nodes;
-			      var nodelinks = jsonResult.relations;
-			} else {
-			  //read nodes from memory
-			  var ret=getNodeAndNodelinksFromMemory(jsonResult,baseLevel);
-			  //parse return value
-			  var nodes=ret.nodes,nodelinks=ret.nodelinks;
-			  baseLevel=ret.baseLevel;
-			}
-
-			// replace the description of the source and target of the links with the actual nodes.
-			nodelinks.forEach(function(link) {
-			  {
-			    //check if link-desccription already replaced with corresponding object
-			    if (typeof link.source == "string"){
-			      //replace link-desccription with corresponding object
-				link.source = nodes[link.source] ;
-				link.distance=link.source.distance;
-				link.target = nodes[link.target];
-				//distance is smallest from target and source
-				if (link.distance<link.target.distance) link.distance=link.target.distance;
-			    }
-			  }
-			});
-
-			VisualisationJsModule.camera.updateProjectionMatrix();
-			visualize(baseLevel,nodes, nodelinks);
-			animate();
-			changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
-			console.log("initialized all");
-			VisualisationJsModule.nodes=nodes;
-			VisualisationJsModule.nodelinks=nodelinks;
-			
-			// Animate the webGL objects for rendering
-			function animate() {
-				requestAnimationFrame(animate);
-				renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
-				VisualisationJsModule.controls.update();
-
-				for (var label in labels) {
-					labels[label].lookAt(VisualisationJsModule.camera.position); //makes the labels spin around to try to look at the camera
-				}
-				render();
-			}
-
-			// Extension of default render function, runs continuously, add code here if needed
-			function render() {
-
-			}
-		}
-
-		
 //Wait for document to finish loading		
 $(document).ready(function() {
 	
