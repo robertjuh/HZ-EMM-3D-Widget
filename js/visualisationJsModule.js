@@ -5,10 +5,8 @@
 */
 
 
-
 var VisualisationJsModule = (function () {
   //TODO think about defaults for WIDTH and HEIGHT
-
 	var getStyle = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;
@@ -32,11 +30,32 @@ var VisualisationJsModule = (function () {
 					return null;			
 			}
 	
+	var getStyleAttr = function(CLASSname,attr,defaultValue) {
+	  try {
+	    var text=getStyle(CLASSname).cssText;
+	    var p=text.indexOf("{");
+	    text=text.substring(p);
+	    p=text.indexOf(attr);
+	    text=text.substring(p+attr.length);
+	    var f=text.substring(0,1);
+	    if (!((f==" ")|| (f==":"))) return defaultValue;
+	    //TODO check for other possible occurrences of attr, by using while
+	    p=text.indexOf(":");
+	    text=text.substring(p+1);
+	    p=text.indexOf(";");
+	    text=text.substring(0,p);
+	    if ( text.length>0) return text;else return defaultValue;
+	  }
+	  catch (e) {
+	    return defaultValue;
+	  }
+  
+	}
 	
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-	var DEPTH=getStyle(".maxDepth").style.order;
-	var WIDTH=parseInt(getStyle('.containerAttributes').style.width)||400;
-	var HEIGHT=parseInt(getStyle('.containerAttributes').style.height)||400;	
+	var DEPTH=getStyleAttr(".maxDepth","order","4");
+	var WIDTH=parseInt(getStyleAttr('.containerAttributes',"width","400"));
+	var HEIGHT=parseInt(getStyleAttr('.containerAttributes',"height","400"));	
 	
 
 	// Set camera attributes and create camera
@@ -83,7 +102,8 @@ var VisualisationJsModule = (function () {
 		  object.distance=distance;
 		  this.threeDObjects.push(object);
 		},
-		getStyle: getStyle
+		getStyle: getStyle,
+		getStyleAttr:getStyleAttr
 	};
 	
 });
