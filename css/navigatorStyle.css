@@ -6,7 +6,6 @@
 
 /* container represents the div that everything is being drawn on*/
 .containerAttributes{
-    max-width: 500px;
 
 	height: 700px;
 	width: 700px;

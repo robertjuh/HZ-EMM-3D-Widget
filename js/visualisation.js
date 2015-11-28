@@ -1,6 +1,7 @@
+//CSS constants
 var CSSarrow_related_color="red";
 var CSSsphere_color="orange";
-var CSScontainerAttributes_fontsize="20px";//font-weight: bold
+var CSScontainerAttributes_fontsize="20px";
 var CSScontainerAttributes_fontfamily="Times";
 var CSScontainerAttributes_fontweight="normal";
 var CSSarrow_related_color="red";
