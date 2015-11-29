@@ -2,7 +2,6 @@
 var CSSarrow_related_color="red";
 var CSSsphere_color="rgb(191,172,136)";
 var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
-var CSSsphere_centersphere_color="red";
 var CSScontainerAttributes_fontsize="20px";
 var CSScontainerAttributes_fontfamily="Times";
 var CSScontainerAttributes_fontweight="normal";
