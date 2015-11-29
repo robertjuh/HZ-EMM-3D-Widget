@@ -276,7 +276,7 @@ var CSSarrow_broader_color="black";
 								color : VisualisationJsModule.getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
 							});												
 						}
-						catch (e){
+						catch (e){//if level is too high, set default
 							sphereMaterial = new THREE.MeshPhongMaterial({
 								color : VisualisationJsModule.getStyleAttr(".sphere","color",CSSsphere_color)
 							});
