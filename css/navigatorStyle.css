@@ -29,13 +29,25 @@
 }
 
 
-.sphere{
+/*.sphere.level1{
 	color: rgb(191,172,136);
 }
 
-.sphere.centersphere{
+.sphere.level0{
 color: rgb(76,151,214);
 }
+
+.sphere.level2{
+color: blue;
+}
+
+.sphere.level3{
+color: purple;
+}
+
+.sphere.level4{
+color: rgb(76,151,214);
+}*/
 
 
 

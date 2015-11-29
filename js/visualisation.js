@@ -1,6 +1,8 @@
 //CSS constants
 var CSSarrow_related_color="red";
-var CSSsphere_color="orange";
+var CSSsphere_color="rgb(191,172,136)";
+var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
+var CSSsphere_centersphere_color="red";
 var CSScontainerAttributes_fontsize="20px";
 var CSScontainerAttributes_fontfamily="Times";
 var CSScontainerAttributes_fontweight="normal";
@@ -268,12 +270,13 @@ var CSSarrow_broader_color="black";
 	
 						// create the sphere's material and color
 						var sphereMaterial;
-						if(nodes[key].distance==0){ 
+						try 
+						{ 
 							sphereMaterial = new THREE.MeshPhongMaterial({
-								color : VisualisationJsModule.getStyleAttr(".sphere.centersphere","color",CSSarrow_related_color)
+								color : VisualisationJsModule.getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
 							});												
 						}
-						else{
+						catch (e){
 							sphereMaterial = new THREE.MeshPhongMaterial({
 								color : VisualisationJsModule.getStyleAttr(".sphere","color",CSSsphere_color)
 							});
