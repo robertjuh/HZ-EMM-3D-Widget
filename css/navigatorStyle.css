@@ -28,6 +28,11 @@
 	background: rgb(229,200,205);
 }
 
+#sliderDiv{
+    vertical-align: top;
+  width: 20px;
+  height:500px;
+}
 
 /*.sphere.level1{
 	color: rgb(191,172,136);

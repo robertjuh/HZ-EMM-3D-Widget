@@ -37,6 +37,7 @@ var VisualisationJsModule = (function () {
 	var getStyleAttr = function(CLASSname,attr,defaultValue) {
 	  try {
 	    var text=getStyle(CLASSname).cssText;
+	    if (CLASSname=='#sliderDiv')console.log(text);
 	    //parse css, get text inbetween brackets
 	    var p=text.indexOf("{");
 	    text=text.substring(p+1);
