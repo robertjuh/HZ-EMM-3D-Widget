@@ -36,7 +36,9 @@ var depthScale = d3.scale.linear()
         .range([0,100]);
 
 //de "volume" driehoek
-var vis = d3.select("svg").append("svg")
+var vis = d3.select("svg")
+	 .attr("id", "sliderTotal")
+	 .append("svg")
          .attr("width", containerWidth)
          .attr("height", divHeight),
 scaleX = d3.scale.linear()
@@ -52,6 +54,7 @@ poly = [{"x":sliderOffsetSides, "y":sliderOffsetTop},
 vis.selectAll("polygon")
     .data([poly])
   .enter().append("polygon")
+    .attr("id", "sliderArea")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
     .attr("fill",  VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.background )
@@ -67,6 +70,7 @@ var setSliderInfoText=function(width,value){
    sliderInfo = svgContainer.append('foreignObject')
                         .attr('x', 2)
                         .attr('y', 1)
+			.attr("id","sliderText")
 			  //center text above slider
 			.style(    "text-align","center")
                         .attr('width', containerWidth)
