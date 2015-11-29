@@ -683,6 +683,26 @@ $(document).ready(function() {
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 	
+/*
+ //TODO: met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+ //je moet dan echter dus het stuk voor het model (145px) bij de x optellen, en dat is skin-gevoelig. Dus een work-around.
+ //daar moet dus over nagedacht worden. Sowieso is het handig om de twee elementen in een parent-html-element op te nemen.
+ 
+jQuery('<div/>', {
+ id: 'EMMContainerDiv',
+}).appendTo('#bodyContent');
+$("#sliderDiv").appendTo('#EMMContainerDiv');
+$("#containerDiv").appendTo('#EMMContainerDiv');
+
+samen met
+#sliderDiv{
+  position:absolute;
+  left:845px;
+    vertical-align: top;
+  width: 30px;
+  height:500px;
+} */
+	  
 	}
 	
 

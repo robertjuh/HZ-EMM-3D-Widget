@@ -29,8 +29,10 @@
 }
 
 #sliderDiv{
+  position:absolute;
+  left:845px;
     vertical-align: top;
-  width: 20px;
+  width: 30px;
   height:500px;
 }
 
