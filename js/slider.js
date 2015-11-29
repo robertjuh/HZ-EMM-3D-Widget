@@ -12,7 +12,7 @@ var MAXDEPTH=4;
 //TODO set width container in css
 var SLIDERDIV="sliderDiv";
 var containerWidth = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"width",30);
-var divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",500);
+divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
 var slideDepth = 1;
 var tempSliderDepthInt=1;
 
