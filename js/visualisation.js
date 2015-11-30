@@ -11,6 +11,7 @@ var CSSarrow_broader_color="black";
 	var targetDivId = 'bodyContent'; //bodyContent
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
 	var containerDivId = containerDiv[0][0].id;
+	var EMMContainerDivId = "EMMContainerDiv";
 	
 	//console.log("target class ");
 	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
@@ -345,6 +346,7 @@ var CSSarrow_broader_color="black";
 		var textWidth = context.measureText( key ).width;
 		
 		var canvas = document.createElement('canvas');
+
 		//TODO make width of sprite dependant on width of text
 		//size is now hard-coded!?
 		var size = 350;
@@ -448,6 +450,7 @@ var CSSarrow_broader_color="black";
 			  //color red was arbitrarily added to some arrows
 			  //TODO: see what next line does. If not necessary: omit it!
 				//arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
+				arrow.setColor(VisualisationJsModule.getStyleAttr(".arrow.narrower","color"));
 			}
 		
 		
@@ -675,36 +678,144 @@ $(document).ready(function() {
 
 		renderer.setClearColor(0x000000, 0);
 		renderer.setSize(containerWIDTH, containerHEIGHT);		
+		renderer.domElement.id = 'visualisationCanvas';
 		VisualisationJsModule.container.appendChild(renderer.domElement);
+		
 				
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
-		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
+		
+		
+		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);		
+		
+		
+		
+		
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 	
-/*
- //TODO: met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
- //je moet dan echter dus het stuk voor het model (145px) bij de x optellen, en dat is skin-gevoelig. Dus een work-around.
- //daar moet dus over nagedacht worden. Sowieso is het handig om de twee elementen in een parent-html-element op te nemen.
- 
-jQuery('<div/>', {
- id: 'EMMContainerDiv',
-}).appendTo('#bodyContent');
-$("#sliderDiv").appendTo('#EMMContainerDiv');
-$("#containerDiv").appendTo('#EMMContainerDiv');
-
-samen met
-#sliderDiv{
-  position:absolute;
-  left:845px;
-    vertical-align: top;
-  width: 30px;
-  height:500px;
-} */
-	  
+		createButton();
+	
+		positionDivsOnScreen();
+		
+	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles
+	  //onleesbaar is, maar het totaaloverzicht blijft
 	}
 	
+	function createButton(){
+		var buttonGroup = d3.select('body').append('svg').attr("id", "buttonSvg")
+				.append("g");
+			
+
+
+		
+		var rect = buttonGroup.append("rect")
+				.attr("width", 90)
+				.attr("height", 30)
+				.attr("fill", "red");
+					
+		var text = buttonGroup.append("text")
+				.attr("x", 5)
+				.attr("y", 20)
+				.style("fill", "black")
+				.text("do it");
+
+		$("#buttonSvg").prependTo('#firstHeading'); //TODO dit moet ergens anders komen uiteindelijk
+			
+		buttonGroup.on("click", function() {
+			buttonClick(rect);
+		});
+
+		
+		
+		
+		buttonGroup.on("mouseenter", function() {
+			rect.transition().attr("fill", "orange");
+		});		
+		
+		buttonGroup.on("mouseleave", function() {
+			rect.transition().attr("fill", "red");
+		});
+		
+		renderer.setSize('777px', '1345px');		
+	}
+	
+	function buttonClick(buttonBackground){
+		var initialbuttonstate = buttonBackground;
+		
+		console.log("ayy");
+		
+		//buttonBackground.transition()
+		
+		//.attr("opacity", 0);
+		//;
+		
+		//delay enzo
+		//mySquare.transition()
+		//  .attr("x",320)
+		//  .duration(1000) // this is 1s
+		//  .delay(100)     // this is 0.1s
+				
+		
+		//kan gewoon weg
+		buttonBackground
+		.transition()
+		//.attr("width", 1000)
+		.duration(130)
+		.attr("opacity", 0.4);
+		
+		buttonBackground
+		.transition()
+		.delay(140)
+		.attr("opacity", 1);		
+		
+		d3.select('#EMMContainerDiv').transition()
+			.attr("height", 1000)
+			.attr("width", 1000);
+					
+		d3.select('#containerDiv').transition()
+			.attr("height", 1000)
+			.attr("width", 1000);
+			
+		d3.select('#canvas').transition()
+			.attr("height", 1000);
+			
+		//renderer.domElement.setAttribute('id','canvasje');
+		//VisualisationJsModule.container
+		
+		renderer.domElement.clientHeight = 1000;
+		renderer.domElement.set_height = 1100;
+		
+		renderer.domElement.id = 'qq';
+		
+		renderer.domElement.style.height = "1200px";
+		
+		
+		console.log(renderer);
+		console.log(renderer.domElement);
+		//console.log(renderer.domElement.get_height());
+		//console.log(renderer.domElement.getHeight());
+		console.log(renderer.domElement.style);
+		console.log(renderer.domElement.style.height);
+		console.log(renderer.domElement.style[0]);
+		renderer.domElement.cssText = "width: 700px; height: 999px;";
+		console.log(VisualisationJsModule.container);
+	}
+	
+	
+	
+	function positionDivsOnScreen(){
+		//TODO: met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+		//je moet dan echter dus het stuk voor het model (145px) bij de x optellen, en dat is skin-gevoelig. Dus een work-around.
+		//daar moet dus over nagedacht worden. Sowieso is het handig om de twee elementen in een parent-html-element op te nemen.
+		 
+		jQuery('<div/>', {
+		 id: EMMContainerDivId,
+		}).prependTo('#' + targetDivId);
+		$("#sliderDiv").appendTo('#' + EMMContainerDivId);
+		$("#containerDiv").appendTo('#' + EMMContainerDivId);	
+		
+	}
 
 	
 	//creates additional functions	

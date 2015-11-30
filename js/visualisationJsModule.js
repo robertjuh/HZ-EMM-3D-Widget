@@ -24,7 +24,7 @@ var VisualisationJsModule = (function () {
 							if (classes[x].selectorText == CLASSname) {
 					 return classes[x];
 								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
+								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";};
 								return ret;
 							}
 						}
