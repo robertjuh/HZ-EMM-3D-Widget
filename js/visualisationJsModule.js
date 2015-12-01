@@ -8,7 +8,10 @@ var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
 
+//var VisualisationJsModule = (function (newHeight, newWidth) {
 var VisualisationJsModule = (function () {
+	//console.log("newWidth??");
+	//console.log(newHeight);
 	var getStyle = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;
@@ -75,8 +78,8 @@ var VisualisationJsModule = (function () {
 	}
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
 	var DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
-	var WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
-	var HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
+	var WIDTH=getStyleAttrInt('.containerAttributes', "width",CSScontainerAttributes_width);
+	var HEIGHT=getStyleAttrInt('.containerAttributes', "height",CSScontainerAttributes_height);
 	
 
 	// Set camera attributes and create camera
@@ -107,6 +110,11 @@ var VisualisationJsModule = (function () {
 		//three arrays to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,
+		
+		setContainerSize: function(h, w) {
+			this.width = w;
+			this.height = h;			
+		},
 		
 		getContainerSize: function () {
 			var size = [WIDTH,HEIGHT]

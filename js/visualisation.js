@@ -678,7 +678,7 @@ $(document).ready(function() {
 
 		renderer.setClearColor(0x000000, 0);
 		renderer.setSize(containerWIDTH, containerHEIGHT);		
-		renderer.domElement.id = 'visualisationCanvas';
+		renderer.domElement.id = 'containerCanvas';
 		VisualisationJsModule.container.appendChild(renderer.domElement);
 		
 				
@@ -687,7 +687,7 @@ $(document).ready(function() {
 		
 		
 		
-		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);		
+		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);		
 		
 		
 		
@@ -737,7 +737,6 @@ $(document).ready(function() {
 			rect.transition().attr("fill", "red");
 		});
 		
-		renderer.setSize('777px', '1345px');		
 	}
 	
 	function buttonClick(buttonBackground){
@@ -761,45 +760,50 @@ $(document).ready(function() {
 		buttonBackground
 		.transition()
 		//.attr("width", 1000)
-		.duration(130)
-		.attr("opacity", 0.4);
+		.duration(100)
+		.attr("opacity", 0.4)
+		.each("end", function(){buttonBackground.transition()
+			.attr("opacity", 1);});
 		
-		buttonBackground
-		.transition()
-		.delay(140)
-		.attr("opacity", 1);		
+
 		
-		d3.select('#EMMContainerDiv').transition()
-			.attr("height", 1000)
-			.attr("width", 1000);
+//		d3.select('#EMMContainerDiv').transition()
+//			.attr("height", 1234)
+//			.attr("width", 1234);
 					
-		d3.select('#containerDiv').transition()
-			.attr("height", 1000)
-			.attr("width", 1000);
-			
-		d3.select('#canvas').transition()
-			.attr("height", 1000);
+//		d3.select('#containerDiv').transition()
+//			.attr("height", 1200)
+//			.attr("width", 1200);
+
 			
 		//renderer.domElement.setAttribute('id','canvasje');
 		//VisualisationJsModule.container
 		
-		renderer.domElement.clientHeight = 1000;
-		renderer.domElement.set_height = 1100;
-		
-		renderer.domElement.id = 'qq';
-		
-		renderer.domElement.style.height = "1200px";
+		renderer.domElement.clientHeight = 1010;
 		
 		
-		console.log(renderer);
-		console.log(renderer.domElement);
-		//console.log(renderer.domElement.get_height());
-		//console.log(renderer.domElement.getHeight());
-		console.log(renderer.domElement.style);
-		console.log(renderer.domElement.style.height);
-		console.log(renderer.domElement.style[0]);
-		renderer.domElement.cssText = "width: 700px; height: 999px;";
+
+		var containerCanvas = d3.select('#containerCanvas');
+		
+		containerCanvas
+			//.transition()
+			//.duration(1500)
+				//.style("width", "0px")
+				//.style("height", "0px")
+					.transition()
+					.duration(1500)
+					.style("width", "1200px")
+						.each("end", function(){
+							containerCanvas
+								.transition()
+								.duration(2000)
+								.style("height", "1200px");
+					});
+					
+	
 		console.log(VisualisationJsModule.container);
+		//clearCanvas();
+		//initialiseTHREEComponents(1200,1200);
 	}
 	
 	
