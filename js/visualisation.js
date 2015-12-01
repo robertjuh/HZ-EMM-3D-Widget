@@ -705,9 +705,6 @@ $(document).ready(function() {
 	function createButton(){
 		var buttonGroup = d3.select('body').append('svg').attr("id", "buttonSvg")
 				.append("g");
-			
-
-
 		
 		var rect = buttonGroup.append("rect")
 				.attr("width", 90)
@@ -720,13 +717,11 @@ $(document).ready(function() {
 				.style("fill", "black")
 				.text("do it");
 
-		$("#buttonSvg").prependTo('#firstHeading'); //TODO dit moet ergens anders komen uiteindelijk
+		$("#buttonSvg").prependTo('#firstHeading'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
 			
 		buttonGroup.on("click", function() {
-			buttonClick(rect);
+			buttonClickResizeCanvas(rect);
 		});
-
-		
 		
 		
 		buttonGroup.on("mouseenter", function() {
@@ -739,65 +734,33 @@ $(document).ready(function() {
 		
 	}
 	
-	function buttonClick(buttonBackground){
+	function buttonClickResizeCanvas(buttonBackground){
 		var initialbuttonstate = buttonBackground;
 		
-		console.log("ayy");
-		
-		//buttonBackground.transition()
-		
-		//.attr("opacity", 0);
-		//;
-		
-		//delay enzo
-		//mySquare.transition()
-		//  .attr("x",320)
-		//  .duration(1000) // this is 1s
-		//  .delay(100)     // this is 0.1s
-				
-		
+
 		//kan gewoon weg
 		buttonBackground
 		.transition()
-		//.attr("width", 1000)
 		.duration(100)
 		.attr("opacity", 0.4)
 		.each("end", function(){buttonBackground.transition()
 			.attr("opacity", 1);});
-		
 
-		
-//		d3.select('#EMMContainerDiv').transition()
-//			.attr("height", 1234)
-//			.attr("width", 1234);
-					
-//		d3.select('#containerDiv').transition()
-//			.attr("height", 1200)
-//			.attr("width", 1200);
-
-			
-		//renderer.domElement.setAttribute('id','canvasje');
-		//VisualisationJsModule.container
 		
 		renderer.domElement.clientHeight = 1010;
 		
 		
-
 		var containerCanvas = d3.select('#containerCanvas');
 		
 		containerCanvas
-			//.transition()
-			//.duration(1500)
-				//.style("width", "0px")
-				//.style("height", "0px")
-					.transition()
-					.duration(1500)
-					.style("width", "1200px")
-						.each("end", function(){
-							containerCanvas
-								.transition()
-								.duration(2000)
-								.style("height", "1200px");
+			.transition()
+			.duration(1500)
+			.style("width", "1200px")
+				.each("end", function(){
+					containerCanvas
+						.transition()
+						.duration(2000)
+						.style("height", "1200px");
 					});
 					
 	
