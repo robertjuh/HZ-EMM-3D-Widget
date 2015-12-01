@@ -73,15 +73,15 @@ var VisualisationJsModule = (function () {
 	  }
 	  catch (e) {
 	    return defaultValue;
-	  }
-	  
+	  }	  
 	}
+	
+	
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
 	var DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
 	var WIDTH=getStyleAttrInt('.containerAttributes', "width",CSScontainerAttributes_width);
 	var HEIGHT=getStyleAttrInt('.containerAttributes', "height",CSScontainerAttributes_height);
 	
-
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
 	    ASPECT = WIDTH / HEIGHT, 
@@ -89,6 +89,13 @@ var VisualisationJsModule = (function () {
 	    NEAR = 10,
 	    FAR = 10000;
 	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+	
+	var renderer = new THREE.WebGLRenderer({
+			alpha : true,
+			antialiasing : true
+		});
+	renderer.domElement.id = 'containerCanvas';
+
 	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
@@ -107,6 +114,7 @@ var VisualisationJsModule = (function () {
 		controls : controls,
 		container : container,
 		sphereArray : sphereArray,
+		renderer : renderer,
 		//three arrays to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,

@@ -8,7 +8,7 @@
 .containerAttributes{
 
 	height: 70px;
-	width: 700px;
+	width: 70px;
 	/* font: Bold 35px Arial; */
 	font: 30px Open_Sans
 
@@ -89,7 +89,7 @@ color: rgb(76,151,214);
 
 /* Order = the initial loaded depth in the visualisation, once the program is loaded and the user selected a higher depth, it will be reloaded */
 .maxDepth{
-	order: 2;	
+	order: 1;	
 }
 
 /*used to change cursor into wait while ajax-call busy*/

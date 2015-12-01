@@ -96,8 +96,8 @@ var CSSarrow_broader_color="black";
 		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
 		//uses the mouse variable which is a THREE.Vector2
 		function normalizeCurrentMouseCoordinates(e, mouse){
-			mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - renderer.domElement.offsetLeft ) / renderer.domElement.width ) * 2 - 1;			
-			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - renderer.domElement.offsetTop) / renderer.domElement.height ) * 2 + 1;			
+			mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - VisualisationJsModule.renderer.domElement.offsetLeft ) / VisualisationJsModule.renderer.domElement.width ) * 2 - 1;			
+			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - VisualisationJsModule.renderer.domElement.offsetTop) / VisualisationJsModule.renderer.domElement.height ) * 2 + 1;			
 		}
 
 
@@ -157,7 +157,7 @@ var CSSarrow_broader_color="black";
 				setArrowSourceTarget(three_links[j]);
 			}
 	
-			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
+			VisualisationJsModule.renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
 		
 		
@@ -481,6 +481,7 @@ var CSSarrow_broader_color="black";
 	function clearCanvas(){
 			for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) {						
 				//does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
+				
 				if(VisualisationJsModule.scene.children[i].geometry != null | VisualisationJsModule.scene.children[i].type == "Object3D"){
 					VisualisationJsModule.scene.remove(VisualisationJsModule.scene.children[i]);	
 				}
@@ -586,7 +587,7 @@ var CSSarrow_broader_color="black";
 	// Animate the webGL objects for rendering
 	function animate() {
 		requestAnimationFrame(animate);
-		renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
+		VisualisationJsModule.renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		VisualisationJsModule.controls.update();
 
 		for (var label in labels) {
@@ -643,63 +644,117 @@ var CSSarrow_broader_color="black";
 				  
 //Wait for document to finish loading		
 $(document).ready(function() {
+	VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
+
 	
 	initialiseTHREEComponents(); 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
-	function initialiseTHREEComponents(){ //current page name als concept meen
-		VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
-		var containerHEIGHT = VisualisationJsModule.height;
-		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
+	function initialiseTHREEComponents(newWidth, newHeight){ //current page name als concept meen
+	
+	var containerHEIGHT;
+	var containerWIDTH;
+	
+	
+	if (typeof newWidth !== 'undefined' && typeof newHeight !== 'undefined'){
+		containerHEIGHT = newHeight; //afmetingen worden bij initialisatie doorgegeven na buttonclick
+		containerWIDTH = newWidth;
+				
+		var containerCanvas = d3.select('#containerCanvas');
 		
 		
+		containerCanvas 
+			.transition()
+			.duration(1500)
+			.style("width", containerWIDTH + "px")
+						.transition()
+						.duration(2000)
+						.style("height", containerHEIGHT + "px")
+					.each("end", function(){
+						VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
+					});
+				
+				
+				
+		console.log("threeob objects met newwidth");
+		VisualisationJsModule.init3DObjects();
+		console.log(VisualisationJsModule.threeDObjects);
+
+		//for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) { 
+		//	obj = VisualisationJsModule.scene.children[i];
+		//	VisualisationJsModule.scene.remove(obj);
+		//}
+		
+		
+	}else{
+		console.log("if wel undifined");
+		console.log("threeob objects "); 
+		console.log(VisualisationJsModule.threeDObjects);
+		containerHEIGHT = VisualisationJsModule.height;
+		containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
-		
+		console.log("thesizesElse");
+		console.log(containerHEIGHT);
+		console.log(containerWIDTH);
+		console.log(VisualisationJsModule.container);
+	
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
 			.style("fill", "black")   // fill the text with the colour black
 			.attr("x", 200)           // set x position of left side of text
 			.attr("y", 100)           // set y position of bottom of text 
 			.text("DEZE PAGINA GAAT OVER: " + currentPageName);     // define the text to display 
-				
-		// Create Renderer
-		renderer = new THREE.WebGLRenderer({
-			alpha : true,
-			antialiasing : true
-		});
-
-		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
-		VisualisationJsModule.camera.position.x = containerWIDTH/2;			
-		VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
+	
+		VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT);
+	
 		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
-				
-
-		renderer.setClearColor(0x000000, 0);
-		renderer.setSize(containerWIDTH, containerHEIGHT);		
-		renderer.domElement.id = 'containerCanvas';
-		VisualisationJsModule.container.appendChild(renderer.domElement);
 		
-				
+		VisualisationJsModule.container.appendChild(VisualisationJsModule.renderer.domElement);
+	
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
+			
 		
 		
-		
-		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);		
-		
-		
-		
+		//VisualisationJsModule.camera.aspect = 1; //TODO als de visualisatie niet vierkant is, wordt het uitestrekt, is dit een probleem?
+		//console.log(VisualisationJsModule.camera);
 		
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 	
 		createButton();
 	
 		positionDivsOnScreen();
+	
+	
+		console.log("de scene");
+		console.log(VisualisationJsModule.scene);
+	
+	}
 		
-	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles
-	  //onleesbaar is, maar het totaaloverzicht blijft
+		//document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
+	
+		
+		
+				
+
+		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
+		VisualisationJsModule.camera.position.x = containerWIDTH/2;	
+		VisualisationJsModule.camera.position.z =  200;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
+		//VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
+		
+		//VisualisationJsModule.scene.add(VisualisationJsModule.camera);
+			
+		//VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT);		
+		//VisualisationJsModule.container.appendChild(VisualisationJsModule.renderer.domElement);
+		
+	
+		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);
+		
+		
+		
+
 	}
 	
 	function createButton(){
@@ -741,32 +796,29 @@ $(document).ready(function() {
 		//kan gewoon weg
 		buttonBackground
 		.transition()
-		.duration(100)
+		.duration(50)
 		.attr("opacity", 0.4)
 		.each("end", function(){buttonBackground.transition()
 			.attr("opacity", 1);});
-
-		
-		renderer.domElement.clientHeight = 1010;
-		
 		
 		var containerCanvas = d3.select('#containerCanvas');
 		
-		containerCanvas
+		/*
+		containerCanvas //TODO dit kan terug al;s alles is uitgepluisd!
 			.transition()
 			.duration(1500)
-			.style("width", "1200px")
+			.style("width", "800px")
 				.each("end", function(){
 					containerCanvas
 						.transition()
 						.duration(2000)
-						.style("height", "1200px");
+						.style("height", "800px");
 					});
-					
+		*/		
 	
 		console.log(VisualisationJsModule.container);
 		//clearCanvas();
-		//initialiseTHREEComponents(1200,1200);
+		initialiseTHREEComponents(800,800);
 	}
 	
 	
