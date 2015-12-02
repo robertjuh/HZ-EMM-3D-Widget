@@ -32,6 +32,36 @@ var CSSarrow_broader_color="black";
 		var	mouse = new THREE.Vector2();
 		
 		
+	/*	
+	* Functions for folding the visualisationcanvas
+	* Take the target (cCanvas) and the desired widths the canvas would be transitioned into.
+	*/
+	function unfoldAnimation(cCanvas, containerWIDTH, containerHEIGHT){
+		cCanvas 
+			.transition()
+			.duration(900)
+			.style("width", containerWIDTH + "px")
+					.transition()
+					.duration(1300)
+					.style("height", containerHEIGHT + "px")
+				.each("end", function(){
+					VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
+				});
+	}
+	
+	function foldBackAnimation(cCanvas, containerWIDTH, containerHEIGHT){
+		cCanvas 
+			.transition()
+			.duration(900)
+			.style("height", containerHEIGHT + "px")
+					.transition()
+					.duration(1300)
+					.style("width", containerWIDTH + "px")
+				.each("end", function(){
+					VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
+				});
+	}
+		
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 	function filterFirstSpheregeometryWithRay(event, mouse){			
 			normalizeCurrentMouseCoordinates(event, mouse);						
@@ -88,10 +118,7 @@ var CSSarrow_broader_color="black";
 			}
 		      }
 		    }
-		  }
-			
-			
-		
+		}		
 		
 		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
 		//uses the mouse variable which is a THREE.Vector2
@@ -105,7 +132,7 @@ var CSSarrow_broader_color="black";
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
 			clearCanvas();
-			window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;			
+			window.location = window.location.href.getFirstPartOfUrl() + conceptNameString; //navigate to the clicked object
 			}		
 		}
 				
@@ -126,8 +153,12 @@ var CSSarrow_broader_color="black";
 		//end of functions for arrows -----======-----
 		
 		
-		// Initializes calculations and spaces nodes according to a forced layout
-		// takes variables from the startvisualisation method
+		/*
+		* Initializes calculations and spaces nodes according to a forced layout
+		* takes variables from the startvisualisation method		
+		*/
+		
+
 		function initialiseConstraints(nodes, spheres, three_links) {
 
 			var min=-100;
@@ -645,60 +676,20 @@ var CSSarrow_broader_color="black";
 //Wait for document to finish loading		
 $(document).ready(function() {
 	VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
-
 	
 	initialiseTHREEComponents(); 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
-	function initialiseTHREEComponents(newWidth, newHeight){ //current page name als concept meen
+	function initialiseTHREEComponents(){
 	
 	var containerHEIGHT;
 	var containerWIDTH;
-	
-	
-	if (typeof newWidth !== 'undefined' && typeof newHeight !== 'undefined'){
-		containerHEIGHT = newHeight; //afmetingen worden bij initialisatie doorgegeven na buttonclick
-		containerWIDTH = newWidth;
-				
-		var containerCanvas = d3.select('#containerCanvas');
-		
-		
-		containerCanvas 
-			.transition()
-			.duration(1500)
-			.style("width", containerWIDTH + "px")
-						.transition()
-						.duration(2000)
-						.style("height", containerHEIGHT + "px")
-					.each("end", function(){
-						VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
-					});
-				
-				
-				
-		console.log("threeob objects met newwidth");
-		VisualisationJsModule.init3DObjects();
-		console.log(VisualisationJsModule.threeDObjects);
 
-		//for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) { 
-		//	obj = VisualisationJsModule.scene.children[i];
-		//	VisualisationJsModule.scene.remove(obj);
-		//}
-		
-		
-	}else{
-		console.log("if wel undifined");
-		console.log("threeob objects "); 
-		console.log(VisualisationJsModule.threeDObjects);
-		containerHEIGHT = VisualisationJsModule.height;
-		containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
-		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
+	containerHEIGHT = VisualisationJsModule.height;
+	containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 	
-		console.log("thesizesElse");
-		console.log(containerHEIGHT);
-		console.log(containerWIDTH);
-		console.log(VisualisationJsModule.container);
+	document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
@@ -709,63 +700,40 @@ $(document).ready(function() {
 	
 		VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT);
 	
+		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
+
+		positionDivsOnScreen();		
+
+		VisualisationJsModule.container.appendChild(VisualisationJsModule.renderer.domElement);
+		VisualisationJsModule.containerCanvas = d3.select('#containerCanvas'); //So the general visualisation canvas will be global accisible via the VisualisationJSsModule namespace
+		
+		createButton();		
+
 		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
 		
-		VisualisationJsModule.container.appendChild(VisualisationJsModule.renderer.domElement);
-	
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
-			
 		
-		
-		//VisualisationJsModule.camera.aspect = 1; //TODO als de visualisatie niet vierkant is, wordt het uitestrekt, is dit een probleem?
-		//console.log(VisualisationJsModule.camera);
-		
-		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
-	
-		createButton();
-	
-		positionDivsOnScreen();
-	
-	
-		console.log("de scene");
-		console.log(VisualisationJsModule.scene);
-	
-	}
-		
-		//document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
-	
-		
-		
-				
-
 		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
 		VisualisationJsModule.camera.position.x = containerWIDTH/2;	
-		VisualisationJsModule.camera.position.z =  200;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
+		VisualisationJsModule.camera.position.z =  700;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
 		//VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
-		
-		//VisualisationJsModule.scene.add(VisualisationJsModule.camera);
-			
-		//VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT);		
-		//VisualisationJsModule.container.appendChild(VisualisationJsModule.renderer.domElement);
-		
-	
-		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);
-		
-		
-		
 
+		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);
+				
 	}
 	
 	function createButton(){
 		var buttonGroup = d3.select('body').append('svg').attr("id", "buttonSvg")
 				.append("g");
 		
-		var rect = buttonGroup.append("rect")
+		buttonGroup.toggled = "false"; //property for the button so it can check wether to be folded or unfolded.
+		
+		var buttonRectangle = buttonGroup.append("rect")
 				.attr("width", 90)
 				.attr("height", 30)
 				.attr("fill", "red");
-					
+				
 		var text = buttonGroup.append("text")
 				.attr("x", 5)
 				.attr("y", 20)
@@ -773,38 +741,62 @@ $(document).ready(function() {
 				.text("do it");
 
 		$("#buttonSvg").prependTo('#firstHeading'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
-			
+				
+		//buttonclick animation
 		buttonGroup.on("click", function() {
-			buttonClickResizeCanvas(rect);
-		});
-		
+			//kan gewoon weg, just aesthetics
+			buttonRectangle
+			.transition()
+			.duration(50)
+			.attr("opacity", 0.4)
+			.each("end", function(){buttonRectangle.transition()
+				.attr("opacity", 1);});
+			
+			buttonClickResizeCanvas(buttonGroup, VisualisationJsModule.containerCanvas);
+			
+			
+			//check if the button is toggled so the canvas will be folded or unfolded.
+//			if(buttonGroup.toggled == "false"){
+//				buttonClickResizeCanvas();
+//				buttonGroup.toggled = "true";
+//				
+//			}else if(buttonGroup.toggled == "true"){
+//				
+//				buttonGroup.toggled = "false";
+//				
+//			}else{
+//				return;
+//			}			
+		});		
 		
 		buttonGroup.on("mouseenter", function() {
-			rect.transition().attr("fill", "orange");
+			buttonRectangle.transition().attr("fill", "orange");
 		});		
 		
 		buttonGroup.on("mouseleave", function() {
-			rect.transition().attr("fill", "red");
-		});
-		
+			buttonRectangle.transition().attr("fill", "red");
+		});		
 	}
 	
-	function buttonClickResizeCanvas(buttonBackground){
-		var initialbuttonstate = buttonBackground;
+	function buttonClickResizeCanvas(buttonGroup, containerCanvas){
+	console.log("containerCanvas bij buttonresizecklik");
+	console.log(containerCanvas);
+	
 		
+			//check if the button is toggled so the canvas will be folded or unfolded.
+			if(buttonGroup.toggled == "false"){
+				unfoldAnimation(containerCanvas, 800,800); //TODO fixed height / window.innerwidth en innerheight?
+				buttonGroup.toggled = "true";				
+			}else if(buttonGroup.toggled == "true"){
+				foldBackAnimation(containerCanvas, VisualisationJsModule.width,VisualisationJsModule.height);
+				buttonGroup.toggled = "false";				
+			}else{
+				return;
+			}
 
-		//kan gewoon weg
-		buttonBackground
-		.transition()
-		.duration(50)
-		.attr("opacity", 0.4)
-		.each("end", function(){buttonBackground.transition()
-			.attr("opacity", 1);});
-		
-		var containerCanvas = d3.select('#containerCanvas');
-		
-		/*
-		containerCanvas //TODO dit kan terug al;s alles is uitgepluisd!
+
+/*		
+		containerCanvas
 			.transition()
 			.duration(1500)
 			.style("width", "800px")
@@ -814,11 +806,9 @@ $(document).ready(function() {
 						.duration(2000)
 						.style("height", "800px");
 					});
-		*/		
-	
+				
+	*/
 		console.log(VisualisationJsModule.container);
-		//clearCanvas();
-		initialiseTHREEComponents(800,800);
 	}
 	
 	
@@ -834,6 +824,10 @@ $(document).ready(function() {
 		$("#sliderDiv").appendTo('#' + EMMContainerDivId);
 		$("#containerDiv").appendTo('#' + EMMContainerDivId);	
 		
+		VisualisationJsModule.containerCanvas = d3.select('#containerCanvas');
+		console.log("VisualisationJsModule.containerCanvas");
+		console.log(VisualisationJsModule.containerCanvas);
+		console.log(d3.select('#containerCanvas'));
 	}
 
 	
@@ -863,11 +857,10 @@ $(document).ready(function() {
 				var joinedString = strArray.join("/")+"/";
 				return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
 			}
-			
 			//Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.
 			String.prototype.compareStrings = function (string2, ignoreCase, useLocale) {
 				var string1 = this;
-				if (ignoreCase) {
+				if (ignoreCase) { 
 					if (useLocale) {
 						string1 = string1.toLocaleLowerCase();
 						string2 = string2.toLocaleLowerCase();

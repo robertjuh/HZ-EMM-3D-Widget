@@ -94,14 +94,18 @@ var VisualisationJsModule = (function () {
 			alpha : true,
 			antialiasing : true
 		});
+		
 	renderer.domElement.id = 'containerCanvas';
-
+	//var containerCanvas = d3.select('#containerCanvas');
+	var containerCanvas; //is set in visualisation.js
+	
 	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
 	var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
 	var newDepth;
+	
 	
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
@@ -113,6 +117,7 @@ var VisualisationJsModule = (function () {
 		camera : camera,
 		controls : controls,
 		container : container,
+		containerCanvas : containerCanvas,
 		sphereArray : sphereArray,
 		renderer : renderer,
 		//three arrays to contain the visible objects of the model. Distance of all objects is set.
