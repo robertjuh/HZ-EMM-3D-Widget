@@ -12,7 +12,7 @@ var MAXDEPTH=4;
 //TODO set width container in css
 var SLIDERDIV="sliderDiv";
 var containerWidth = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"width",30);
-divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
+var divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
 var slideDepth = 1;
 var tempSliderDepthInt=1;
 
@@ -35,10 +35,6 @@ var svgContainer = d3.select('#'+SLIDERDIV).append("svg")
 	.attr("width", containerWidth)
 	.attr("height", divHeight);
 	
-var depthScale = d3.scale.linear()
-        .domain([0,5])
-        .range([0,100]);
-
 //de "volume" driehoek
 var vis = d3.select("svg")
 	 .attr("id", "sliderTotal")
@@ -67,11 +63,12 @@ vis.selectAll("polygon")
 
 
   
-var setSliderInfoText=function(width,value){
-  return ((width<40)?"":"Depth: ") + value;
-}
-  //text boven de slider
-   sliderInfo = svgContainer.append('foreignObject')
+	var setSliderInfoText=function(width,value){
+	  return ((width<40)?"":"Depth: ") + value;
+	}
+	
+	//text boven de slider
+	sliderInfo = svgContainer.append('foreignObject')
                         .attr('x', 2)
                         .attr('y', 1)
 			.attr("id","sliderText")
@@ -79,31 +76,29 @@ var setSliderInfoText=function(width,value){
 			.style(    "text-align","center")
                         .attr('width', containerWidth)
                         .attr('height', 100)
-    .text(setSliderInfoText(containerWidth-(sliderOffsetSides), slideDepth));
+		.text(setSliderInfoText(containerWidth-(sliderOffsetSides), slideDepth));
 
 
-//de sliderbutton
-var sliderAttr = [
-  { "rx": sliderOffsetSides/2, "ry": divHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides)}];	
+	//de sliderbutton
+	var sliderAttr = [
+	  { "rx": sliderOffsetSides/2, "ry": divHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides)}];	
 	
-var sliderRect = svgContainer.selectAll("rect")
-                              .data(sliderAttr)
-                              .enter()
-                              .append("rect");
+	var sliderRect = svgContainer.selectAll("rect")
+        .data(sliderAttr)
+        .enter()
+        .append("rect");
 
-var rectangleAttributes = sliderRect
-.attr("id", "amountSlider")
-                          .attr("x", function (d) { return d.rx; })
-                          .attr("y", function (d) { return d.ry; })
-                          .attr("height", function (d) { return d.height; })
-                          .attr("width", function (d) { return d.width; })
-                         .style("fill", VisualisationJsModule.getStyle(".sliderAttributes.sliderButton").style.color );
+	var rectangleAttributes = sliderRect
+		.attr("id", "amountSlider")
+        .attr("x", function (d) { return d.rx; })
+        .attr("y", function (d) { return d.ry; })
+        .attr("height", function (d) { return d.height; })
+        .attr("width", function (d) { return d.width; })
+        .style("fill", VisualisationJsModule.getStyle(".sliderAttributes.sliderButton").style.color );
 	
-
-
 			 
-//drag functionality
-var drag2 = d3.behavior.drag()
+	//drag functionality
+	var drag2 = d3.behavior.drag()
         .origin(function() { 
             var t = sliderRect;
             return {x: t.attr("x"), y: t.attr("y")};
@@ -115,7 +110,7 @@ var drag2 = d3.behavior.drag()
           	    .attr("y", d3.event.y);   
                 
 				
-                var sliderY = d3.select(this).attr("y");
+    var sliderY = d3.select(this).attr("y");
 		tempSliderDepthInt=Math.floor((divHeight-sliderY)/divHeight*MAXDEPTH+1);
 
                 sliderInfo[0][0].textContent = setSliderInfoText(d.width,tempSliderDepthInt);
