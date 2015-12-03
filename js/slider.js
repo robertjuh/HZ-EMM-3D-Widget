@@ -25,7 +25,7 @@ var sliderDiv = d3.select('#' + targetDivId).append("div")
 	.attr("width", containerWidth)
 	.attr("position", "fixed")
 	//TODO find out why vertical-align:top only works when added to css, and not here....
-	.attr("vertical-align", "top")
+	.style("vertical-align", "top")
 	.attr("height", divHeight)
 	.style("display", "inline-block")
 	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );

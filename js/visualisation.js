@@ -38,6 +38,7 @@ var CSSarrow_broader_color="black";
 	*/
 	function unfoldAnimation(cCanvas, containerWIDTH, containerHEIGHT){
 		cCanvas 
+		//d3.select('#EMMContainerDiv')
 			.transition()
 			.duration(900)
 			.style("width", containerWIDTH + "px")
@@ -51,6 +52,7 @@ var CSSarrow_broader_color="black";
 	
 	function foldBackAnimation(cCanvas, containerWIDTH, containerHEIGHT){
 		cCanvas 
+		//d3.select('#EMMContainerDiv')
 			.transition()
 			.duration(900)
 			.style("height", containerHEIGHT + "px")
@@ -157,16 +159,12 @@ var CSSarrow_broader_color="black";
 		* Initializes calculations and spaces nodes according to a forced layout
 		* takes variables from the startvisualisation method		
 		*/
-		
-
 		function initialiseConstraints(nodes, spheres, three_links) {
-
 			var min=-100;
 			var max=50;
 			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
 			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
-			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);
-				
+			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);				
 			
 			//first see what the new position of base-node will be, because that is positioned on 0,0,0
 			//base for translation of nodes
@@ -175,19 +173,15 @@ var CSSarrow_broader_color="black";
 			    zcomp=yScale(0);
 					
 			for (var key in nodes) {
-				//scale to new location and do a translation to place nodes in the middle
-			
+				//scale to new location and do a translation to place nodes in the middle		
 				spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
 				var p=spheres[key].position;
 				nodes[key].label.position.set(p.x, p.y+5 , p.z-5 );				
 			}
 			
-			//three_links is copy of nodelinks, so they also contain source and target of relation, and distance.
-			
 			for (var j = 0; j < three_links.length; j++) {			  
 				setArrowSourceTarget(three_links[j]);
-			}
-	
+			}	
 			VisualisationJsModule.renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		}
 		
@@ -397,7 +391,6 @@ var CSSarrow_broader_color="black";
 		var mat = new THREE.SpriteMaterial({
 		    map: amap,
 		    transparent: true,
-		    //useScreenCoordinates: false,
 		    color: 0x000000
 		});
 
@@ -409,11 +402,8 @@ var CSSarrow_broader_color="black";
 		sprite.position.set(10,10,0);
 		VisualisationJsModule.scene.add( sprite );
 		VisualisationJsModule.add3DObject(sprite,distance);		
-		//node.label=sprite;
 		
-		
-		return sprite;	
-		
+		return sprite;			
 	}
 		
 	function roundRect(ctx, x, y, w, h, r){
@@ -434,8 +424,7 @@ var CSSarrow_broader_color="black";
 		
 	
 	function createArrows(three_links, nodelinks){	
-		for (var i = 0; i < nodelinks.length; i++) {
-										
+		for (var i = 0; i < nodelinks.length; i++) {										
 				if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
 					three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.related","color",CSSarrow_related_color), nodelinks[i]));					
 				}
@@ -453,7 +442,6 @@ var CSSarrow_broader_color="black";
 	/*
 	* Function for adding an arrow to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
 	* Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the three_links data.
-	*
 	*/
 	//function for setting the data and creating the new arrow
 	function setArrowData(arrowColor, currentNodeLink){
@@ -480,11 +468,9 @@ var CSSarrow_broader_color="black";
 			  //commented out by anton
 			  //color red was arbitrarily added to some arrows
 			  //TODO: see what next line does. If not necessary: omit it!
-				//arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
 				arrow.setColor(VisualisationJsModule.getStyleAttr(".arrow.narrower","color"));
 			}
-		
-		
+				
 		VisualisationJsModule.scene.add(arrow);	
 		return arrow;
 	}
@@ -716,7 +702,7 @@ $(document).ready(function() {
 		
 		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
 		VisualisationJsModule.camera.position.x = containerWIDTH/2;	
-		VisualisationJsModule.camera.position.z =  700;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
+		VisualisationJsModule.camera.position.z =  500;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
 		//VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
 
 		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);
@@ -724,94 +710,69 @@ $(document).ready(function() {
 	}
 	
 	function createButton(){
-		var buttonGroup = d3.select('body').append('svg').attr("id", "buttonSvg")
+		var buttonsize = 22;
+		var bordersize = 1;
+		
+		var buttonGroup = d3.select('body').append('svg')
+			.attr("id", "buttonSvg")
+			.style("background-color", "rgb(191,172,136)")
+			.attr("height", buttonsize + bordersize)
+			.attr("width", buttonsize + bordersize)
+			.style("border", "1px solid black")
 				.append("g");
 		
 		buttonGroup.toggled = "false"; //property for the button so it can check wether to be folded or unfolded.
-		
-		var buttonRectangle = buttonGroup.append("rect")
-				.attr("width", 90)
-				.attr("height", 30)
-				.attr("fill", "red");
-				
-		var text = buttonGroup.append("text")
-				.attr("x", 5)
-				.attr("y", 20)
-				.style("fill", "black")
-				.text("do it");
+							
+		var expandButtonImage = buttonGroup.append("svg:image")
+				.attr("xlink:href", mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/src/icon.png") 
+				.attr("width", buttonsize - bordersize)
+				.attr("height", buttonsize - bordersize);
+   
 
-		$("#buttonSvg").prependTo('#firstHeading'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
-				
+		$("#buttonSvg").prependTo('#right-navigation'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
+//		VisualisationJsModule.containerCanvas.attr("hidden", true); //TODO hidden, of balkje, of helemaal niet tekenen?
+		
 		//buttonclick animation
 		buttonGroup.on("click", function() {
-			//kan gewoon weg, just aesthetics
-			buttonRectangle
-			.transition()
-			.duration(50)
-			.attr("opacity", 0.4)
-			.each("end", function(){buttonRectangle.transition()
-				.attr("opacity", 1);});
-			
-			buttonClickResizeCanvas(buttonGroup, VisualisationJsModule.containerCanvas);
-			
-			
-			//check if the button is toggled so the canvas will be folded or unfolded.
-//			if(buttonGroup.toggled == "false"){
-//				buttonClickResizeCanvas();
-//				buttonGroup.toggled = "true";
-//				
-//			}else if(buttonGroup.toggled == "true"){
-//				
-//				buttonGroup.toggled = "false";
-//				
-//			}else{
-//				return;
-//			}			
+			buttonGroup
+				.transition()
+				.duration(50)
+				.attr("opacity", 0.3)
+				.each("end", function(){buttonGroup.transition()
+					.attr("opacity", 1);});
+					
+			buttonClickResizeCanvas(buttonGroup, VisualisationJsModule.containerCanvas);		
 		});		
 		
 		buttonGroup.on("mouseenter", function() {
-			buttonRectangle.transition().attr("fill", "orange");
+			//expandButtonImage.transition().style("border", 5).attr("width", 55);
+			
+			buttonGroup.transition().style("border", "25px");
 		});		
 		
 		buttonGroup.on("mouseleave", function() {
-			buttonRectangle.transition().attr("fill", "red");
+			expandButtonImage.transition().style("padding", "5px");
 		});		
 	}
 	
-	function buttonClickResizeCanvas(buttonGroup, containerCanvas){
-	console.log("containerCanvas bij buttonresizecklik");
-	console.log(containerCanvas);
-	
-		
-			//check if the button is toggled so the canvas will be folded or unfolded.
+	/*
+	* check if the button is toggled so the canvas will be folded or unfolded.
+	* @param: svg with a <g> element within
+	* @param: containerCanvas is the container were the canvas div and other HTML elements are placed in that represent the visualisation.
+	*/
+	function buttonClickResizeCanvas(buttonGroup, containerCanvas){		
 			if(buttonGroup.toggled == "false"){
+//				containerCanvas.attr("hidden", false);
 				unfoldAnimation(containerCanvas, 800,800); //TODO fixed height / window.innerwidth en innerheight?
 				buttonGroup.toggled = "true";				
 			}else if(buttonGroup.toggled == "true"){
 				foldBackAnimation(containerCanvas, VisualisationJsModule.width,VisualisationJsModule.height);
+//				containerCanvas.attr("hidden", true);
 				buttonGroup.toggled = "false";				
 			}else{
 				return;
 			}
-
-
-/*		
-		containerCanvas
-			.transition()
-			.duration(1500)
-			.style("width", "800px")
-				.each("end", function(){
-					containerCanvas
-						.transition()
-						.duration(2000)
-						.style("height", "800px");
-					});
-				
-	*/
-		console.log(VisualisationJsModule.container);
 	}
-	
-	
 	
 	function positionDivsOnScreen(){
 		//TODO: met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
@@ -824,12 +785,8 @@ $(document).ready(function() {
 		$("#sliderDiv").appendTo('#' + EMMContainerDivId);
 		$("#containerDiv").appendTo('#' + EMMContainerDivId);	
 		
-		VisualisationJsModule.containerCanvas = d3.select('#containerCanvas');
-		console.log("VisualisationJsModule.containerCanvas");
-		console.log(VisualisationJsModule.containerCanvas);
-		console.log(d3.select('#containerCanvas'));
+		//VisualisationJsModule.containerCanvas = d3.select('#containerCanvas');
 	}
-
 	
 	//creates additional functions	
 	function createExtraFunctions(){
@@ -855,8 +812,9 @@ $(document).ready(function() {
 				var strArray = this.split("/");
 				strArray.splice(-1, 1); //remove last part of str
 				var joinedString = strArray.join("/")+"/";
-				return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
+				return joinedString; //returns the http://127.0.0.1/mediawiki2/index.php/ format
 			}
+			
 			//Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.
 			String.prototype.compareStrings = function (string2, ignoreCase, useLocale) {
 				var string1 = this;

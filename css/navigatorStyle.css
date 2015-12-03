@@ -2,7 +2,10 @@
 
 #containerDiv{	
 	background-color: rgb(229,222,205);	
+	cursor: pointer;   
 }
+
+
 
 /* container represents the div that everything is being drawn on*/
 .containerAttributes{
@@ -15,11 +18,12 @@
 }
 
 #sliderDiv{
-  position:absolute;
-  left:845px;
-    vertical-align: top;
+  position:relative;
+ /* left:845px;  */
+  /* vertical-align: top; */
   width: 30px;
-  height:500px;
+  /* height:500px;  */
+  cursor: pointer;
 }
 
 
@@ -36,18 +40,19 @@
 	background: rgb(229,200,205);
 }
 
-#sliderDiv{
+#sliderDiv2{
     vertical-align: top;
-  width: 20px;
-  height:500px;
+	width: 35px; /* width of the div(background) */
+	height:500px;
 }
 
-/*.sphere.level1{
-	color: rgb(191,172,136);
-}
-
+/*
 .sphere.level0{
 color: rgb(76,151,214);
+}
+
+.sphere.level1{
+	color: rgb(191,172,136);
 }
 
 .sphere.level2{
@@ -98,6 +103,6 @@ body.wait, body.wait *{
 }
 
 div{
-   cursor: pointer;   
+/*   cursor: pointer;   */
 }
 /*end change cursor*/
