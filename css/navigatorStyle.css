@@ -10,20 +10,33 @@
 /* container represents the div that everything is being drawn on*/
 .containerAttributes{
 
-	height: 7px;
-	width: 7px;
+	height: 222px;
+	width: 222px;
 	/* font: Bold 35px Arial; */
 	font: 30px Open_Sans
-
+	visible: false;
 }
 
 #sliderDiv{
-  position:relative;
+  position: absolute;
+ /* left:845px;  */
+  /* vertical-align: top; */
+  width: 30px;
+ /*  height:100px;  */
+  cursor: pointer;
+}
+
+/* use this? */
+.sliderDiv{
+  position: absolute;
  /* left:845px;  */
   /* vertical-align: top; */
   width: 30px;
   /* height:500px;  */
   cursor: pointer;
+  
+  top: 20px;
+  border: 10px;
 }
 
 

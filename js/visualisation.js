@@ -7,17 +7,16 @@ var CSScontainerAttributes_fontfamily="Times";
 var CSScontainerAttributes_fontweight="normal";
 var CSSarrow_related_color="red";
 var CSSarrow_broader_color="black";
-	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
-	var targetDivId = 'bodyContent'; //bodyContent
-	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
-	var containerDivId = containerDiv[0][0].id;
+	//var targetDivId = 'bodyContent'; //bodyContent
+//todo fix	//var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
+//	var containerDiv = d3.select("div").append("div:div").attr("id", VisualisationJsModule.containerDivId).style("display", "inline-block");	
+	//var containerDivId = containerDiv[0][0].id;
+//	var containerDivId = containerDiv[0][0].id;
 	var EMMContainerDivId = "EMMContainerDiv";
 	
 	//console.log("target class ");
 	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
 	
-	//set the position to inherit instead of relative, or the nodes won't be clickable	
-	d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
 	
 /**
  * @author NJK @author robertjuh
@@ -37,17 +36,33 @@ var CSSarrow_broader_color="black";
 	* Take the target (cCanvas) and the desired widths the canvas would be transitioned into.
 	*/
 	function unfoldAnimation(cCanvas, containerWIDTH, containerHEIGHT){
+		//TODO slider initial state = hidden
+		//TODO slider.makevisible
+		
 		cCanvas 
 		//d3.select('#EMMContainerDiv')
 			.transition()
-			.duration(900)
-			.style("width", containerWIDTH + "px")
+				.duration(900)
+				.style("width", containerWIDTH + "px")
+						.transition()
+							.duration(1300)
+							.style("height", containerHEIGHT + "px")
+								.each("end", function(){
+									VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
+								});
+		
+		
+		d3.select("#" + VisualisationJsModule.sliderDivId)
+			.transition()
+				.duration(900)
+				.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+sliderDivId,"width",30)) + "px")
 					.transition()
-					.duration(1300)
-					.style("height", containerHEIGHT + "px")
-				.each("end", function(){
-					VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
-				});
+						.duration(1300)
+						.style("height", containerHEIGHT + "px")		//TODO fix de hoogte mee met het uitklappen van de div					
+
+					
+	//	d3.select('#' + targetDivId)
+		//transition .style("left", "200px") en 	.attr("height", divHeight) met de canvas mee
 	}
 	
 	function foldBackAnimation(cCanvas, containerWIDTH, containerHEIGHT){
@@ -62,6 +77,14 @@ var CSSarrow_broader_color="black";
 				.each("end", function(){
 					VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
 				});
+				
+		d3.select("#" + VisualisationJsModule.sliderDivId)
+			.transition()
+				.duration(900)
+				.style("height", 0 + "px") //TODO fix de hoogte mee met het uitklappen van de div
+					.transition()
+						.duration(1300)
+						.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + (containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+sliderDivId,"width",30)))  + "px");		
 	}
 		
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
@@ -663,6 +686,11 @@ var CSSarrow_broader_color="black";
 $(document).ready(function() {
 	VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
 	
+	//set the position to inherit instead of relative, or the nodes won't be clickable	
+	//var targetDivId = VisualisationJsModule.targetDivId; //bodyContent
+	d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
+	
+	
 	initialiseTHREEComponents(); 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
@@ -675,7 +703,7 @@ $(document).ready(function() {
 	containerHEIGHT = VisualisationJsModule.height;
 	containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 	
-	document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
+	document.getElementById(VisualisationJsModule.targetDivId).appendChild( VisualisationJsModule.container);
 	
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
@@ -781,9 +809,16 @@ $(document).ready(function() {
 		 
 		jQuery('<div/>', {
 		 id: EMMContainerDivId,
-		}).prependTo('#' + targetDivId);
-		$("#sliderDiv").appendTo('#' + EMMContainerDivId);
-		$("#containerDiv").appendTo('#' + EMMContainerDivId);	
+		}).prependTo('#' + VisualisationJsModule.targetDivId);
+		//$("#sliderDiv").appendTo('#' + EMMContainerDivId);
+		$("#" + VisualisationJsModule.sliderDivId).appendTo('#' + EMMContainerDivId);
+		$("#" + VisualisationJsModule.containerDivId).appendTo('#' + EMMContainerDivId);	
+		////$(VisualisationJsModule.containerDiv).appendTo('#' + EMMContainerDivId);	
+		
+		console.log(d3.select('#containerDiv'));
+		console.log(d3.select('#sliderDiv'));
+		console.log( VisualisationJsModule.containerDivId);
+		console.log(d3.select('#' + EMMContainerDivId));
 		
 		//VisualisationJsModule.containerCanvas = d3.select('#containerCanvas');
 	}

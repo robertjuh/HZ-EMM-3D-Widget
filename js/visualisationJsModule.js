@@ -3,11 +3,22 @@
 * all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
-//CSS constants (integers!)
-var CSSmaxDepth_order=4;
-var CSScontainerAttributes_width=400;
-var CSScontainerAttributes_height=400;	
+	//CSS constants (integers!) (default values)
+	var CSSmaxDepth_order=4;
+	var CSScontainerAttributes_width=400;
+	var CSScontainerAttributes_height=400;	
 
+	//ID names of used divs
+	var targetDivId = 'bodyContent'; //targetDivId kan een element op de mediawiki zijn. Plaatst de hele visualisation bij dit element
+	var sliderDivId = 'sliderDiv';
+	var rendererDomElementId = 'containerCanvas';
+	var containerDivId = 'containerDiv'; //attr("id", "containerDiv")
+	
+	//relevant DOM elements
+	var containerDiv = d3.select("div").append("div:div").attr("id", containerDivId).style("display", "inline-block");	
+
+	
+	
 //var VisualisationJsModule = (function (newHeight, newWidth) {
 var VisualisationJsModule = (function () {
 	//console.log("newWidth??");
@@ -60,8 +71,7 @@ var VisualisationJsModule = (function () {
 	  }
 	  catch (e) {
 	    return defaultValue;
-	  }
-  
+	  }  
 	}
 	
 	/*
@@ -95,18 +105,18 @@ var VisualisationJsModule = (function () {
 			antialiasing : true
 		});
 		
-	renderer.domElement.id = 'containerCanvas';
-	//var containerCanvas = d3.select('#containerCanvas');
-	var containerCanvas; //is set in visualisation.js
 	
+	//Variables which are relevant to the THREE visualisation element
+	renderer.domElement.id = rendererDomElementId; //The canvas ID where the visualisation is being drawn upon
+	var containerCanvas; //is set in visualisation.js, but defined here for accesibility
+	//var container = document.getElementById( containerDivId ); //now uses global var
 	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
 	var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
 	var newDepth;
-	
-	
+		
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
 		height : HEIGHT,
@@ -116,6 +126,10 @@ var VisualisationJsModule = (function () {
 		scene : scene,
 		camera : camera,
 		controls : controls,
+		targetDivId : targetDivId,
+		sliderDivId : sliderDivId,
+		containerDiv : containerDiv,
+		containerDivId : containerDivId,
 		container : container,
 		containerCanvas : containerCanvas,
 		sphereArray : sphereArray,

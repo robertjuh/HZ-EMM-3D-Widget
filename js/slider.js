@@ -10,28 +10,35 @@ var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, conc
 var MAXDEPTH=4;
 
 //TODO set width container in css
-var SLIDERDIV="sliderDiv";
-var containerWidth = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"width",30);
-var divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
+//var sliderDivId="sliderDiv"; //id attribute given to the sliderdiv variable
+var sliderDivId=VisualisationJsModule.sliderDivId; 
+var containerWidth = VisualisationJsModule.getStyleAttrInt('#'+sliderDivId,"width",30);
+var divHeight = VisualisationJsModule.getStyleAttrInt('#'+sliderDivId,"height",divHeight);
 var slideDepth = 1;
 var tempSliderDepthInt=1;
 
-var sliderOffsetTop = 20;
-var sliderOffsetSides = 10;
+var sliderOffsetTop = VisualisationJsModule.getStyleAttrInt(".sliderDiv", "top");
+var sliderOffsetSides = VisualisationJsModule.getStyleAttrInt(".sliderDiv", "border");
 
-var sliderDiv = d3.select('#' + targetDivId).append("div")
+var sliderDiv = d3.select('#' + VisualisationJsModule.targetDivId).append("div")
 //var sliderDiv = d3.select('#' + containerDivId).append("div")
-	.attr("id", SLIDERDIV)
+	.attr("id", sliderDivId)
 	.attr("width", containerWidth)
-	.attr("position", "fixed")
+	.style("position", "absolute")
 	//TODO find out why vertical-align:top only works when added to css, and not here....
-	.style("vertical-align", "top")
+	.style("vertical-align", "top")	
 	.attr("height", divHeight)
 	.style("display", "inline-block")
+	//.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background", "background") );
 	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
 	
+
 	
-var svgContainer = d3.select('#'+SLIDERDIV).append("svg")
+//TODO transition .style("left", "200px") en 	.attr("height", divHeight) met de canvas mee
+	
+	
+var svgContainer = d3.select('#'+sliderDivId).append("svg")
+	.attr("id", "svgContainer")
 	.attr("width", containerWidth)
 	.attr("height", divHeight);
 	
