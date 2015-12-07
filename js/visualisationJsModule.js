@@ -8,7 +8,7 @@
 	var CSScontainerAttributes_width=400;
 	var CSScontainerAttributes_height=400;	
 
-	//ID names of used divs
+	//ID names of used divs //TODO TARGETDIV KAN DEFAULT WORDEn
 	var targetDivId = 'bodyContent'; //targetDivId kan een element op de mediawiki zijn. Plaatst de hele visualisation bij dit element
 	var sliderDivId = 'sliderDiv';
 	var rendererDomElementId = 'containerCanvas';
@@ -19,11 +19,51 @@
 
 	
 	
-//var VisualisationJsModule = (function (newHeight, newWidth) {
-var VisualisationJsModule = (function () {
-	//console.log("newWidth??");
-	//console.log(newHeight);
+	//var VisualisationJsModule = (function (newHeight, newWidth) {
+	var VisualisationJsModule = (function () {
+		
+		
+	
+	//Picks the navigatorstyle.css stylesheet so it doesn't have to loop through each style sheet each fuction call. Use getStyleByLoopingEachSheet if used on other sheet.
+	var styleSheets = window.document.styleSheets;	
+	var currentstylesheet;	
+	for(var i = 0; i < styleSheets.length; i++){		
+			if(window.document.styleSheets[i].href != null && window.document.styleSheets[i].href.search("navigatorStyle") > 1){
+				currentstylesheet = window.document.styleSheets[i];
+			}
+			else{
+				console.log("dit is hem nie");
+				console.log(window.document.styleSheets[i]);
+			}
+	}
+			
+		
 	var getStyle = function(CLASSname) {
+				if (currentstylesheet.rules ) { var classes = currentstylesheet.rules; }
+					else { 
+						try {  if(!currentstylesheet.cssRules)
+								{
+									console.log("no cssrules available")
+									return;
+								}
+						} 
+						//Note that SecurityError exception is specific to Firefox.
+						catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant read: "+ currentstylesheet.href);  return; }}
+						var classes = currentstylesheet.cssRules ;
+					}
+				for (var x = 0; x < classes.length; x++) {
+					if (classes[x].selectorText == CLASSname) {
+						return classes[x];
+						var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+						if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";};
+						return ret;
+					}
+				}
+			return null;			
+	}		
+		
+
+	var getStyleByLoopingEachSheet = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;
 					for(var i = 0; i < styleSheetsLength; i++){
@@ -44,7 +84,8 @@ var VisualisationJsModule = (function () {
 						}
 					}
 					return null;			
-			}
+	}
+	
 	/*
 	 * get attribute in style, if not available return defaultValue
 	 */ 
@@ -96,7 +137,7 @@ var VisualisationJsModule = (function () {
 	var VIEW_ANGLE = 20, //field of view
 	    ASPECT = WIDTH / HEIGHT, 
 		//ASPECT  = $VisualisationJsModule.container[0].clientWidth / $VisualisationJsModule.container[0].clientHeight,
-	    NEAR = 10,
+	    NEAR = 65,
 	    FAR = 10000;
 	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
 	

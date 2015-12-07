@@ -688,6 +688,7 @@ $(document).ready(function() {
 	
 	//set the position to inherit instead of relative, or the nodes won't be clickable	
 	//var targetDivId = VisualisationJsModule.targetDivId; //bodyContent
+	console.log(d3.select('#' + VisualisationJsModule.targetDivId));
 	d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
 	
 	
@@ -703,7 +704,7 @@ $(document).ready(function() {
 	containerHEIGHT = VisualisationJsModule.height;
 	containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 	
-	document.getElementById(VisualisationJsModule.targetDivId).appendChild( VisualisationJsModule.container);
+	document.getElementById(VisualisationJsModule.targetDivId).appendChild(VisualisationJsModule.container);
 	
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
