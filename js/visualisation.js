@@ -13,6 +13,12 @@ var CSSarrow_broader_color="black";
 	//var containerDivId = containerDiv[0][0].id;
 //	var containerDivId = containerDiv[0][0].id;
 	var EMMContainerDivId = "EMMContainerDiv";
+	var targetDivPlacementElementId1;
+	var targetButtonPlacementId1;
+	
+	
+	
+	
 	
 	//console.log("target class ");
 	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
@@ -24,11 +30,16 @@ var CSSarrow_broader_color="black";
  * 
  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
- var startVisualisation = (function(currentPageName){
+ var startVisualisation = (function(currentPageName, targetDivPlacementElementId, targetButtonPlacementId){
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
 		var	mouse = new THREE.Vector2();
+	
+	targetDivPlacementElementId1=targetDivPlacementElementId;
+	targetButtonPlacementId1=targetButtonPlacementId;
+	
+
 		
 		
 	/*	
@@ -55,7 +66,7 @@ var CSSarrow_broader_color="black";
 		d3.select("#" + VisualisationJsModule.sliderDivId)
 			.transition()
 				.duration(900)
-				.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+sliderDivId,"width",30)) + "px")
+				.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+VisualisationJsModule.sliderDivId,"width",30)) + "px")
 					.transition()
 						.duration(1300)
 						.style("height", containerHEIGHT + "px")		//TODO fix de hoogte mee met het uitklappen van de div					
@@ -84,7 +95,7 @@ var CSSarrow_broader_color="black";
 				.style("height", 0 + "px") //TODO fix de hoogte mee met het uitklappen van de div
 					.transition()
 						.duration(1300)
-						.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + (containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+sliderDivId,"width",30)))  + "px");		
+						.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + (containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+VisualisationJsModule.sliderDivId,"width",30)))  + "px");		
 	}
 		
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
@@ -682,15 +693,21 @@ var CSSarrow_broader_color="black";
 		  }).done(drawNewObjectsWithAjaxData);
 	}//initialiseDrawingSequence
 				  
-//Wait for document to finish loading		
-$(document).ready(function() {
-	VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
+/*
+* When everything is loaded up, the visualisation and data loading will comence. The parameters provided by the widget will be used
+* For reference, consult the em3d wiki page: http://195.93.238.56/wiki/hzdoc/wiki/index.php/HZ_3D_navigation_widget
+* @param: targetDivPlacementElementId : div ID name given by the widget call where the visualisationcanvas will be placed
+* @param: targetButtonPlacementId : div ID name given by the widget call where the button will be placed
+*/
+$(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId) {
+	VisualisationJsModule= new VisualisationJsModule(targetDivPlacementElementId1, targetButtonPlacementId1); //creates a module with most THREE components so they will be accesible throughout the class
 	
-	//set the position to inherit instead of relative, or the nodes won't be clickable	
-	//var targetDivId = VisualisationJsModule.targetDivId; //bodyContent
-	console.log(d3.select('#' + VisualisationJsModule.targetDivId));
-	d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
-	
+	//set the position to inherit instead of relative, or the nodes won't be clickable. 	
+	if(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
+		d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
+	}else{
+		console.log("setting inherit is not needed in this case");
+	}
 	
 	initialiseTHREEComponents(); 
 	/**
@@ -740,25 +757,25 @@ $(document).ready(function() {
 	
 	function createButton(){
 		var buttonsize = 22;
-		var bordersize = 1;
 		
 		var buttonGroup = d3.select('body').append('svg')
 			.attr("id", "buttonSvg")
 			.style("background-color", "rgb(191,172,136)")
-			.attr("height", buttonsize + bordersize)
-			.attr("width", buttonsize + bordersize)
-			.style("border", "1px solid black")
+			.attr("height", buttonsize)
+			.attr("width", buttonsize)
+			//.style("border", "1px solid black")
 				.append("g");
 		
 		buttonGroup.toggled = "false"; //property for the button so it can check wether to be folded or unfolded.
 							
 		var expandButtonImage = buttonGroup.append("svg:image")
 				.attr("xlink:href", mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/src/icon.png") 
-				.attr("width", buttonsize - bordersize)
-				.attr("height", buttonsize - bordersize);
+				.attr("width", buttonsize)
+				.attr("height", buttonsize);
    
 
-		$("#buttonSvg").prependTo('#right-navigation'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
+		//$("#buttonSvg").prependTo('#right-navigation'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
+		$("#buttonSvg").prependTo('#' + VisualisationJsModule.targetButtonId); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
 //		VisualisationJsModule.containerCanvas.attr("hidden", true); //TODO hidden, of balkje, of helemaal niet tekenen?
 		
 		//buttonclick animation

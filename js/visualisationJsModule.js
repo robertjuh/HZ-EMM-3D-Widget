@@ -3,27 +3,47 @@
 * all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
+	
+
+	
+	//var VisualisationJsModule = (function (newHeight, newWidth) {
+	var VisualisationJsModule = (function (targetDivPlacementElementId, targetButtonPlacementId) {
+		
+		
 	//CSS constants (integers!) (default values)
 	var CSSmaxDepth_order=4;
 	var CSScontainerAttributes_width=400;
 	var CSScontainerAttributes_height=400;	
 
 	//ID names of used divs //TODO TARGETDIV KAN DEFAULT WORDEn
-	var targetDivId = 'bodyContent'; //targetDivId kan een element op de mediawiki zijn. Plaatst de hele visualisation bij dit element
+	//var targetDivId = 'bodyContent'; //targetDivId kan een element op de mediawiki zijn. Plaatst de hele visualisation bij dit element
+	var targetDivId = targetDivPlacementElementId; //where the visualisation will be placed
+	var targetButtonId = targetButtonPlacementId; //Where the button will be placed
 	var sliderDivId = 'sliderDiv';
 	var rendererDomElementId = 'containerCanvas';
 	var containerDivId = 'containerDiv'; //attr("id", "containerDiv")
 	
-	//relevant DOM elements
-	var containerDiv = d3.select("div").append("div:div").attr("id", containerDivId).style("display", "inline-block");	
+	
+	console.log("BUTTOOOOOOOOOOOOON");
+	console.log(targetButtonPlacementId);	
+	console.log("targetje jonge target div");
+	console.log(targetDivPlacementElementId);
+	
+		
 
 	
 	
-	//var VisualisationJsModule = (function (newHeight, newWidth) {
-	var VisualisationJsModule = (function () {
-		
-		
+	//		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
+
 	
+	
+	//relevant DOM elements
+	var containerDiv = d3.select("div").append("div:div").attr("id", containerDivId).style("display", "inline-block");	
+		
+		
+
+		
+			
 	//Picks the navigatorstyle.css stylesheet so it doesn't have to loop through each style sheet each fuction call. Use getStyleByLoopingEachSheet if used on other sheet.
 	var styleSheets = window.document.styleSheets;	
 	var currentstylesheet;	
@@ -64,26 +84,26 @@
 		
 
 	var getStyleByLoopingEachSheet = function(CLASSname) {
-					var styleSheets = window.document.styleSheets;
-					var styleSheetsLength = styleSheets.length;
-					for(var i = 0; i < styleSheetsLength; i++){
-						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
-						else { 
-							try {  if(!styleSheets[i].cssRules) {continue;} } 
-							//Note that SecurityError exception is specific to Firefox.
-							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
-							var classes = styleSheets[i].cssRules ;
-						}
-						for (var x = 0; x < classes.length; x++) {
-							if (classes[x].selectorText == CLASSname) {
-					 return classes[x];
-								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";};
-								return ret;
-							}
+		var styleSheets = window.document.styleSheets;
+		var styleSheetsLength = styleSheets.length;
+			for(var i = 0; i < styleSheetsLength; i++){
+				if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
+					else { 
+						try {  if(!styleSheets[i].cssRules) {continue;} } 
+						//Note that SecurityError exception is specific to Firefox.
+						catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
+						var classes = styleSheets[i].cssRules ;
+					}
+					for (var x = 0; x < classes.length; x++) {
+						if (classes[x].selectorText == CLASSname) {
+							return classes[x];
+						var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+							if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";};
+							return ret;
 						}
 					}
-					return null;			
+			}
+		return null;			
 	}
 	
 	/*
@@ -133,22 +153,21 @@
 	var WIDTH=getStyleAttrInt('.containerAttributes', "width",CSScontainerAttributes_width);
 	var HEIGHT=getStyleAttrInt('.containerAttributes', "height",CSScontainerAttributes_height);
 	
+	
+	//Variables which are relevant to the THREE visualisation element
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
 	    ASPECT = WIDTH / HEIGHT, 
 		//ASPECT  = $VisualisationJsModule.container[0].clientWidth / $VisualisationJsModule.container[0].clientHeight,
 	    NEAR = 65,
 	    FAR = 10000;
-	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
-	
+	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);		
 	var renderer = new THREE.WebGLRenderer({
 			alpha : true,
 			antialiasing : true
-		});
-		
-	
-	//Variables which are relevant to the THREE visualisation element
+	});	
 	renderer.domElement.id = rendererDomElementId; //The canvas ID where the visualisation is being drawn upon
+	
 	var containerCanvas; //is set in visualisation.js, but defined here for accesibility
 	//var container = document.getElementById( containerDivId ); //now uses global var
 	var container = document.getElementById( containerDivId );
@@ -171,6 +190,7 @@
 		sliderDivId : sliderDivId,
 		containerDiv : containerDiv,
 		containerDivId : containerDivId,
+		targetButtonId : targetButtonId,
 		container : container,
 		containerCanvas : containerCanvas,
 		sphereArray : sphereArray,
