@@ -194,8 +194,8 @@ var CSSarrow_broader_color="black";
 		* takes variables from the startvisualisation method		
 		*/
 		function initialiseConstraints(nodes, spheres, three_links) {
-			var min=-100;
-			var max=50;
+			var min=-150;
+			var max=100;
 			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
 			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
 			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);				
@@ -701,12 +701,29 @@ var CSSarrow_broader_color="black";
 */
 $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId) {
 	VisualisationJsModule= new VisualisationJsModule(targetDivPlacementElementId1, targetButtonPlacementId1); //creates a module with most THREE components so they will be accesible throughout the class
+	console.log("heir moet het goe gaan");
+	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ));
+	console.log( d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className);
+	if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
+		alert("qq");
+		
+		
+	}
+	console.log(d3.select('body')[0][0].style);
+	console.log(d3.select('#' + VisualisationJsModule.targetDivId));
+	console.log(typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0]));
+	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style);
 	
+	//TODO this code might still be a little bit sketchy, is it alright? perhaps try catch
 	//set the position to inherit instead of relative, or the nodes won't be clickable. 	
-	if(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
+	if(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className && (d3.select('#' + VisualisationJsModule.targetDivId)[0][0] != null) && (typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className)) != null){ //if the current selected element has a class, give it the inherit position property
 		d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
-	}else{
+	}else if(d3.select(VisualisationJsModule.targetDivId) && VisualisationJsModule.targetDivId[0].style){
 		console.log("setting inherit is not needed in this case");
+	}else if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
+		console.log("setting inherit is not needed in this case as well");
+	}else{
+		console.log("Can you still click elements?")
 	}
 	
 	initialiseTHREEComponents(); 
@@ -722,6 +739,8 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 	containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 	
 	document.getElementById(VisualisationJsModule.targetDivId).appendChild(VisualisationJsModule.container);
+//	d3.select(VisualisationJsModule.targetDivId)[0][0].append(VisualisationJsModule.container)
+	
 	
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
@@ -774,9 +793,7 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 				.attr("height", buttonsize);
    
 
-		//$("#buttonSvg").prependTo('#right-navigation'); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
 		$("#buttonSvg").prependTo('#' + VisualisationJsModule.targetButtonId); //TODO dit moet ergens anders komen uiteindelijk EN een plaatje krijgen ipv text
-//		VisualisationJsModule.containerCanvas.attr("hidden", true); //TODO hidden, of balkje, of helemaal niet tekenen?
 		
 		//buttonclick animation
 		buttonGroup.on("click", function() {

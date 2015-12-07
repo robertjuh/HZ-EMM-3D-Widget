@@ -3,11 +3,8 @@
 * all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
-	
-
-	
-	//var VisualisationJsModule = (function (newHeight, newWidth) {
-	var VisualisationJsModule = (function (targetDivPlacementElementId, targetButtonPlacementId) {
+//var VisualisationJsModule = (function (newHeight, newWidth) {
+var VisualisationJsModule = (function (targetDivPlacementElementId, targetButtonPlacementId) {
 		
 		
 	//CSS constants (integers!) (default values)
@@ -15,34 +12,20 @@
 	var CSScontainerAttributes_width=400;
 	var CSScontainerAttributes_height=400;	
 
-	//ID names of used divs //TODO TARGETDIV KAN DEFAULT WORDEn
-	//var targetDivId = 'bodyContent'; //targetDivId kan een element op de mediawiki zijn. Plaatst de hele visualisation bij dit element
-	var targetDivId = targetDivPlacementElementId; //where the visualisation will be placed
-	var targetButtonId = targetButtonPlacementId; //Where the button will be placed
+	
+	//Relevant DOM element ID's
+	//var targetDivId = targetDivPlacementElementId; //where the visualisation will be placed
+	//var targetButtonId = targetButtonPlacementId; //Where the button will be placed
+	var targetDivId =  targetDivPlacementElementId !== 'undefined' ? targetDivPlacementElementId : "body";  //if all else fails in the widget, use default value
+	var targetButtonId =  targetButtonPlacementId !== 'undefined' ? targetButtonPlacementId : "ca-form_edit"; //if all else fails in the widget, use default value
 	var sliderDivId = 'sliderDiv';
 	var rendererDomElementId = 'containerCanvas';
 	var containerDivId = 'containerDiv'; //attr("id", "containerDiv")
-	
-	
-	console.log("BUTTOOOOOOOOOOOOON");
-	console.log(targetButtonPlacementId);	
-	console.log("targetje jonge target div");
-	console.log(targetDivPlacementElementId);
-	
-		
 
-	
-	
-	//		var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
-
-	
 	
 	//relevant DOM elements
 	var containerDiv = d3.select("div").append("div:div").attr("id", containerDivId).style("display", "inline-block");	
-		
-		
-
-		
+	
 			
 	//Picks the navigatorstyle.css stylesheet so it doesn't have to loop through each style sheet each fuction call. Use getStyleByLoopingEachSheet if used on other sheet.
 	var styleSheets = window.document.styleSheets;	
@@ -52,8 +35,7 @@
 				currentstylesheet = window.document.styleSheets[i];
 			}
 			else{
-				console.log("dit is hem nie");
-				console.log(window.document.styleSheets[i]);
+				continue;
 			}
 	}
 			
