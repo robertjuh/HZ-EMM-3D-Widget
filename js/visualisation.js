@@ -50,6 +50,15 @@ var CSSarrow_broader_color="black";
 		//TODO slider initial state = hidden
 		//TODO slider.makevisible
 		
+//		 $( '#containerDiv').slideDown(700, 'linear', function() {
+           //callback function after animation finished
+//          $('#'+ EMMContainerDivId).slideDown( "slow" );
+		   
+		   
+
+
+		
+
 		cCanvas 
 		//d3.select('#EMMContainerDiv')
 			.transition()
@@ -69,8 +78,16 @@ var CSSarrow_broader_color="black";
 				.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+VisualisationJsModule.sliderDivId,"width",30)) + "px")
 					.transition()
 						.duration(1300)
-						.style("height", containerHEIGHT + "px")		//TODO fix de hoogte mee met het uitklappen van de div					
+						.style("height", containerHEIGHT + "px");		//TODO fix de hoogte mee met het uitklappen van de div					
 
+	
+	
+	
+//		}); //end of the callback (after revealing the canvas, it will unfold)
+	
+					
+					
+					
 					
 	//	d3.select('#' + targetDivId)
 		//transition .style("left", "200px") en 	.attr("height", divHeight) met de canvas mee
@@ -86,7 +103,11 @@ var CSSarrow_broader_color="black";
 					.duration(1300)
 					.style("width", containerWIDTH + "px")
 				.each("end", function(){
-					VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
+//TODO is dit nog nodig?			//VisualisationJsModule.renderer.setSize(containerWIDTH, containerHEIGHT); //Zo wordt de visualisatie nog even scherp getekend.		
+				//	$( '#'+VisualisationJsModule.containerDivId ).hide();
+//					$( '#EMMContainerDiv' ).slideUp( "slow" );
+//					$( '#containerDiv' ).slideUp( "slow" );
+					//$( '#'+EMMContainerDivId ).hide();
 				});
 				
 		d3.select("#" + VisualisationJsModule.sliderDivId)
@@ -167,8 +188,14 @@ var CSSarrow_broader_color="black";
 		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
-			clearCanvas();
-			window.location = window.location.href.getFirstPartOfUrl() + conceptNameString; //navigate to the clicked object
+				clearCanvas();
+				
+							//TODO experiment with this code, moving nodes is possible, dragging should be as well. Pushing nodes aside? next level
+						//	console.log("sphere");
+						//	console.log(sphere);
+							//sphere.position.x=10;
+						//	sphere.node.x=10;
+				window.location = window.location.href.getFirstPartOfUrl() + conceptNameString; //navigate to the clicked object
 			}		
 		}
 				
@@ -194,8 +221,8 @@ var CSSarrow_broader_color="black";
 		* takes variables from the startvisualisation method		
 		*/
 		function initialiseConstraints(nodes, spheres, three_links) {
-			var min=-150;
-			var max=100;
+			var min=-110;
+			var max=60;
 			var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
 			    yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
 			    zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);				
@@ -429,7 +456,8 @@ var CSSarrow_broader_color="black";
 		});
 
 		var sprite = new THREE.Sprite(mat);
-		sprite.scale.set(50,50,1.2); //grootte van text
+		//sprite.scale.set(50,50,1.2); //grootte van text
+		sprite.scale.set(90,90,10); //grootte van text
 		sprite.textWidth=textWidth;
 		
 		labels[key] = sprite;
@@ -705,8 +733,7 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ));
 	console.log( d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className);
 	if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
-		alert("qq");
-		
+		//alert("qq");	
 		
 	}
 	console.log(d3.select('body')[0][0].style);
@@ -767,7 +794,7 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 		
 		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
 		VisualisationJsModule.camera.position.x = containerWIDTH/2;	
-		VisualisationJsModule.camera.position.z =  500;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
+		VisualisationJsModule.camera.position.z =  600;	  //TODO: distance van camera increasen zodat alles op het scherm zichtbaar is, zelfs als dit betekend dat alles onleesbaar is, maar het totaaloverzicht blijft
 		//VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
 
 		initialiseDrawingSequence(currentPageName, VisualisationJsModule.depth);
@@ -776,6 +803,27 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 	
 	function createButton(){
 		var buttonsize = 22;
+		
+//		$("#"+EMMContainerDivId).css("position","relative").css("display","inline-block");
+//		$("#containerDiv").css("position","relative").css("display","inline-block");		
+//		$("#sliderDiv").css("position","absolute").css("left",""+($("#containerDiv").width()-$("#sliderDiv").width())+"px").css("vertical-align","top");
+//		$( '#'+EMMContainerDivId ).hide();
+		//$( '#containerDiv' ).hide();
+		
+		//$( '#'+EMMCONTAINERDIV ).hide();
+	
+	
+		//TODO testing thing
+//				jQuery('<div/>', {
+//		 id: EMMContainerDivId,
+//		}).prependTo('#' + VisualisationJsModule.targetDivId);
+//		//$("#sliderDiv").appendTo('#' + EMMContainerDivId);
+//		$("#" + VisualisationJsModule.sliderDivId).appendTo('#' + EMMContainerDivId);
+//		$("#" + VisualisationJsModule.containerDivId).appendTo('#' + EMMContainerDivId);	
+//		////$(VisualisationJsModule.containerDiv).appendTo('#' + EMMContainerDivId);	
+		
+//		$( '#'+VisualisationJsModule.containerDivId ).hide();
+		
 		
 		var buttonGroup = d3.select('body').append('svg')
 			.attr("id", "buttonSvg")
@@ -825,12 +873,15 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 	*/
 	function buttonClickResizeCanvas(buttonGroup, containerCanvas){		
 			if(buttonGroup.toggled == "false"){
+				//$( '#'+VisualisationJsModule.containerDivId ).show();
 //				containerCanvas.attr("hidden", false);
 				unfoldAnimation(containerCanvas, 800,800); //TODO fixed height / window.innerwidth en innerheight?
 				buttonGroup.toggled = "true";				
 			}else if(buttonGroup.toggled == "true"){
 				foldBackAnimation(containerCanvas, VisualisationJsModule.width,VisualisationJsModule.height);
+//				 $( '#'+ EMMContainerDivId ).slideUp( "slow" );
 //				containerCanvas.attr("hidden", true);
+			
 				buttonGroup.toggled = "false";				
 			}else{
 				return;
