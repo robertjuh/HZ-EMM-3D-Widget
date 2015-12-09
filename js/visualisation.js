@@ -755,8 +755,7 @@ var rightBracket=jQuery('<span/>', {
 var showdiv=jQuery('<a/>', {
  id: showbuttonDiv,
  href:"#",
- html:mw.message( 'collapsible-expand' ).text() //"uitvouwen",//collapsible-expand', 'collapsible-collapse
- //mw.message( 'collapsible-expand' ).text() 
+ html:mw.message( 'collapsible-expand' ).text() 
 });
 
 showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
