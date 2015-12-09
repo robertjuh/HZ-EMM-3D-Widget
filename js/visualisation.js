@@ -734,25 +734,29 @@ var showdivcontainer=jQuery('<div/>', {
 });
 var showdivtext=jQuery('<span/>', {
  id: showbuttonDiv+"text",
- html:"Model"
+ html:"<b>Model</b>"
 });
 
 var showdivcontainer2=jQuery('<span/>', {
  id: showbuttonDiv+"container2",
+ class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"
 }).css("float","right");
 
 var leftBracket=jQuery('<span/>', {
-   html:"["
+   html:"[",
+   class:"mw-collapsible-bracket"
 });
 
 var rightBracket=jQuery('<span/>', {
-   html:"]"
+   html:"]",
+   class:"mw-collapsible-bracket"
 });
 
 var showdiv=jQuery('<a/>', {
  id: showbuttonDiv,
  href:"#",
- html:"uitvouwen",
+ html:mw.message( 'collapsible-expand' ).text() //"uitvouwen",//collapsible-expand', 'collapsible-collapse
+ //mw.message( 'collapsible-expand' ).text() 
 });
 
 showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
@@ -763,9 +767,11 @@ showdivcontainer.prependTo('#'+BODYCONTENTDIV);
 $( '#'+EMMCONTAINERDIV ).hide();
 $( "#"+showbuttonDiv  ).click(function () {
   if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
+    showdiv.html(mw.message( 'collapsible-collapse' ).text());
     $( '#'+EMMCONTAINERDIV ).slideDown( "slow" );
   } else {
     $( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
+    showdiv.html(mw.message( 'collapsible-expand' ).text());
   }
 });
 /*
