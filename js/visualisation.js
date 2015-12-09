@@ -13,10 +13,11 @@ var CSSarrow_broader_color="black";
 	var containerDivId = containerDiv[0][0].id;
 	
 	//console.log("target class ");
-	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
+	console.log(d3.select('#' + targetDivId));
 	
-	//set the position to inherit instead of relative, or the nodes won't be clickable	
-	d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
+	//set the position to inherit instead of relative, or the nodes won't be clickable
+//anton: following line gives error in Chameleon. Not necessary anymore?	
+	//d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
 	
 /**
  * @author NJK @author robertjuh
@@ -25,6 +26,7 @@ var CSSarrow_broader_color="black";
  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
  var startVisualisation = (function(currentPageName){
+   setTimeout(function(){startVisualisation(currentPageName)}, 1000);
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
@@ -92,11 +94,37 @@ var CSSarrow_broader_color="black";
 			
 		
 		
+		  //get offset for dom-element, while looping over all parent elements and summing all offsets
+		  function getOffset( el ) {
+		      var _x = 0;
+		      var _y = 0;
+		      while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+			  _x += el.offsetLeft - el.scrollLeft;
+			  _y += el.offsetTop - el.scrollTop;
+			  el = el.offsetParent;
+		      }
+		      return { top: _y, left: _x };
+		  }
 		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
 		//uses the mouse variable which is a THREE.Vector2
 		function normalizeCurrentMouseCoordinates(e, mouse){
-			mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - renderer.domElement.offsetLeft ) / renderer.domElement.width ) * 2 - 1;			
-			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - renderer.domElement.offsetTop) / renderer.domElement.height ) * 2 + 1;			
+		  console.log(e);
+var x = getOffset( e.target ).left; 
+    console.log($("#EMMContainerDiv").offset().left,$("#EMMContainerDiv").offset().top);
+    console.log(getOffset( e.target ).left,getOffset( e.target ).top);//1
+    console.log($(document).scrollLeft(),$(document).scrollTop());//2
+    console.log(e.clientX,e.clientY);//3
+    console.log(e.layerX,e.layerY);
+    console.log( (e.clientX - (getOffset( e.target ).left-$(document).scrollLeft())),( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()))   );
+			var x=(e.clientX - (getOffset( e.target ).left-$(document).scrollLeft()));
+			if (x>e.layerX)x=e.layerX;
+			var y=( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()));
+			if (y>e.layerY)y=e.layerY;
+			/*mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - (renderer.domElement.offsetLeft )) / renderer.domElement.width ) * 2 - 1;			
+			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - (renderer.domElement.offsetTop)) / renderer.domElement.height ) * 2 + 1;	*/		
+			mouse.x = ( (x) / renderer.domElement.width ) * 2 - 1;			
+			mouse.y = - ( (y) / renderer.domElement.height ) * 2 + 1;			
+    console.log(mouse.x,mouse.y);
 		}
 
 
@@ -634,7 +662,7 @@ var CSSarrow_broader_color="black";
 			success:function(result)//we got the response
 			{
 			},
-			error:function(exception){alert('Exeption: '+exception);}	   
+			error:function(exception){console.log('Exeption: '+exception);}	   
 		  }).done(drawNewObjectsWithAjaxData);
 	}//initialiseDrawingSequence
 				  
@@ -655,12 +683,12 @@ $(document).ready(function() {
 	
 		
 		//todo dit is tijdelijke code
-		d3.select("body").append("text")         // append text
+		/*d3.select("body").append("text")         // append text
 			.style("fill", "black")   // fill the text with the colour black
 			.attr("x", 200)           // set x position of left side of text
 			.attr("y", 100)           // set y position of bottom of text 
 			.text("DEZE PAGINA GAAT OVER: " + currentPageName);     // define the text to display 
-				
+				*/
 		// Create Renderer
 		renderer = new THREE.WebGLRenderer({
 			alpha : true,
@@ -682,26 +710,82 @@ $(document).ready(function() {
 		
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
 		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
-	
+
+var showbuttonDiv='showbutton';
+var sliderDiv='sliderDiv';
+var BODYCONTENTDIV='bodyContent';
+var EMMCONTAINERDIV='EMMContainerDiv';	
+var containerDivDescription="containerDiv";
+console.log("position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;");
+jQuery('<div/>', {
+ id: EMMCONTAINERDIV/*,
+ css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
+}).prependTo('#'+BODYCONTENTDIV);
+$("#"+containerDivDescription).appendTo('#'+EMMCONTAINERDIV);
+$("#"+containerDivDescription).attr("css","position:relative;");
+$("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
+//TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
+$("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
+  .css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
+$("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
+jQuery('<div/>', {
+ id: showbuttonDiv,
+ html:"[uitvouwen]",
+}).prependTo('#'+BODYCONTENTDIV);
+$( '#'+EMMCONTAINERDIV ).hide();
+$( "#"+showbuttonDiv  ).click(function () {
+  if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
+    $( '#'+EMMCONTAINERDIV ).slideDown( "slow" );
+  } else {
+    $( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
+  }
+});
 /*
  //TODO: met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
  //je moet dan echter dus het stuk voor het model (145px) bij de x optellen, en dat is skin-gevoelig. Dus een work-around.
  //daar moet dus over nagedacht worden. Sowieso is het handig om de twee elementen in een parent-html-element op te nemen.
  
+var EMMCONTAINERDIV='EMMContainerDiv';	
 jQuery('<div/>', {
- id: 'EMMContainerDiv',
-}).appendTo('#bodyContent');
-$("#sliderDiv").appendTo('#EMMContainerDiv');
-$("#containerDiv").appendTo('#EMMContainerDiv');
+ id: EMMCONTAINERDIV,
+ 
+ 
+}).prependTo('#bodyContent');
+$("#containerDiv").appendTo('#'+EMMCONTAINERDIV);
+$("#sliderDiv").appendTo('#'+EMMCONTAINERDIV);
+jQuery('<div/>', {
+ id: 'showbutton',
+ html:"show!",
+}).prependTo('#bodyContent');
+$( "#EMMContainerDiv" ).hide();
+$( "#showbutton"  ).click(function () {
+  if ( $( "#EMMContainerDiv" ).is( ":hidden" ) ) {
+    $( "#EMMContainerDiv" ).slideDown( "slow" );
+  } else {
+    $( "#EMMContainerDiv" ).slideUp( "slow" );
+  }
+});
 
 samen met
+#containerDiv{
+position:relative;
+	background-color: rgb(229,222,205);	
+}
+
+#EMMContainerDiv{
+position:relative;
+	height: 700px;
+	width: 700px;
+display:inline-block;
+}
 #sliderDiv{
   position:absolute;
-  left:845px;
+  left:670px;
     vertical-align: top;
   width: 30px;
   height:500px;
-} */
+}
+*/
 	  
 	}
 	

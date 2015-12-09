@@ -1,8 +1,5 @@
 /* It is possible to ask attributes from this sheet with the following js code: VisualisationJsModule.getStyle(".containerAttributes").style.color; */
 
-#containerDiv{	
-	background-color: rgb(229,222,205);	
-}
 
 /* container represents the div that everything is being drawn on*/
 .containerAttributes{
@@ -10,8 +7,23 @@
 	height: 700px;
 	width: 700px;
 	/* font: Bold 35px Arial; */
-	font: 30px Open_Sans
+	font-size: 30px;
+	font-family:Arial;
+display:inline-block;
 
+}
+#containerDiv{
+	background-color: rgb(229,222,205);	
+}
+#showbutton:before {
+  /*content: "Uitvouwen";*/
+}
+#EMMContainerDiv{
+}
+#sliderDiv{
+
+width: 30px;
+  height:500px;
 }
 
 
@@ -26,12 +38,6 @@
 .sliderAttributes.sliderPolygon{
 	color: rgb(29,20,205);
 	background: rgb(229,200,205);
-}
-
-#sliderDiv{
-    vertical-align: top;
-  width: 20px;
-  height:500px;
 }
 
 /*.sphere.level1{

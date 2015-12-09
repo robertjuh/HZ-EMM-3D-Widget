@@ -4,6 +4,7 @@
 * @author Robert Walhout
 */
 //CSS constants (integers!)
+
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
