@@ -4,7 +4,8 @@
 * @author Robert Walhout
 */
 //var VisualisationJsModule = (function (newHeight, newWidth) {
-var VisualisationJsModule = (function (targetDivPlacementElementId, targetButtonPlacementId) {
+//var VisualisationJsModule = (function (targetDivPlacementElementId, targetButtonPlacementId) {
+var VisualisationJsModule = (function (targetDivPlacementElementId,targetButtonPlacementId) {
 		
 		
 	//CSS constants (integers!) (default values)
@@ -16,13 +17,13 @@ var VisualisationJsModule = (function (targetDivPlacementElementId, targetButton
 	//Relevant DOM element ID's
 	//var targetDivId = targetDivPlacementElementId; //where the visualisation will be placed
 	//var targetButtonId = targetButtonPlacementId; //Where the button will be placed
-	var targetDivId =  targetDivPlacementElementId !== 'undefined' ? targetDivPlacementElementId : "body";  //if all else fails in the widget, use default value
-	var targetButtonId =  targetButtonPlacementId !== 'undefined' ? targetButtonPlacementId : "ca-form_edit"; //if all else fails in the widget, use default value
+
+	var targetDivId =  typeof targetDivPlacementElementId !== 'undefined' ? targetDivPlacementElementId : "body";  //if all else fails in the widget, use default value
+	var targetButtonId = typeof targetButtonPlacementId !== 'undefined' ? targetButtonPlacementId : "body"; //if all else fails in the widget, use default value
 	var sliderDivId = 'sliderDiv';
 	var rendererDomElementId = 'containerCanvas';
 	var containerDivId = 'containerDiv'; //attr("id", "containerDiv")
 
-	
 	//relevant DOM elements
 	var containerDiv = d3.select("div").append("div:div").attr("id", containerDivId).style("display", "inline-block");	
 	
@@ -41,27 +42,27 @@ var VisualisationJsModule = (function (targetDivPlacementElementId, targetButton
 			
 		
 	var getStyle = function(CLASSname) {
-				if (currentstylesheet.rules ) { var classes = currentstylesheet.rules; }
-					else { 
-						try {  if(!currentstylesheet.cssRules)
-								{
-									console.log("no cssrules available")
-									return;
-								}
-						} 
-						//Note that SecurityError exception is specific to Firefox.
-						catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant read: "+ currentstylesheet.href);  return; }}
-						var classes = currentstylesheet.cssRules ;
-					}
-				for (var x = 0; x < classes.length; x++) {
-					if (classes[x].selectorText == CLASSname) {
-						return classes[x];
-						var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-						if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";};
-						return ret;
-					}
+			if (currentstylesheet.rules ) { var classes = currentstylesheet.rules; }
+				else { 
+					try {  if(!currentstylesheet.cssRules)
+							{
+								console.log("no cssrules available")
+								return;
+							}
+					} 
+					//Note that SecurityError exception is specific to Firefox.
+					catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant read: "+ currentstylesheet.href);  return; }}
+					var classes = currentstylesheet.cssRules ;
 				}
-			return null;			
+			for (var x = 0; x < classes.length; x++) {
+				if (classes[x].selectorText == CLASSname) {
+					return classes[x];
+					var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+					if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";};
+					return ret;
+				}
+			}
+		return null;			
 	}		
 		
 
@@ -151,7 +152,6 @@ var VisualisationJsModule = (function (targetDivPlacementElementId, targetButton
 	renderer.domElement.id = rendererDomElementId; //The canvas ID where the visualisation is being drawn upon
 	
 	var containerCanvas; //is set in visualisation.js, but defined here for accesibility
-	//var container = document.getElementById( containerDivId ); //now uses global var
 	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;

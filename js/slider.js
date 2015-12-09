@@ -64,9 +64,10 @@ vis.selectAll("polygon")
     .attr("id", "sliderArea")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
-    .attr("fill",  VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.background )
+  //  .attr("fill",  VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.background )
+    .attr("fill",  "rgb(237,231,220)")
     .attr("stroke", VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.color )
-    .attr("stroke-width",2);
+    .attr("stroke-width",1);
 
 
   
@@ -88,7 +89,7 @@ vis.selectAll("polygon")
 
 	//de sliderbutton
 	var sliderAttr = [
-	  { "rx": sliderOffsetSides/2, "ry": divHeight-(sliderOffsetTop*2), "height": 20, "width": containerWidth-(sliderOffsetSides)}];	
+	  { "rx": sliderOffsetSides/2, "ry": divHeight-(sliderOffsetTop*2), "height": 12, "width": containerWidth-(sliderOffsetSides)}];	
 	
 	var sliderRect = svgContainer.selectAll("rect")
         .data(sliderAttr)

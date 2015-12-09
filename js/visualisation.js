@@ -13,12 +13,6 @@ var CSSarrow_broader_color="black";
 	//var containerDivId = containerDiv[0][0].id;
 //	var containerDivId = containerDiv[0][0].id;
 	var EMMContainerDivId = "EMMContainerDiv";
-	var targetDivPlacementElementId1;
-	var targetButtonPlacementId1;
-	
-	
-	
-	
 	
 	//console.log("target class ");
 	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
@@ -35,12 +29,7 @@ var CSSarrow_broader_color="black";
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
 		var	mouse = new THREE.Vector2();
-	
-	targetDivPlacementElementId1=targetDivPlacementElementId;
-	targetButtonPlacementId1=targetButtonPlacementId;
-	
 
-		
 		
 	/*	
 	* Functions for folding the visualisationcanvas
@@ -259,6 +248,8 @@ var CSSarrow_broader_color="black";
 		//colors the ball that is being clicked, serves no real purpose yet.
 		function onDocumentMouseDown(event){
 			event.preventDefault();
+			console.log(event);
+			console.log(mouse);
 			colorSelectedSphere(event, mouse); //Mouse and camera are global variables.
 		}
 		
@@ -431,14 +422,12 @@ var CSSarrow_broader_color="black";
 		var context = canvas.getContext('2d');
 		var textWidth = context.measureText( key ).width;
 		
-		var canvas = document.createElement('canvas');
-
 		//TODO make width of sprite dependant on width of text
 		//size is now hard-coded!?
 		var size = 350;
 		canvas.width = size;
 		canvas.height = size;
-		var context = canvas.getContext('2d');
+		//var context = canvas.getContext('2d');
 		context.fillStyle = '#990000';
 		context.textAlign = 'center';
 		context.font = VisualisationJsModule.getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
@@ -527,6 +516,12 @@ var CSSarrow_broader_color="black";
 		//sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
 		//This code become rudimentary if there are new types introduced
 			if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){	
+			  
+			  console.log("currentNodeLink.type van de huidige arrow");
+			  console.log(currentNodeLink.type);
+			  console.log(arrow.target);
+			  console.log(arrow.source);
+			  
 			  //commented out by anton
 			  //color red was arbitrarily added to some arrows
 			  //TODO: see what next line does. If not necessary: omit it!
@@ -708,7 +703,7 @@ var CSSarrow_broader_color="black";
 			url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 			async : true,
 			data : {
-				concept : concept,
+				concept : "TZW:woon-zorgzones",
 				depth : depth.toString(),
 				relations : relations,
 				uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
@@ -727,31 +722,50 @@ var CSSarrow_broader_color="black";
 * @param: targetDivPlacementElementId : div ID name given by the widget call where the visualisationcanvas will be placed
 * @param: targetButtonPlacementId : div ID name given by the widget call where the button will be placed
 */
-$(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId) {
-	VisualisationJsModule= new VisualisationJsModule(targetDivPlacementElementId1, targetButtonPlacementId1); //creates a module with most THREE components so they will be accesible throughout the class
+$(document).ready(function() {
+	VisualisationJsModule= new VisualisationJsModule(targetDivPlacementElementId, targetButtonPlacementId); //creates a module with most THREE components so they will be accesible throughout the class
 	console.log("heir moet het goe gaan");
 	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ));
-	console.log( d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className);
-	if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
-		//alert("qq");	
-		
-	}
-	console.log(d3.select('body')[0][0].style);
-	console.log(d3.select('#' + VisualisationJsModule.targetDivId));
-	console.log(typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0]));
+//	console.log( d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className);
+//	if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
+		//alert("qq");			
+//	}
+
+
+//	console.log(d3.select('#' + VisualisationJsModule.targetDivId));
+//	console.log(typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0]));
 	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style);
 	
 	//TODO this code might still be a little bit sketchy, is it alright? perhaps try catch
 	//set the position to inherit instead of relative, or the nodes won't be clickable. 	
-	if(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className && (d3.select('#' + VisualisationJsModule.targetDivId)[0][0] != null) && (typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className)) != null){ //if the current selected element has a class, give it the inherit position property
-		d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
-	}else if(d3.select(VisualisationJsModule.targetDivId) && VisualisationJsModule.targetDivId[0].style){
-		console.log("setting inherit is not needed in this case");
-	}else if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
-		console.log("setting inherit is not needed in this case as well");
-	}else{
-		console.log("Can you still click elements?")
+	
+	try{
+		console.log("check dit");
+		console.log(d3.select('body')[0][0].style);
+		console.log(VisualisationJsModule.targetDivId);
+		console.log(d3.select('#' + VisualisationJsModule.targetDivId));
+		console.log(d3.select(VisualisationJsModule.targetDivId));
+		console.log(typeof (d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className));
+		console.log(VisualisationJsModule.targetDivId);
+		
+		
+		
+		//if(!d3.select('#' + VisualisationJsModule.targetDivId)){
+		//	alert("kan niet selecten op dom element");
+		//}	
+		if((d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className) && (d3.select('#' + VisualisationJsModule.targetDivId)[0][0] != null) && (typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className)) != null){ //if the current selected element has a class, give it the inherit position property
+			d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
+		}
+		//else if(d3.select(VisualisationJsModule.targetDivId) && VisualisationJsModule.targetDivId[0].style){
+		//	console.log("setting inherit is not needed in this case");
+		//}else if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
+		//	console.log("setting inherit is not needed in this case as well");
+		//}else{
+		//	console.log("Can you still click elements?")
+		//}
 	}
+	catch(err){console.log(err)};
+	
 	
 	initialiseTHREEComponents(); 
 	/**
@@ -765,10 +779,21 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 	containerHEIGHT = VisualisationJsModule.height;
 	containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 	
-	document.getElementById(VisualisationJsModule.targetDivId).appendChild(VisualisationJsModule.container);
-//	d3.select(VisualisationJsModule.targetDivId)[0][0].append(VisualisationJsModule.container)
-	
-	
+		//Try adding the visualisations on the wiki, depending on which target elements are chosen
+		try{
+			document.getElementById(VisualisationJsModule.targetDivId).appendChild(VisualisationJsModule.container);
+		}
+		catch(err){
+			try{
+				d3.select(VisualisationJsModule.targetDivId).append(function() { return VisualisationJsModule.container; });// van voorbeld
+				alert("The slider isn't added because a wrong target element was chosen");
+			}
+			catch(err){
+				d3.select("#" + VisualisationJsModule.targetDivId).append(function() { return VisualisationJsModule.container; });// van voorbeld
+			}			
+		}
+		
+
 		//todo dit is tijdelijke code
 		d3.select("body").append("text")         // append text
 			.style("fill", "black")   // fill the text with the colour black
@@ -875,7 +900,7 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 			if(buttonGroup.toggled == "false"){
 				//$( '#'+VisualisationJsModule.containerDivId ).show();
 //				containerCanvas.attr("hidden", false);
-				unfoldAnimation(containerCanvas, 800,800); //TODO fixed height / window.innerwidth en innerheight?
+				unfoldAnimation(containerCanvas, 650,650); //TODO fixed height / window.innerwidth en innerheight?
 				buttonGroup.toggled = "true";				
 			}else if(buttonGroup.toggled == "true"){
 				foldBackAnimation(containerCanvas, VisualisationJsModule.width,VisualisationJsModule.height);
@@ -900,13 +925,6 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 		$("#" + VisualisationJsModule.sliderDivId).appendTo('#' + EMMContainerDivId);
 		$("#" + VisualisationJsModule.containerDivId).appendTo('#' + EMMContainerDivId);	
 		////$(VisualisationJsModule.containerDiv).appendTo('#' + EMMContainerDivId);	
-		
-		console.log(d3.select('#containerDiv'));
-		console.log(d3.select('#sliderDiv'));
-		console.log( VisualisationJsModule.containerDivId);
-		console.log(d3.select('#' + EMMContainerDivId));
-		
-		//VisualisationJsModule.containerCanvas = d3.select('#containerCanvas');
 	}
 	
 	//creates additional functions	
@@ -950,7 +968,7 @@ $(document).ready(function(targetDivPlacementElementId, targetButtonPlacementId)
 					}
 				}
 				return string1 === string2;
-			}
+			}			
 	}
 });
 
