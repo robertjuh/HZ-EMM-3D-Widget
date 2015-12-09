@@ -728,10 +728,38 @@ $("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
 $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
   .css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
 $("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
-jQuery('<div/>', {
+
+var showdivcontainer=jQuery('<div/>', {
+ id: showbuttonDiv+"container"
+});
+var showdivtext=jQuery('<span/>', {
+ id: showbuttonDiv+"text",
+ html:"Model"
+});
+
+var showdivcontainer2=jQuery('<span/>', {
+ id: showbuttonDiv+"container2",
+}).css("float","right");
+
+var leftBracket=jQuery('<span/>', {
+   html:"["
+});
+
+var rightBracket=jQuery('<span/>', {
+   html:"]"
+});
+
+var showdiv=jQuery('<a/>', {
  id: showbuttonDiv,
- html:"[uitvouwen]",
-}).prependTo('#'+BODYCONTENTDIV);
+ href:"#",
+ html:"uitvouwen",
+});
+
+showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
+
+showdivcontainer.append(showdivtext);
+showdivcontainer.append(showdivcontainer2);
+showdivcontainer.prependTo('#'+BODYCONTENTDIV);
 $( '#'+EMMCONTAINERDIV ).hide();
 $( "#"+showbuttonDiv  ).click(function () {
   if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
