@@ -23,11 +23,16 @@ var VisualisationJsModule = (function (targetDivPlacementElementId,targetButtonP
 	var sliderDivId = 'sliderDiv';
 	var rendererDomElementId = 'containerCanvas';
 	var containerDivId = 'containerDiv'; //attr("id", "containerDiv")
-
+	
 	//relevant DOM elements
 	var containerDiv = d3.select("div").append("div:div").attr("id", containerDivId).style("display", "inline-block");	
+	var containerCanvas; //is set in visualisation.js, but defined here for accesibility
+	var container = document.getElementById( containerDivId );
 	
-			
+console.log(container);
+console.log(containerDiv);
+console.log(d3.select('#' + containerDivId));
+	
 	//Picks the navigatorstyle.css stylesheet so it doesn't have to loop through each style sheet each fuction call. Use getStyleByLoopingEachSheet if used on other sheet.
 	var styleSheets = window.document.styleSheets;	
 	var currentstylesheet;	
@@ -151,8 +156,6 @@ var VisualisationJsModule = (function (targetDivPlacementElementId,targetButtonP
 	});	
 	renderer.domElement.id = rendererDomElementId; //The canvas ID where the visualisation is being drawn upon
 	
-	var containerCanvas; //is set in visualisation.js, but defined here for accesibility
-	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
