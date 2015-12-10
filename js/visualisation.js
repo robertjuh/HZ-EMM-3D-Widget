@@ -108,72 +108,33 @@ var CSSarrow_broader_color="black";
 						.style("left", 	(VisualisationJsModule.containerDiv[0][0].offsetLeft + (containerWIDTH - VisualisationJsModule.getStyleAttrInt('#'+VisualisationJsModule.sliderDivId,"width",30)))  + "px");		
 	}
 		
-		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
-	function filterFirstSpheregeometryWithRay(event, mouse){			
-			normalizeCurrentMouseCoordinates(event, mouse);						
-			raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
-
-			var intersects = raycaster.intersectObjects( VisualisationJsModule.sphereArray ); 
-
-			if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
-				checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
-			}			
-		}
-		
+	
 	function colorSelectedSphere(event, mouse){
 			normalizeCurrentMouseCoordinates(event,mouse);
-			
-			console.log(event);
+						
 			raycaster.setFromCamera( mouse, VisualisationJsModule.camera );
-			
-			var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 	
+		
+			//var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 	
+			var intersects = raycaster.intersectObjects(VisualisationJsModule.sphereArray ); 	
 
 			checkGeometryTypeAndSlice(intersects)	
-		}	
+	}	
 		
 		
-		//TODO onderstaande functie volledig opschonen omdat er nu alleen nog spheres worden meegenomen in intersects (intersectable objects.
-		function checkGeometryTypeAndSlice(intersects, urlname){
-		    var intersectLength = intersects.length;
-		    //If there is an intersection, and it is a sphere, apply click event.
-		    //Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
-		    for (var i = 0; i <= intersectLength; i++) {
-
-		    if(intersects == 0 || intersects[0].object.geometry.type == null){	
-			    return;
-		    }else{				 
-			switch(intersects[0].object.geometry.type){
-				case 'SphereGeometry':
-					intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
-					
-						intersects[0].object.callback(intersects[0].object.urlName);
-
-					console.log("je heb geklikt op een geometry:");
-					console.log(intersects[0].object.geometry.type);
+		function checkGeometryTypeAndSlice(intersects){
+			var intersectLength = intersects.length;
+			//If there is an intersection, and it is a sphere, apply click event.
+			//Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
+			for (var i = 0; i <= intersectLength; i++) {
+				if(intersects == 0 || intersects[0].object.geometry.type == null){	
 					return;
-					//break;
-				case 'PlaneGeometry':
-					intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere								
-					break;
-				case 'BufferGeometry':
-					intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
-					break;
-				case 'CylinderGeometry':
-					intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere		
-				    break;
-				default:					
+				}else{			 
+						intersects[0].object.material.color.setHex( Math.random() * 0xffffff );					
+						intersects[0].object.callback(intersects[0].object.urlName);
+				}
 			}
-		      }
-		    }
 		}		
-		
-		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
-		//uses the mouse variable which is a THREE.Vector2
-		function normalizeCurrentMouseCoordinatesDeprecated(e, mouse){
-			mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - VisualisationJsModule.renderer.domElement.offsetLeft ) / VisualisationJsModule.renderer.domElement.width ) * 2 - 1;			
-			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - VisualisationJsModule.renderer.domElement.offsetTop) / VisualisationJsModule.renderer.domElement.height ) * 2 + 1;			
-		}
-		
+			
 		//uses d3.mouse(this)[0],[1] to find the mouse coordinates on the current element
 		//uses the mouse variable which is a THREE.Vector2
 		function normalizeCurrentMouseCoordinates(e, mouse){
@@ -181,18 +142,16 @@ var CSSarrow_broader_color="black";
 			mouse.y = - (  (e[1]) / VisualisationJsModule.renderer.domElement.height ) * 2 + 1;			
 		}		
 
-
 		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
 		function createCallbackFunctionForSphere(sphere){		
 			sphere.callback = function(conceptNameString){
-//TODO tijdelijk uitcomment				clearCanvas();
-				
+				clearCanvas();				
 							//TODO experiment with this code, moving nodes is possible, dragging should be as well. Pushing nodes aside? next level
-						//	console.log("sphere");
-						//	console.log(sphere);
+							console.log("sphere");
+							console.log(sphere);
 							//sphere.position.x=10;
 						//	sphere.node.x=10;
-//TODO tijdelijk uitgecomment				window.location = window.location.href.getFirstPartOfUrl() + conceptNameString; //navigate to the clicked object
+				window.location = window.location.href.getFirstPartOfUrl() + conceptNameString; //navigate to the clicked object
 			}		
 		}
 				
@@ -250,7 +209,8 @@ var CSSarrow_broader_color="black";
 				event.preventDefault();
 				event.clientX = event.touches[0].clientX;
 				event.clientY = event.touches[0].clientY;
-				onDocumentMouseUp( event );
+				onDocumentMouseDownD3();
+				//onDocumentMouseUp( event );
 		}
 		
 
@@ -263,14 +223,7 @@ var CSSarrow_broader_color="black";
 
 		//colors the ball that is being clicked, serves no real purpose yet. //TODO
 		function onDocumentMouseDownD3(){
-			//event.preventDefault();
 			colorSelectedSphere(d3.mouse(this), mouse); //Mouse and camera are global variables.
-		}
-		
-		//calls the callback function on mouse up, on the appointed sphere. Mouse and camera are global variables.
-		function onDocumentMouseUp(event){
-			event.preventDefault();	
-			//filterFirstSpheregeometryWithRay(event, mouse);
 		}
 		//end of functions for mouseEvents -----======-----
 		
@@ -400,13 +353,9 @@ var CSSarrow_broader_color="black";
 				initialiseConstraints(nodes, spheres, three_links);
 				VisualisationJsModule.three_links=three_links;
 				
-				//VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				//VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				//VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );	
-
-				//VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				VisualisationJsModule.containerDiv.on( 'click', onDocumentMouseDownD3, false );					
+				VisualisationJsModule.containerDiv.on( 'touchstart', onDocumentTouchStart, false );
+				VisualisationJsModule.containerDiv.on( 'click', onDocumentMouseDownD3, false );	
+				
 		}
 		
 		
@@ -534,16 +483,12 @@ var CSSarrow_broader_color="black";
 			
 		//sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
 		//This code become rudimentary if there are new types introduced
+		 //TODO: This code does not really do what it's meant to do, it just works, optimize this code!
 			if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){	
-			  
-			  console.log("currentNodeLink.type van de huidige arrow");
-			  console.log(currentNodeLink.type);
-			  console.log(arrow.target);
-			  console.log(arrow.source);
-			  
 			  //commented out by anton
 			  //color red was arbitrarily added to some arrows
 			  //TODO: see what next line does. If not necessary: omit it!
+
 				arrow.setColor(VisualisationJsModule.getStyleAttr(".arrow.narrower","color"));
 			}
 				
@@ -722,7 +667,7 @@ var CSSarrow_broader_color="black";
 			url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 			async : true,
 			data : {
-				concept : "TZW:woon-zorgzones",
+				concept : concept,
 				depth : depth.toString(),
 				relations : relations,
 				uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
@@ -743,48 +688,6 @@ var CSSarrow_broader_color="black";
 */
 $(document).ready(function() {
 	VisualisationJsModule= new VisualisationJsModule(targetDivPlacementElementId, targetButtonPlacementId); //creates a module with most THREE components so they will be accesible throughout the class
-	console.log("heir moet het goe gaan");
-	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ));
-//	console.log( d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className);
-//	if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
-		//alert("qq");			
-//	}
-
-
-//	console.log(d3.select('#' + VisualisationJsModule.targetDivId));
-//	console.log(typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0]));
-	//console.log(d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style);
-	
-	//TODO this code might still be a little bit sketchy, is it alright? perhaps try catch
-	//set the position to inherit instead of relative, or the nodes won't be clickable. 	
-	
-	try{
-		console.log("check dit");
-		console.log(d3.select('body')[0][0].style);
-		console.log(VisualisationJsModule.targetDivId);
-		console.log(d3.select('#' + VisualisationJsModule.targetDivId));
-		console.log(d3.select(VisualisationJsModule.targetDivId));
-		console.log(typeof (d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className));
-		console.log(VisualisationJsModule.targetDivId);
-		
-		
-		
-		//if(!d3.select('#' + VisualisationJsModule.targetDivId)){
-		//	alert("kan niet selecten op dom element");
-		//}	
-		if((d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className) && (d3.select('#' + VisualisationJsModule.targetDivId)[0][0] != null) && (typeof(d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className)) != null){ //if the current selected element has a class, give it the inherit position property
-			d3.select('.' + d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className ).style("position", "inherit");
-		}
-		//else if(d3.select(VisualisationJsModule.targetDivId) && VisualisationJsModule.targetDivId[0].style){
-		//	console.log("setting inherit is not needed in this case");
-		//}else if(!d3.select('#' + VisualisationJsModule.targetDivId)[0][0].className){
-		//	console.log("setting inherit is not needed in this case as well");
-		//}else{
-		//	console.log("Can you still click elements?")
-		//}
-	}
-	catch(err){console.log(err)};
-	
 	
 	initialiseTHREEComponents(); 
 	/**
@@ -807,8 +710,7 @@ $(document).ready(function() {
 				d3.select(VisualisationJsModule.targetDivId).append(function() { return VisualisationJsModule.container; });// van voorbeld
 				alert("The slider isn't added because a wrong target element was chosen");
 			}
-			catch(err){
-				
+			catch(err){				
 				console.log(VisualisationJsModule.container);
 				console.log(VisualisationJsModule.targetDivId);
 				console.log(d3.select("#" + VisualisationJsModule.targetDivId));
@@ -881,6 +783,7 @@ $(document).ready(function() {
 		var buttonGroup = d3.select('body').append('svg')
 			.attr("id", "buttonSvg")
 			.style("background-color", "rgb(191,172,136)")
+			.style("background-color", VisualisationJsModule.getStyleAttr(".unfoldButton", "background-color",CSSsphere_color))
 			.attr("height", buttonsize)
 			.attr("width", buttonsize)
 			//.style("border", "1px solid black")
@@ -906,17 +809,7 @@ $(document).ready(function() {
 					.attr("opacity", 1);});
 					
 			buttonClickResizeCanvas(buttonGroup, VisualisationJsModule.containerCanvas);		
-		});		
-		
-		buttonGroup.on("mouseenter", function() {
-			//expandButtonImage.transition().style("border", 5).attr("width", 55);
-			
-			buttonGroup.transition().style("border", "25px");
-		});		
-		
-		buttonGroup.on("mouseleave", function() {
-			expandButtonImage.transition().style("padding", "5px");
-		});		
+		});			
 	}
 	
 	/*
