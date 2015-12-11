@@ -3,18 +3,21 @@
 //$SMWServerURLForSPARQLQuery = 'http://192.168.238.133/index.php/Speciaal:URIResolver';
 /*
 call within a widget with javascript:
+<noinclude>
+Dit is de EM3DNavigator Widget.
+</noinclude>
+<includeonly>
+
 <script type="text/javascript">
-
-mw.loader.using( ['jquery.makeCollapsible','ext.EM3DNavigator']).done( function () {
-//makeCollapsible gives error. Side-effect: error concerning makeCollapsible disappears
-
-$(document).ready(function() {
+$(window).load(function() {
+mw.loader.using( ['ext.bootstrap','jquery.makeCollapsible','ext.EM3DNavigator']).done( function () {
 startVisualisation("<!--{$currentPageName|default:'Pagename niet doorgekregen'}-->"); 
 }
-);//document.ready
+);//mw.loader
 
-});//mw.loader
+});//document.ready
 </script>
+</includeonly>
 */
 $wgResourceModules['ext.EM3DNavigator'] = array(
 	'scripts' =>  array(//'js/jquery-2.1.1.min.js'
