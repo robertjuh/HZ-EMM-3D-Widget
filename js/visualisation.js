@@ -8,16 +8,6 @@ var CSScontainerAttributes_fontweight="normal";
 var CSSarrow_related_color="red";
 var CSSarrow_broader_color="black";
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
-	var targetDivId = 'bodyContent'; //bodyContent
-	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
-	var containerDivId = containerDiv[0][0].id;
-	
-	console.log("target class ");
-	console.log(d3.select('#' + targetDivId));
-	
-	//set the position to inherit instead of relative, or the nodes won't be clickable
-//anton: following line gives error in Chameleon. Not necessary anymore?	
-	//d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
 	
 /**
  * @author NJK @author robertjuh
@@ -108,14 +98,14 @@ var CSSarrow_broader_color="black";
 		//function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
 		//uses the mouse variable which is a THREE.Vector2
 		function normalizeCurrentMouseCoordinates(e, mouse){
-		  console.log(e);
+		  //console.log(e);
 var x = getOffset( e.target ).left; 
-    console.log($("#EMMContainerDiv").offset().left,$("#EMMContainerDiv").offset().top);
+    /*console.log($("#EMMContainerDiv").offset().left,$("#EMMContainerDiv").offset().top);
     console.log(getOffset( e.target ).left,getOffset( e.target ).top);//1
     console.log($(document).scrollLeft(),$(document).scrollTop());//2
     console.log(e.clientX,e.clientY);//3
     console.log(e.layerX,e.layerY);
-    console.log( (e.clientX - (getOffset( e.target ).left-$(document).scrollLeft())),( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()))   );
+    console.log( (e.clientX - (getOffset( e.target ).left-$(document).scrollLeft())),( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()))   );*/
 			var x=(e.clientX - (getOffset( e.target ).left-$(document).scrollLeft()));
 			if (x>e.layerX)x=e.layerX;
 			var y=( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()));
@@ -124,7 +114,7 @@ var x = getOffset( e.target ).left;
 			mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - (renderer.domElement.offsetTop)) / renderer.domElement.height ) * 2 + 1;	*/		
 			mouse.x = ( (x) / renderer.domElement.width ) * 2 - 1;			
 			mouse.y = - ( (y) / renderer.domElement.height ) * 2 + 1;			
-    console.log(mouse.x,mouse.y);
+    //console.log(mouse.x,mouse.y);
 		}
 
 
@@ -668,13 +658,24 @@ var x = getOffset( e.target ).left;
 				  
 //Wait for document to finish loading		
 $(document).ready(function() {
-	
-	initialiseTHREEComponents(); 
+  initialiseTHREEComponents();
+});
+	 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
 	function initialiseTHREEComponents(){ //current page name als concept meen
-		VisualisationJsModule= new VisualisationJsModulePrototype(); //creates a module with most THREE components so they will be accesible throughout the class
+	var targetDivId = 'bodyContent'; //bodyContent
+	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
+	var containerDivId = containerDiv[0][0].id;
+	
+	//console.log("target class ");
+	//console.log(d3.select('#' + targetDivId));
+	
+	//set the position to inherit instead of relative, or the nodes won't be clickable
+//anton: following line gives error in Chameleon. Not necessary anymore?	
+	//d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
+		VisualisationJsModule= new VisualisationJsModulePrototype(containerDivId); //creates a module with most THREE components so they will be accesible throughout the class
 		var containerHEIGHT = VisualisationJsModule.height;
 		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		
@@ -709,14 +710,15 @@ $(document).ready(function() {
 		createLightingForScene();
 		
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
-		createSlider(containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
+		//console.log(targetDivId);
+		createSlider(targetDivId, containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 
 var showbuttonDiv='showbutton';
 var sliderDiv='sliderDiv';
 var BODYCONTENTDIV='bodyContent';
 var EMMCONTAINERDIV='EMMContainerDiv';	
 var containerDivDescription="containerDiv";
-console.log("position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;");
+//console.log("position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;");
 jQuery('<div/>', {
  id: EMMCONTAINERDIV/*,
  css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
@@ -869,4 +871,4 @@ display:inline-block;
 	}
 });
 
-});
+

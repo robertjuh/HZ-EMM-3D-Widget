@@ -96,6 +96,6 @@ body.wait, body.wait *{
 }
 
 div{
-   cursor: pointer;   
+   cursor: default;   
 }
 /*end change cursor*/

@@ -9,7 +9,7 @@ var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
 
-var VisualisationJsModulePrototype = (function () {
+var VisualisationJsModulePrototype = (function (containerDivId) {
 	var getStyle = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;

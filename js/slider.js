@@ -5,7 +5,8 @@
 * @author Robert Walhout
 */
 
-var createSlider = (function(divHeight, higherFunction, lowerDepthFunction, concept,depth){
+var createSlider = (function(targetDivId,divHeight, higherFunction, lowerDepthFunction, concept,depth){
+		//console.log(targetDivId);
   
 var MAXDEPTH=4;
 
