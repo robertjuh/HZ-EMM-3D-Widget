@@ -29,8 +29,8 @@ $query = $querybuilder -> generateQuery($_POST["relations"]);
 //TODO alternative is to replace -3A with :, and -2D with -
 //$result =  str_replace("%", "-", urldecode ( str_replace("-", "%", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
 $result =  str_replace("-2D", "-", str_replace("-3A", ":", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query))));
-						file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
-						file_put_contents('php://stderr', print_r($result, TRUE));
+						//file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
+						//file_put_contents('php://stderr', print_r($result, TRUE));
 // Parse data
 $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
@@ -43,6 +43,7 @@ foreach ($objects as $object) {
 					//file_put_contents('php://stderr', print_r($objects, TRUE));
 	$object -> accept($visitor);
 }
+
 // Return JSON
 echo $visitor -> getUsableJSON();
  

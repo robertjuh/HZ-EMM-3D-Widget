@@ -12,7 +12,7 @@ var CSSarrow_broader_color="black";
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
 	var containerDivId = containerDiv[0][0].id;
 	
-	//console.log("target class ");
+	console.log("target class ");
 	console.log(d3.select('#' + targetDivId));
 	
 	//set the position to inherit instead of relative, or the nodes won't be clickable
@@ -26,7 +26,7 @@ var CSSarrow_broader_color="black";
  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
  var startVisualisation = (function(currentPageName){
-   setTimeout(function(){startVisualisation(currentPageName)}, 1000);
+   //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
 		var	raycaster = new THREE.Raycaster();
@@ -674,7 +674,7 @@ $(document).ready(function() {
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
 	function initialiseTHREEComponents(){ //current page name als concept meen
-		VisualisationJsModule= new VisualisationJsModule(); //creates a module with most THREE components so they will be accesible throughout the class
+		VisualisationJsModule= new VisualisationJsModulePrototype(); //creates a module with most THREE components so they will be accesible throughout the class
 		var containerHEIGHT = VisualisationJsModule.height;
 		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
 		
@@ -738,18 +738,18 @@ var showdivtext=jQuery('<span/>', {
 });
 
 var showdivcontainer2=jQuery('<span/>', {
- id: showbuttonDiv+"container2",
- class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"
+ id: showbuttonDiv+"container2"/*,
+ class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
 }).css("float","right");
 
 var leftBracket=jQuery('<span/>', {
-   html:"[",
-   class:"mw-collapsible-bracket"
+   html:"["/*,
+   class:"mw-collapsible-bracket"*/
 });
 
 var rightBracket=jQuery('<span/>', {
-   html:"]",
-   class:"mw-collapsible-bracket"
+   html:"]"/*,
+   class:"mw-collapsible-bracket"*/
 });
 
 var showdiv=jQuery('<a/>', {

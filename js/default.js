@@ -1,9 +1,10 @@
 /*
  * This code is listen for triggers when loading is complete.
  */
-$(document).ready(function() {
+//TODO: check which function in this library is used; otherwise they can be removed
+//$(document).ready(function() {
 
-	if (window.location.hash != "") {
+/*	if (window.location.hash != "") {
 		if (window.location.hash == "#runQuery") {
 			$('#visualisation').fadeOut(function() {
 				$(this).html('');
@@ -53,8 +54,8 @@ $(document).ready(function() {
 				$('#visualisation').fadeIn();
 			});
 		}
-	});
-});
+	});*/
+//});
 
 function getQuery(concept, depth, run, selection) {
 	$.ajax({
