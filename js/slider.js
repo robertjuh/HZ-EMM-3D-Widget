@@ -5,10 +5,11 @@
 * @author Robert Walhout
 */
 
-var createSlider = (function(targetDivId,divHeight, higherFunction, lowerDepthFunction, concept,depth){
+var createSlider = (function(higherFunction, lowerDepthFunction, concept,depth){
 		//console.log(targetDivId);
   
 var MAXDEPTH=4;
+var divHeight=VisualisationJsModule.height;
 
 //TODO set width container in css
 var SLIDERDIV="sliderDiv";
@@ -20,17 +21,6 @@ var tempSliderDepthInt=1;
 var sliderOffsetTop = 20;
 var sliderOffsetSides = 10;
 
-var sliderDiv = d3.select('#' + targetDivId).append("div")
-//var sliderDiv = d3.select('#' + containerDivId).append("div")
-	.attr("id", SLIDERDIV)
-	.attr("width", containerWidth)
-	.attr("position", "fixed")
-	//TODO find out why vertical-align:top only works when added to css, and not here....
-	.attr("vertical-align", "top")
-	.attr("height", divHeight)
-	.style("display", "inline-block")
-	.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
-	
 	
 var svgContainer = d3.select('#'+SLIDERDIV).append("svg")
 	.attr("width", containerWidth)

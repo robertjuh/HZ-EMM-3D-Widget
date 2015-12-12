@@ -8,6 +8,9 @@ var CSScontainerAttributes_fontweight="normal";
 var CSSarrow_related_color="red";
 var CSSarrow_broader_color="black";
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
+var renderer;//global
+var	mouse;//global
+var	raycaster;//global
 	
 /**
  * @author NJK @author robertjuh
@@ -19,9 +22,10 @@ var CSSarrow_broader_color="black";
    //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
 		//mouselocation variables
 		var onClickPosition = new THREE.Vector2();
-		var	raycaster = new THREE.Raycaster();
-		var	mouse = new THREE.Vector2();
-		
+		raycaster = new THREE.Raycaster();
+		mouse = new THREE.Vector2();
+  initialiseTHREEComponents(currentPageName);
+});		
 		
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 	function filterFirstSpheregeometryWithRay(event, mouse){			
@@ -614,7 +618,7 @@ var x = getOffset( e.target ).left;
 	function render() {
 
 	}
-  }//drawNewObjectsWithAjaxData
+  };//drawNewObjectsWithAjaxData
 
 		
 	function initialiseDrawingSequence(concept, depth, newdepth){
@@ -658,13 +662,13 @@ var x = getOffset( e.target ).left;
 				  
 //Wait for document to finish loading		
 $(document).ready(function() {
-  initialiseTHREEComponents();
+  //anton: not used anymore. Just start the drawing inside a document.ready-function
 });
 	 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
-	function initialiseTHREEComponents(){ //current page name als concept meen
+	function initialiseTHREEComponents(currentPageName){ //current page name als concept meen
 	var targetDivId = 'bodyContent'; //bodyContent
 	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
 	var containerDivId = containerDiv[0][0].id;
@@ -677,153 +681,122 @@ $(document).ready(function() {
 	//d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
 		VisualisationJsModule= new VisualisationJsModulePrototype(containerDivId); //creates a module with most THREE components so they will be accesible throughout the class
 		var containerHEIGHT = VisualisationJsModule.height;
-		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieert
+		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieerd
 		
 		
 		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
 	
 		
-		//todo dit is tijdelijke code
-		/*d3.select("body").append("text")         // append text
-			.style("fill", "black")   // fill the text with the colour black
-			.attr("x", 200)           // set x position of left side of text
-			.attr("y", 100)           // set y position of bottom of text 
-			.text("DEZE PAGINA GAAT OVER: " + currentPageName);     // define the text to display 
-				*/
 		// Create Renderer
 		renderer = new THREE.WebGLRenderer({
 			alpha : true,
 			antialiasing : true
 		});
 
-		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
-		VisualisationJsModule.camera.position.x = containerWIDTH/2;			
-		VisualisationJsModule.camera.position.z =  Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/4);			
-		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
-				
-
 		renderer.setClearColor(0x000000, 0);
 		renderer.setSize(containerWIDTH, containerHEIGHT);		
 		VisualisationJsModule.container.appendChild(renderer.domElement);
+		
+		drawHTMLElements(targetDivId);
+		drawModel(currentPageName);
+	  
+}//initialiseTHREEComponents
+
+function drawHTMLElements(targetDivId){				
+//draw html-elements, and give them basic csss-styles to position them
+//met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+    var sliderDiv='sliderDiv';
+    d3.select('#' + targetDivId).append("div")
+	    .attr("id", sliderDiv)
+	    .attr("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
+	    .attr("position", "fixed")
+	    //TODO find out why vertical-align:top only works when added to css, and not here....
+	    .attr("vertical-align", "top")
+	    .attr("height", VisualisationJsModule.height)
+	    .style("display", "inline-block")
+	    .style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
+	    
+
+    var showbuttonDiv='showbutton';
+    var BODYCONTENTDIV='bodyContent';
+    var EMMCONTAINERDIV='EMMContainerDiv';	
+    var containerDivDescription="containerDiv";
+    //console.log("position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;");
+    jQuery('<div/>', {
+    id: EMMCONTAINERDIV/*,
+    css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
+    }).prependTo('#'+BODYCONTENTDIV);
+    $("#"+containerDivDescription).appendTo('#'+EMMCONTAINERDIV);
+    $("#"+containerDivDescription).attr("css","position:relative;");
+    $("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
+    //TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
+    $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
+      .css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
+    $("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
+
+    var showdivcontainer=jQuery('<div/>', {
+    id: showbuttonDiv+"container"
+    });
+    var showdivtext=jQuery('<span/>', {
+    id: showbuttonDiv+"text",
+    html:"<b>Model</b>"
+    });
+
+    var showdivcontainer2=jQuery('<span/>', {
+    id: showbuttonDiv+"container2"/*,
+    class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
+    }).css("float","right");
+
+    var leftBracket=jQuery('<span/>', {
+      html:"["/*,
+      class:"mw-collapsible-bracket"*/
+    });
+
+    var rightBracket=jQuery('<span/>', {
+      html:"]"/*,
+      class:"mw-collapsible-bracket"*/
+    });
+
+    var showdiv=jQuery('<a/>', {
+    id: showbuttonDiv,
+    href:"#",
+    html:mw.message( 'collapsible-expand' ).text() 
+    });
+
+    showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
+
+    showdivcontainer.append(showdivtext);
+    showdivcontainer.append(showdivcontainer2);
+    showdivcontainer.prependTo('#'+BODYCONTENTDIV);
+    $( '#'+EMMCONTAINERDIV ).hide();
+    $( "#"+showbuttonDiv  ).click(function () {
+      if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
+	showdiv.html(mw.message( 'collapsible-collapse' ).text());
+	$( '#'+EMMCONTAINERDIV ).slideDown( "slow" );
+      } else {
+	$( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
+	showdiv.html(mw.message( 'collapsible-expand' ).text());
+      }
+    });
+    console.log("pagename:",mw.config.get( 'wgPageName' ));
+}
+
+
+function drawModel(currentPageName){
+//draw model
+		var containerHEIGHT = VisualisationJsModule.height;
+		var containerWIDTH = VisualisationJsModule.width;
+		VisualisationJsModule.camera.position.y = containerHEIGHT/2;
+		VisualisationJsModule.camera.position.x = containerWIDTH/2;			
+		VisualisationJsModule.camera.position.z =  Math.pow((containerHEIGHT*containerHEIGHT + containerWIDTH*containerWIDTH), 1/4);			
+		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
 				
 		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
+		createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
 		initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
-		//console.log(targetDivId);
-		createSlider(targetDivId, containerHEIGHT, initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
-
-var showbuttonDiv='showbutton';
-var sliderDiv='sliderDiv';
-var BODYCONTENTDIV='bodyContent';
-var EMMCONTAINERDIV='EMMContainerDiv';	
-var containerDivDescription="containerDiv";
-//console.log("position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;");
-jQuery('<div/>', {
- id: EMMCONTAINERDIV/*,
- css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
-}).prependTo('#'+BODYCONTENTDIV);
-$("#"+containerDivDescription).appendTo('#'+EMMCONTAINERDIV);
-$("#"+containerDivDescription).attr("css","position:relative;");
-$("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
-//TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
-$("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
-  .css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
-$("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
-
-var showdivcontainer=jQuery('<div/>', {
- id: showbuttonDiv+"container"
-});
-var showdivtext=jQuery('<span/>', {
- id: showbuttonDiv+"text",
- html:"<b>Model</b>"
-});
-
-var showdivcontainer2=jQuery('<span/>', {
- id: showbuttonDiv+"container2"/*,
- class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
-}).css("float","right");
-
-var leftBracket=jQuery('<span/>', {
-   html:"["/*,
-   class:"mw-collapsible-bracket"*/
-});
-
-var rightBracket=jQuery('<span/>', {
-   html:"]"/*,
-   class:"mw-collapsible-bracket"*/
-});
-
-var showdiv=jQuery('<a/>', {
- id: showbuttonDiv,
- href:"#",
- html:mw.message( 'collapsible-expand' ).text() 
-});
-
-showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
-
-showdivcontainer.append(showdivtext);
-showdivcontainer.append(showdivcontainer2);
-showdivcontainer.prependTo('#'+BODYCONTENTDIV);
-$( '#'+EMMCONTAINERDIV ).hide();
-$( "#"+showbuttonDiv  ).click(function () {
-  if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
-    showdiv.html(mw.message( 'collapsible-collapse' ).text());
-    $( '#'+EMMCONTAINERDIV ).slideDown( "slow" );
-  } else {
-    $( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
-    showdiv.html(mw.message( 'collapsible-expand' ).text());
-  }
-});
-/*
- //TODO: met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
- //je moet dan echter dus het stuk voor het model (145px) bij de x optellen, en dat is skin-gevoelig. Dus een work-around.
- //daar moet dus over nagedacht worden. Sowieso is het handig om de twee elementen in een parent-html-element op te nemen.
- 
-var EMMCONTAINERDIV='EMMContainerDiv';	
-jQuery('<div/>', {
- id: EMMCONTAINERDIV,
- 
- 
-}).prependTo('#bodyContent');
-$("#containerDiv").appendTo('#'+EMMCONTAINERDIV);
-$("#sliderDiv").appendTo('#'+EMMCONTAINERDIV);
-jQuery('<div/>', {
- id: 'showbutton',
- html:"show!",
-}).prependTo('#bodyContent');
-$( "#EMMContainerDiv" ).hide();
-$( "#showbutton"  ).click(function () {
-  if ( $( "#EMMContainerDiv" ).is( ":hidden" ) ) {
-    $( "#EMMContainerDiv" ).slideDown( "slow" );
-  } else {
-    $( "#EMMContainerDiv" ).slideUp( "slow" );
-  }
-});
-
-samen met
-#containerDiv{
-position:relative;
-	background-color: rgb(229,222,205);	
 }
-
-#EMMContainerDiv{
-position:relative;
-	height: 700px;
-	width: 700px;
-display:inline-block;
-}
-#sliderDiv{
-  position:absolute;
-  left:670px;
-    vertical-align: top;
-  width: 30px;
-  height:500px;
-}
-*/
-	  
-	}
-	
 
 	
 	//creates additional functions	
@@ -840,18 +813,18 @@ display:inline-block;
 			
 			String.prototype.lowerCaseFirstLetter = function() {
 				return this.charAt(0).toLowerCase() + this.slice(1);
-			}
+			};
 
 			String.prototype.getLastPartOfUrl= function() {
 				return this.split("/").pop();
-			}		
+			};		
 			
 			String.prototype.getFirstPartOfUrl= function() {
 				var strArray = this.split("/");
 				strArray.splice(-1, 1); //remove last part of str
 				var joinedString = strArray.join("/")+"/";
 				return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
-			}
+			};
 			
 			//Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.
 			String.prototype.compareStrings = function (string2, ignoreCase, useLocale) {
@@ -867,8 +840,8 @@ display:inline-block;
 					}
 				}
 				return string1 === string2;
-			}
+			};
 	}
-});
+
 
 

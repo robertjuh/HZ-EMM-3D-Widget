@@ -7,7 +7,7 @@ call within a widget with javascript:
 Dit is de EM3DNavigator Widget.
 </noinclude>
 <includeonly>
-
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script type="text/javascript">
 $(window).load(function() {
 mw.loader.using( ['ext.bootstrap','jquery.makeCollapsible','ext.EM3DNavigator']).done( function () {
@@ -26,7 +26,7 @@ $wgResourceModules['ext.EM3DNavigator'] = array(
 //'js/bootstrap.min.js'
 //, 'js/cola.min.js'
 //,
- 'js/three.min.js', 'js/d3.v3.js',  'js/OrbitControls.js'//, 'js/OrthographicTrackballControls.js', 'js/TrackballControls.js'
+ 'js/three.min.js'/*, 'js/d3.v3.js'*/,  'js/OrbitControls.js'//, 'js/OrthographicTrackballControls.js', 'js/TrackballControls.js'
 ,  'js/default.js', 'js/visualisation.js', 'js/slider.js', 'js/visualisationJsModule.js', 'js/JSONStyleSheet.js'),
 	'styles' => array (/*'css/bootstrap.min.css', 'css/bootstrap-theme.min.css',*/ 'css/highlight.css', 'css/style.css', 'css/navigatorStyle.css'),
 	'position' => 'top',
