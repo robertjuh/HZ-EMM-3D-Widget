@@ -668,35 +668,8 @@ $(document).ready(function() {
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
-	function initialiseTHREEComponents(currentPageName){ //current page name als concept meen
-	var targetDivId = 'bodyContent'; //bodyContent
-	var containerDiv = d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");	
-	var containerDivId = containerDiv[0][0].id;
-	
-	//console.log("target class ");
-	//console.log(d3.select('#' + targetDivId));
-	
-	//set the position to inherit instead of relative, or the nodes won't be clickable
-//anton: following line gives error in Chameleon. Not necessary anymore?	
-	//d3.select('.' + d3.select('#' + targetDivId)[0][0].className ).style("position", "inherit");
-		VisualisationJsModule= new VisualisationJsModulePrototype(containerDivId); //creates a module with most THREE components so they will be accesible throughout the class
-		var containerHEIGHT = VisualisationJsModule.height;
-		var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieerd
-		
-		
-		document.getElementById(targetDivId).appendChild( VisualisationJsModule.container);
-	
-		
-		// Create Renderer
-		renderer = new THREE.WebGLRenderer({
-			alpha : true,
-			antialiasing : true
-		});
-
-		renderer.setClearColor(0x000000, 0);
-		renderer.setSize(containerWIDTH, containerHEIGHT);		
-		VisualisationJsModule.container.appendChild(renderer.domElement);
-		
+	function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
+		var targetDivId = 'bodyContent'; //bodyContent
 		drawHTMLElements(targetDivId);
 		drawModel(currentPageName);
 	  
@@ -705,6 +678,30 @@ $(document).ready(function() {
 function drawHTMLElements(targetDivId){				
 //draw html-elements, and give them basic csss-styles to position them
 //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+    var CONTAINERDIV = 'containerDiv'; //bodyContent
+    //create containerDiv
+    d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
+    var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element.
+    document.getElementById(targetDivId).appendChild( containerDiv);
+
+      
+    //initalise global module to store global variables
+    VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
+
+    var containerHEIGHT = VisualisationJsModule.height;
+    var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieerd
+
+    
+    // Create Renderer
+    renderer = new THREE.WebGLRenderer({
+	    alpha : true,
+	    antialiasing : true
+    });
+
+    renderer.setClearColor(0x000000, 0);
+    renderer.setSize(containerWIDTH, containerHEIGHT);		
+    containerDiv.appendChild(renderer.domElement);
+		
     var sliderDiv='sliderDiv';
     d3.select('#' + targetDivId).append("div")
 	    .attr("id", sliderDiv)
