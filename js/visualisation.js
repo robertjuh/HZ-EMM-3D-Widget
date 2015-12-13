@@ -143,6 +143,8 @@ var CSScontainerAttributes_fontfamily="Times";
 var CSScontainerAttributes_fontweight="normal";
 var CSSarrow_related_color="red";
 var CSSarrow_broader_color="black";
+//Global constant
+var TARGETDIVID = 'bodyContent'; 
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
 var VisualisationJsModule;//global
 var renderer;//global
@@ -164,7 +166,9 @@ var labels;//global
 });
  
  function initVariables(){
+   //TODO anton: volgende variabele lijkt niet gebruikt. Opruimen?
  		var onClickPosition = new THREE.Vector2();
+		//THREE can only be used if library is read using Resource loader
 		raycaster = new THREE.Raycaster();
 		mouse = new THREE.Vector2();
 }
@@ -321,7 +325,7 @@ var x = getOffset( e.target ).left;
 			}
 	
 			renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
-		}
+		}//initialiseConstraints
 		
 		
 		//MouseEvents start -----====-----		
@@ -405,7 +409,7 @@ var x = getOffset( e.target ).left;
 				grootte=Math.floor(grootte/1.5); 
 			}
 		  }
-		}
+		}//setCoordinatesSpheres
 		
 			
 		// Visualize RDF data
@@ -474,7 +478,7 @@ var x = getOffset( e.target ).left;
 				VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
-		}
+		}//visualize
 		
 		
 /*	function createLabel(key,distance){
@@ -545,7 +549,7 @@ var x = getOffset( e.target ).left;
 		
 		return sprite;	
 		
-	}
+	}//createLabelWithSprite
 		
 	function roundRect(ctx, x, y, w, h, r){
 			ctx.beginPath();
@@ -617,7 +621,7 @@ var x = getOffset( e.target ).left;
 		
 		VisualisationJsModule.scene.add(arrow);	
 		return arrow;
-	}
+	}//setArrowData
 	
 	//adds lightsources to the scene, for aesthetic purposes
 	function createLightingForScene() {
@@ -693,7 +697,7 @@ var x = getOffset( e.target ).left;
 	    });
 	    //three return values
 	    return {nodes:nodes,nodelinks:nodelinks,baseLevel:baseLevel};
-	}
+	}//getNodeAndNodelinksFromMemory
 
       //gets called after the ajax call
       var drawNewObjectsWithAjaxData = function (result) {
@@ -807,9 +811,8 @@ var x = getOffset( e.target ).left;
 				  
 //Wait for document to finish loading		
 $(document).ready(function() {
-  //anton: not used anymore. Just start the drawing inside a document.ready-function
-		var targetDivId = 'bodyContent'; //bodyContent
-		drawHTMLElements(targetDivId);
+  //start the drawing inside a document.ready-function
+		drawHTMLElements(TARGETDIVID);
 });
 	 
 	/**
@@ -817,13 +820,12 @@ $(document).ready(function() {
 	*/	
 	function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
 	  //TODO anton:function must be renamed.
-		var targetDivId = 'bodyContent'; //bodyContent
-		drawHTMLElements(targetDivId);
+		drawHTMLElements(TARGETDIVID);
 		drawModel(currentPageName);
 	  
 }//initialiseTHREEComponents
 
-    function initGlobalVariables(CONTAINERDIV){
+function initGlobalVariables(CONTAINERDIV){
     //initalise global module to store global variables
     VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
 
@@ -842,9 +844,9 @@ $(document).ready(function() {
     var containerDiv=document.getElementById( CONTAINERDIV );
     $("#"+CONTAINERDIV).empty();
     containerDiv.appendChild(renderer.domElement);
-    }
+}//initGlobalVariables
 
-    function drawHTMLElements(targetDivId){				
+function drawHTMLElements(targetDivId){				
 //draw html-elements, and give them basic csss-styles to position them
 //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
     createExtraFunctions(); //creates extra functions, they only have to be made once.
@@ -906,13 +908,11 @@ $(document).ready(function() {
       html:"]"/*,
       class:"mw-collapsible-bracket"*/
     });
-console.log("1");
     var showdiv=jQuery('<a/>', {
     id: showbuttonDiv,
     href:"#",
     html:checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand") 
     });
-console.log("2");
 
     showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
 
@@ -933,14 +933,12 @@ console.log("2");
 	showdiv.html(checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand"));
       }
     });
-}
+}//drawHTMLElements
 
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 }
 function checkIfEmpty(text,alternative){
-  console.log("text"+text+".");
-
   if (isBlank(text)||(text.length==0)||text.charAt(0)=="<") return alternative; else return text;
 }
 
