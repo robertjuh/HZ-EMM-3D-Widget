@@ -126,11 +126,15 @@ var drag2 = d3.behavior.drag()
 	//invokes functions on the slider button	
 	sliderRect.call(drag2)
 
+	var getValue=function(){
+	  return parseInt(sliderInfo[0][0].textContent);
+	}
 
         //this is only necessary if another class has to call the current depth
 		//return  {
 		////returns the property sliderdepth, can ba called with the name of this variable (createslider.sliderDepth)
 		//sliderDepth : tempSliderDepthInt
 		//};
+	return {getValue:getValue};
 
 });
