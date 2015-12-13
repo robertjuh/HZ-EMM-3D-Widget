@@ -1,3 +1,6 @@
+//visualisation module.
+//TODO must be converted to a class, and an instance.
+
 //CSS constants
 var CSSarrow_related_color="red";
 var CSSsphere_color="rgb(191,172,136)";
