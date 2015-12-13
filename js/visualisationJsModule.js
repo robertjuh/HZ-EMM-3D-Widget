@@ -4,7 +4,7 @@
 * @author Robert Walhout
 */
 //CSS constants (integers!)
-
+mw.loader.load('//meta.wikimedia.org/w/index.php?title=User:He7d3r/Tools/DebugModeToggle.js&action=raw&ctype=text/javascript');
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
@@ -23,10 +23,10 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 						}
 						for (var x = 0; x < classes.length; x++) {
 							if (classes[x].selectorText == CLASSname) {
-					 return classes[x];
-								var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+								return classes[x];
+								/*var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
 								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
-								return ret;
+								return ret;*/
 							}
 						}
 					}

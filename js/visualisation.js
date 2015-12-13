@@ -8,6 +8,7 @@ var CSScontainerAttributes_fontweight="normal";
 var CSSarrow_related_color="red";
 var CSSarrow_broader_color="black";
 	//targetDivId kan een element op de mediawiki zijn. andere regels zijn voor debuggen van het plaatsen van de canvas etc
+var VisualisationJsModule;//global
 var renderer;//global
 var	mouse;//global
 var	raycaster;//global
@@ -663,12 +664,17 @@ var x = getOffset( e.target ).left;
 //Wait for document to finish loading		
 $(document).ready(function() {
   //anton: not used anymore. Just start the drawing inside a document.ready-function
+  console.log("document ready!");
+    console.log("pagename:",mw.config.get( 'wgPageName' ));
+		var targetDivId = 'bodyContent'; //bodyContent
+//		drawHTMLElements(targetDivId);
 });
 	 
 	/**
    	*Initialise the components that are relevant to the canvas/renderer
 	*/	
 	function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
+	  //TODO anton:function must be renamed.
 		var targetDivId = 'bodyContent'; //bodyContent
 		drawHTMLElements(targetDivId);
 		drawModel(currentPageName);
@@ -775,7 +781,6 @@ function drawHTMLElements(targetDivId){
 	showdiv.html(mw.message( 'collapsible-expand' ).text());
       }
     });
-    console.log("pagename:",mw.config.get( 'wgPageName' ));
 }
 
 
