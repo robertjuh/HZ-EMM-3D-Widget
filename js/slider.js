@@ -62,7 +62,7 @@ var setSliderInfoText=function(width,value){
   return ((width<40)?"":"Depth: ") + value;
 }
   //text boven de slider
-   sliderInfo = svgContainer.append('foreignObject')
+   var sliderInfo = svgContainer.append('foreignObject')
                         .attr('x', 2)
                         .attr('y', 1)
 			.attr("id","sliderText")

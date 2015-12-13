@@ -1,3 +1,136 @@
+/**
+ * VisualisationJsModule.js
+* Module of visualisation.js where most THREE.JS related tools are declared, the size of the canvas and
+* all objects related to drawing, viewing and rendering. Also some styling.
+* @author Robert Walhout
+*/
+//CSS constants (integers!)
+var CSSmaxDepth_order=4;
+var CSScontainerAttributes_width=400;
+var CSScontainerAttributes_height=400;	
+
+var VisualisationJsModulePrototype = (function (containerDivId) {
+	var getStyle = function(CLASSname) {
+					var styleSheets = window.document.styleSheets;
+					var styleSheetsLength = styleSheets.length;
+					for(var i = 0; i < styleSheetsLength; i++){
+						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
+						else { 
+							try {  if(!styleSheets[i].cssRules) {continue;} } 
+							//Note that SecurityError exception is specific to Firefox.
+							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
+							var classes = styleSheets[i].cssRules ;
+						}
+						for (var x = 0; x < classes.length; x++) {
+							if (classes[x].selectorText == CLASSname) {
+								return classes[x];
+								/*var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
+								return ret;*/
+							}
+						}
+					}
+					return null;			
+			}
+	/*
+	 * get attribute in style, if not available return defaultValue
+	 */ 
+	var getStyleAttr = function(CLASSname,attr,defaultValue) {
+	  try {
+	    var text=getStyle(CLASSname).cssText;
+	    //if (CLASSname=='#sliderDiv')console.log(text);
+	    //parse css, get text inbetween brackets
+	    var p=text.indexOf("{");
+	    text=text.substring(p+1);
+	    var p=text.indexOf("}");
+	    text=text.substring(0,p-1);
+	    //split into parts
+	    var listattr = text.split(";");//list with all attributes
+	    var found=false;
+	    var value=null;
+	    for (var i = 0; i < listattr.length; i++) {
+		var attrn = listattr[i].split(":");//becomes key-value pair
+		var key=attrn[0].trim();
+		if (key==attr) {found=true;value=attrn[1].trim();}
+		//Do something
+	    }
+	    if (found) return value;else return defaultValue;
+	  }
+	  catch (e) {
+	    return defaultValue;
+	  }
+  
+	}
+	
+	/*
+	 * get attribute in style as in integer, if not available return defaultValue (must be int)
+	 */ 
+	var getStyleAttrInt = function(CLASSname,attr,defaultValue) {
+	  try {
+	    return parseInt(getStyleAttr(CLASSname,attr,""+defaultValue));
+	  }
+	  catch (e) {
+	    return defaultValue;
+	  }
+	  
+	}
+	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
+	var DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+	var WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+	var HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
+	
+
+	// Set camera attributes and create camera
+	var VIEW_ANGLE = 20, //field of view
+	    ASPECT = WIDTH / HEIGHT, 
+		//ASPECT  = $VisualisationJsModule.container[0].clientWidth / $VisualisationJsModule.container[0].clientHeight,
+	    NEAR = 10,
+	    FAR = 10000;
+	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+	var container = document.getElementById( containerDivId );
+	var controls = new THREE.OrbitControls(camera, container);
+	var scene = new THREE.Scene;
+	var threeDObjects=[];
+	var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
+	var newDepth;
+	
+	return  {
+		//these properties can be asked by: VisualisationJsModule.propertyname
+		height : HEIGHT,
+		width : WIDTH,
+		depth : DEPTH,
+		newDepth : newDepth,
+		scene : scene,
+		camera : camera,
+		controls : controls,
+		container : container,
+		sphereArray : sphereArray,
+		//three arrays to contain the visible objects of the model. Distance of all objects is set.
+		//used to make objects visible or not
+		threeDObjects: threeDObjects,
+		
+		getContainerSize: function () {
+			var size = [WIDTH,HEIGHT]
+			return size;			
+		},
+
+		//can ask CSS propertys in code as: VisualisationJsModule.getStyle(".className").style.color;
+		
+		init3DObjects: function(){
+		  threeDObjects=[];
+		},
+		//functions to set distance for visible yes/no
+		add3DObject(object,distance){
+		  object.distance=distance;
+		  this.threeDObjects.push(object);
+		},
+		getStyle: getStyle,
+		getStyleAttr:getStyleAttr,
+		getStyleAttrInt:getStyleAttrInt
+	};
+	
+});
+
 //visualisation module.
 //TODO must be converted to a class, and an instance.
 
@@ -15,6 +148,7 @@ var VisualisationJsModule;//global
 var renderer;//global
 var	mouse;//global
 var	raycaster;//global
+var labels;//global
 	
 /**
  * @author NJK @author robertjuh
@@ -23,13 +157,17 @@ var	raycaster;//global
  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
  */
  var startVisualisation = (function(currentPageName){
+   //anton: not used right now.
    //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
 		//mouselocation variables
-		var onClickPosition = new THREE.Vector2();
+		initVariables();
+});
+ 
+ function initVariables(){
+ 		var onClickPosition = new THREE.Vector2();
 		raycaster = new THREE.Raycaster();
 		mouse = new THREE.Vector2();
-  initialiseTHREEComponents(currentPageName);
-});		
+}
 		
 		//pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
 	function filterFirstSpheregeometryWithRay(event, mouse){			
@@ -70,8 +208,8 @@ var	raycaster;//global
 					
 						intersects[0].object.callback(intersects[0].object.urlName);
 
-					console.log("je heb geklikt op een geometry:");
-					console.log(intersects[0].object.geometry.type);
+					//console.log("je heb geklikt op een geometry:");
+					//console.log(intersects[0].object.geometry.type);
 					return;
 					//break;
 				case 'PlaneGeometry':
@@ -521,6 +659,8 @@ var x = getOffset( e.target ).left;
 	    //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
 	    //gets nodes and nodelinks from memory
 	    var nodes=VisualisationJsModule.nodes;
+	    var labels=VisualisationJsModule.labels;
+	    var nodelinks=VisualisationJsModule.nodelinks;
 
 	    //depth calculated to largest distance of old ones
 	    for (var key in nodes) {
@@ -604,6 +744,7 @@ var x = getOffset( e.target ).left;
 	changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
 	console.log("initialized all");
 	VisualisationJsModule.nodes=nodes;
+	VisualisationJsModule.labels=labels;
 	VisualisationJsModule.nodelinks=nodelinks;
 	
 	// Animate the webGL objects for rendering
@@ -667,10 +808,8 @@ var x = getOffset( e.target ).left;
 //Wait for document to finish loading		
 $(document).ready(function() {
   //anton: not used anymore. Just start the drawing inside a document.ready-function
-  console.log("document ready!");
-    console.log("pagename:",mw.config.get( 'wgPageName' ));
 		var targetDivId = 'bodyContent'; //bodyContent
-//		drawHTMLElements(targetDivId);
+		drawHTMLElements(targetDivId);
 });
 	 
 	/**
@@ -684,16 +823,7 @@ $(document).ready(function() {
 	  
 }//initialiseTHREEComponents
 
-function drawHTMLElements(targetDivId){				
-//draw html-elements, and give them basic csss-styles to position them
-//met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
-    var CONTAINERDIV = 'containerDiv'; //bodyContent
-    //create containerDiv
-    d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
-    var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element.
-    document.getElementById(targetDivId).appendChild( containerDiv);
-
-      
+    function initGlobalVariables(CONTAINERDIV){
     //initalise global module to store global variables
     VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
 
@@ -708,8 +838,23 @@ function drawHTMLElements(targetDivId){
     });
 
     renderer.setClearColor(0x000000, 0);
-    renderer.setSize(containerWIDTH, containerHEIGHT);		
+    renderer.setSize(containerWIDTH, containerHEIGHT);
+    var containerDiv=document.getElementById( CONTAINERDIV );
+    $("#"+CONTAINERDIV).empty();
     containerDiv.appendChild(renderer.domElement);
+    }
+
+    function drawHTMLElements(targetDivId){				
+//draw html-elements, and give them basic csss-styles to position them
+//met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+    createExtraFunctions(); //creates extra functions, they only have to be made once.
+    var CONTAINERDIV = 'containerDiv'; //bodyContent
+    //create containerDiv
+    d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
+    var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element.
+    document.getElementById(targetDivId).appendChild( containerDiv);
+
+    initGlobalVariables(CONTAINERDIV); 
 		
     var sliderDiv='sliderDiv';
     d3.select('#' + targetDivId).append("div")
@@ -747,7 +892,6 @@ function drawHTMLElements(targetDivId){
     id: showbuttonDiv+"text",
     html:"<b>Model</b>"
     });
-
     var showdivcontainer2=jQuery('<span/>', {
     id: showbuttonDiv+"container2"/*,
     class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
@@ -762,12 +906,13 @@ function drawHTMLElements(targetDivId){
       html:"]"/*,
       class:"mw-collapsible-bracket"*/
     });
-
+console.log("1");
     var showdiv=jQuery('<a/>', {
     id: showbuttonDiv,
     href:"#",
-    html:mw.message( 'collapsible-expand' ).text() 
+    html:checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand") 
     });
+console.log("2");
 
     showdivcontainer2.append(leftBracket).append(showdiv).append(rightBracket);
 
@@ -777,15 +922,27 @@ function drawHTMLElements(targetDivId){
     $( '#'+EMMCONTAINERDIV ).hide();
     $( "#"+showbuttonDiv  ).click(function () {
       if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
-	showdiv.html(mw.message( 'collapsible-collapse' ).text());
+	createExtraFunctions();
+	showdiv.html(checkIfEmpty(mw.message( 'collapsible-collapse' ).text(),"Collapse"));
 	$( '#'+EMMCONTAINERDIV ).slideDown( "slow" );
+	initVariables();
+	initGlobalVariables("containerDiv");
+	drawModel(mw.config.get( 'wgPageName' ));
       } else {
 	$( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
-	showdiv.html(mw.message( 'collapsible-expand' ).text());
+	showdiv.html(checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand"));
       }
     });
 }
 
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
+function checkIfEmpty(text,alternative){
+  console.log("text"+text+".");
+
+  if (isBlank(text)||(text.length==0)||text.charAt(0)=="<") return alternative; else return text;
+}
 
 function drawModel(currentPageName){
 //draw model
@@ -796,7 +953,6 @@ function drawModel(currentPageName){
 		VisualisationJsModule.camera.position.z =  Math.pow((containerHEIGHT*containerHEIGHT + containerWIDTH*containerWIDTH), 1/4);			
 		VisualisationJsModule.scene.add(VisualisationJsModule.camera);
 				
-		createExtraFunctions(); //creates extra functions, they only have to be made once.
 		createLightingForScene();
 		
 		createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth	
@@ -829,6 +985,9 @@ function drawModel(currentPageName){
 				strArray.splice(-1, 1); //remove last part of str
 				var joinedString = strArray.join("/")+"/";
 				return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
+			};
+			String.prototype.isEmpty = function() {
+			    return (this.length === 0 || !this.trim());
 			};
 			
 			//Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.

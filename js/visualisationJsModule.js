@@ -1,10 +1,10 @@
 /**
+ * VisualisationJsModule.js
 * Module of visualisation.js where most THREE.JS related tools are declared, the size of the canvas and
 * all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
 //CSS constants (integers!)
-mw.loader.load('//meta.wikimedia.org/w/index.php?title=User:He7d3r/Tools/DebugModeToggle.js&action=raw&ctype=text/javascript');
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
@@ -38,7 +38,7 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 	var getStyleAttr = function(CLASSname,attr,defaultValue) {
 	  try {
 	    var text=getStyle(CLASSname).cssText;
-	    if (CLASSname=='#sliderDiv')console.log(text);
+	    //if (CLASSname=='#sliderDiv')console.log(text);
 	    //parse css, get text inbetween brackets
 	    var p=text.indexOf("{");
 	    text=text.substring(p+1);

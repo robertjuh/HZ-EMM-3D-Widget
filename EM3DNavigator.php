@@ -5,13 +5,14 @@
 call within a widget with javascript:
 <noinclude>
 Dit is de EM3DNavigator Widget.
+You have to include the script d3.v3.js with the script-tag because it is used in document.ready
 </noinclude>
 <includeonly>
-<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../extensions/EM3DNavigator/js/d3.v3.js" charset="utf-8"></script>
 <script type="text/javascript">
-$(window).load(function() {
-mw.loader.using( ['ext.bootstrap','jquery.makeCollapsible','ext.EM3DNavigator']).done( function () {
-startVisualisation("<!--{$currentPageName|default:'Pagename niet doorgekregen'}-->"); 
+$(document).ready(function() {
+mw.loader.using( ['ext.EM3DNavigator']).done( function () {
+//makeCollapsible gives error. Side-effect: error concerning makeCollapsible disappears
 }
 );//mw.loader
 
