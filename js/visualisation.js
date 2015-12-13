@@ -157,7 +157,7 @@ var Visualisation = (function () {//CSS constants
   var	raycaster;//global
   var labels;//global
   var sliderObject;
-  var previousSliderValue=1;
+  var valuesHaveBeenShown=false;
 	  
   /**
   * @author NJK @author robertjuh
@@ -861,6 +861,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	      .attr("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
 	      .attr("position", "fixed")
 	      //TODO find out why vertical-align:top only works when added to css, and not here....
+	      //could it be it has to be changed to style?
 	      .attr("vertical-align", "top")
 	      .attr("height", VisualisationJsModule.height)
 	      .style("display", "inline-block")
@@ -916,15 +917,19 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $( '#'+EMMCONTAINERDIV ).hide();
       $( "#"+SHOWBUTTONDIV  ).click(function () {
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
-	  createExtraFunctions();
+	  var timeout=0;
+	  if (!valuesHaveBeenShown){
+	    createExtraFunctions();
+	    initVariables();
+	    initGlobalVariables("containerDiv");
+	    drawModel(mw.config.get( 'wgPageName' ));
+	    timeout=1000;
+	  }
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-collapse' ).text(),"Collapse"));
-	  initVariables();
-	  initGlobalVariables("containerDiv");
-	  drawModel(mw.config.get( 'wgPageName' ));
 	  //slide down after one second; smooth animation
-	  setTimeout(function(){$( '#'+EMMCONTAINERDIV ).slideDown( "slow" );}, 1000);
+	  setTimeout(function(){$( '#'+EMMCONTAINERDIV ).slideDown( "slow" );}, timeout);
 	} else {
-	  previousSliderValue=sliderObject.getValue();
+	  valuesHaveBeenShown=true;
 	  $( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand"));
 	}
@@ -950,14 +955,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       createLightingForScene();
       
       sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
-      //TODO only works for 2 times, then previousSliderValue always 1.....
-      if (previousSliderValue>1){
-	if (previousSliderValue>VisualisationJsModule.depth){
-	  VisualisationJsModule.depth=previousSliderValue;
-	}
-
-	initialiseDrawingSequence(currentPageName,previousSliderValue,VisualisationJsModule.depth);
-      } else
       initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
   }
 
