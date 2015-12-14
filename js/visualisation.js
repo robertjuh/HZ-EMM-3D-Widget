@@ -512,6 +512,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   //creates label and connect it to node	
   function createLabelWithSprite( key, distance ){
 
+	  key=key.replace(/_/g, " ");
 	  var canvas = document.createElement('canvas');
 	  var context = canvas.getContext('2d');
 	  var textWidth = context.measureText( key ).width;
