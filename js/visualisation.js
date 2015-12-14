@@ -800,7 +800,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 		  async : true,
 		  data : {
-			  concept : concept,
+			  concept : concept.replace(/_/g, " "),
 			  depth : depth.toString(),
 			  relations : relations,
 			  uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
