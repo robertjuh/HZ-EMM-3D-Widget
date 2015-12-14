@@ -29,7 +29,7 @@ $query = $querybuilder -> generateQuery($_POST["relations"]);
 //this is a workaround. Possible problems occur with a %-sign.
 //TODO alternative is to replace -3A with :, and -2D with -
 //$result =  str_replace("%", "-", urldecode ( str_replace("-", "%", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
-$result =  str_replace("-2D", "-", str_replace("-3A", ":", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query))));
+$result =  str_replace("-27", "'", str_replace("-2D", "-", str_replace("-3A", ":", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
 						//file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
 						//file_put_contents('php://stderr', print_r($result, TRUE));
 // Parse data
