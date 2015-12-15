@@ -158,6 +158,7 @@ var Visualisation = (function () {//CSS constants
   var labels;//global
   var sliderObject;
   var valuesHaveBeenShown=false;
+  var thisconcept;
 	  
   /**
   * @author NJK @author robertjuh
@@ -710,8 +711,9 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     //end loading icon
     $("body").toggleClass("wait");
 
-    if (result.length==0) return;//no output
-    //TODO construct one element in the middle if no relation.....
+    if (result.length==0) 
+      result='{"relations":[],"nodes":{"'+thisconcept+'":{"name":"'+thisconcept+
+      '","distance":0,"url":"http:\/\/195.93.238.56\/wiki\/hzportfolio\/wiki\/index.php\/KNKR_Oncologen"}}}';
 
     VisualisationJsModule.init3DObjects();
 
@@ -781,6 +783,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
 		  
   function initialiseDrawingSequence(concept, depth, newdepth){
+    thisconcept=concept;
 		  
 	  if ( typeof concept === 'undefined' || concept === '') {
 		  throw "Concept is undefined";

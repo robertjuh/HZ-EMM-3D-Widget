@@ -27,7 +27,6 @@ $query = $querybuilder -> generateQuery($_POST["relations"]);
 //execute query
 //replace url-encoded chars. Problem: % has been replaced with -
 //this is a workaround. Possible problems occur with a %-sign.
-//$result =  str_replace("%", "-", urldecode ( str_replace("-", "%", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
 //see list on http://www.w3schools.com/tags/ref_urlencode.asp
 $convertlist=array("-C3-AF"=>"ï", "-27"=>"'", "-2D"=>"-","-3A"=>":","-C3-AB"=>"ë");
 $result=file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query));
@@ -42,9 +41,13 @@ foreach ($convertlist as $key => $val)
 $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
 //file_put_contents('php://stderr', print_r($objects, TRUE));
-if (count($objects)==0) return json_encode($objects); 
+if (count($objects)==0)
+{ 
+  return ""; 
+}
 //file_put_contents('php://stderr', print_r(json_decode($result, true), TRUE));
 $parser -> calcDistances($parser -> getStart($concept,$objects));
+
 // Handle data
 $visitor = new NodeMapVisitor();
 foreach ($objects as $object) {
@@ -54,6 +57,8 @@ foreach ($objects as $object) {
 }
 
 // Return JSON
-echo $visitor -> getUsableJSON();
+$result=$visitor -> getUsableJSON();
+file_put_contents('php://stderr', print_r("\n".$result, TRUE));
+echo $result;
  
 ?>
