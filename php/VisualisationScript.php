@@ -23,7 +23,7 @@ if (isset($_POST['fusekidataset']))
 $depth=intval ($_POST["depth"]);
 $querybuilder = new QueryBuilder($depth, $concept,$SMWServer);
 $query = $querybuilder -> generateQuery($_POST["relations"]);
-file_put_contents('php://stderr', print_r($query, TRUE));
+//file_put_contents('php://stderr', print_r($query, TRUE));
 //execute query
 //replace url-encoded chars. Problem: % has been replaced with -
 //this is a workaround. Possible problems occur with a %-sign.
@@ -35,6 +35,8 @@ $result =  str_replace("-C3-AF", "ï", str_replace("-27", "'", str_replace("-2D"
 // Parse data
 $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
+file_put_contents('php://stderr', print_r($objects, TRUE));
+if (count($objects)==0) return json_encode($objects); 
 //file_put_contents('php://stderr', print_r(json_decode($result, true), TRUE));
 $parser -> calcDistances($parser -> getStart($concept,$objects));
 // Handle data

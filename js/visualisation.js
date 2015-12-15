@@ -710,11 +710,15 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     //end loading icon
     $("body").toggleClass("wait");
 
+    if (result.length==0) return;//no output
+    //TODO construct one element in the middle if no relation.....
+
     VisualisationJsModule.init3DObjects();
 
     var baseLevel=0;
 
     var jsonResult = JSON.parse(result);
+    console.log(jsonResult);
     if (typeof VisualisationJsModule.nodes == 'undefined'){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
