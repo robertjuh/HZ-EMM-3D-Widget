@@ -35,7 +35,7 @@ $result =  str_replace("-C3-AF", "ï", str_replace("-27", "'", str_replace("-2D"
 // Parse data
 $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
-file_put_contents('php://stderr', print_r($objects, TRUE));
+//file_put_contents('php://stderr', print_r($objects, TRUE));
 if (count($objects)==0) return json_encode($objects); 
 //file_put_contents('php://stderr', print_r(json_decode($result, true), TRUE));
 $parser -> calcDistances($parser -> getStart($concept,$objects));
