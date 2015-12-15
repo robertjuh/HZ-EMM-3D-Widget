@@ -273,11 +273,12 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
 
   //create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
-  function createCallbackFunctionForSphere(sphere){		
-	  sphere.callback = function(conceptNameString){
-	  clearCanvas();
-	  window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;			
-	  }		
+  function createCallbackFunctionForSphere(sphere){
+    sphere.callback = function(conceptNameString){
+      if (sphere.distance>0){
+	window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
+      }
+    }		
   }
 		  
   //functions for arrows			
