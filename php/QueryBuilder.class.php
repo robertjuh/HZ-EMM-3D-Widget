@@ -14,7 +14,7 @@ class QueryBuilder {
 			  ?c rdfs:label "%s" .
 			  ?c (%s){,%d} ?s .
 			  ?s ?p ?o
-			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept } )
+			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept }  || EXISTS{ ?s a  uri:Categorie-3ASocKrt_Concept} )
 			}
 		';
 
