@@ -27,9 +27,15 @@ $query = $querybuilder -> generateQuery($_POST["relations"]);
 //execute query
 //replace url-encoded chars. Problem: % has been replaced with -
 //this is a workaround. Possible problems occur with a %-sign.
-//TODO alternative is to replace -3A with :, and -2D with -
 //$result =  str_replace("%", "-", urldecode ( str_replace("-", "%", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query)))));
-$result =  str_replace("-C3-AF", "ï", str_replace("-27", "'", str_replace("-2D", "-", str_replace("-3A", ":", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query))))));
+//see list on http://www.w3schools.com/tags/ref_urlencode.asp
+$convertlist=array("-C3-AF"=>"ï", "-27"=>"'", "-2D"=>"-","-3A"=>":","-C3-AB"=>"ë");
+$result=file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query));
+foreach ($convertlist as $key => $val)
+  {
+      $result = str_replace($key,$val,$result);
+  }
+//$result =  str_replace("-C3-AF", "ï", str_replace("-27", "'", str_replace("-2D", "-", str_replace("-3A", ":", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query))))));
 						//file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
 						//file_put_contents('php://stderr', print_r($result, TRUE));//-C3-AF ï
 // Parse data

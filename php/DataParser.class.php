@@ -157,7 +157,14 @@ class DataParser {
 	    $start=null;
 	    foreach ($objects as $item) {
 	      //uri is at start of itemName; remove it
-	      $itemName=str_replace("_"," ",str_replace("Uri:","",str_replace("uri:","",str_replace("-3A",":",$item->getName()))));//TODO -3A does not have to be replaced anymore; done already at start
+	      $itemName=$item->getName();
+	      $convertlist=array("_"=>" ","Uri:"=>"","uri:"=>"","-3A"=>":");
+	      foreach ($convertlist as $key => $val)
+		{
+		    $itemName = str_replace($key,$val,$itemName);
+		}
+
+	      //$itemName=str_replace("_"," ",str_replace("Uri:","",str_replace("uri:","",str_replace("-3A",":",$item->getName()))));//TODO -3A does not have to be replaced anymore; done already at start
 	      if((strcmp($itemName,$concept)==0))
 	      $start=$item;
 	    }
