@@ -23,7 +23,7 @@ if (isset($_POST['fusekidataset']))
 $depth=intval ($_POST["depth"]);
 $querybuilder = new QueryBuilder($depth, $concept,$SMWServer);
 $query = $querybuilder -> generateQuery($_POST["relations"]);
-file_put_contents('php://stderr', print_r($query, TRUE));
+//file_put_contents('php://stderr', print_r($query, TRUE));
 //execute query
 //replace url-encoded chars. Problem: % has been replaced with -
 //this is a workaround. Possible problems occur with a %-sign.
