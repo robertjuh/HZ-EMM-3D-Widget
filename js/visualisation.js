@@ -42,12 +42,7 @@ var CSSarrow_broader_color="black";
 //		 $( '#containerDiv').slideDown(700, 'linear', function() {
            //callback function after animation finished
 //          $('#'+ EMMContainerDivId).slideDown( "slow" );
-		   
-		   
-
-
 		
-
 		cCanvas 
 		//d3.select('#EMMContainerDiv')
 			.transition()
@@ -130,10 +125,12 @@ var CSSarrow_broader_color="black";
 					return;
 				}else{			 
 						intersects[0].object.material.color.setHex( Math.random() * 0xffffff );					
-						intersects[0].object.callback(intersects[0].object.urlName);
-				}
+						//intersects[0].object.callback(intersects[0].object.urlName);
+						intersects[0].object.callback(intersects[0].object);
+				}		
 			}
-		}		
+		}
+				
 			
 		//uses d3.mouse(this)[0],[1] to find the mouse coordinates on the current element
 		//uses the mouse variable which is a THREE.Vector2
@@ -143,17 +140,57 @@ var CSSarrow_broader_color="black";
 		}		
 
 		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
-		function createCallbackFunctionForSphere(sphere){		
-			sphere.callback = function(conceptNameString){
-				clearCanvas();				
-							//TODO experiment with this code, moving nodes is possible, dragging should be as well. Pushing nodes aside? next level
-							console.log("sphere");
-							console.log(sphere);
-							//sphere.position.x=10;
-						//	sphere.node.x=10;
-				window.location = window.location.href.getFirstPartOfUrl() + conceptNameString; //navigate to the clicked object
+		//Clickevents on objects on the canvas are registered here
+		function createCallbackFunctionForSphere(sphere, nodelinks, three_links){		
+			//sphere.callback = function(conceptNameString){
+			sphere.callback = function(intersectedObject){
+
+				//if user leftclicked a sphere
+				if(d3.event.type == 'click'){
+					clearCanvas();
+					window.location = window.location.href.getFirstPartOfUrl() + intersectedObject.urlName; //navigate to the clicked object
+				}				
+
+				//if user rightclicked a sphere
+				if(d3.event.type == 'contextmenu'){					
+					moveIntersectedSphere(intersectedObject);					
+				}		
 			}		
 		}
+		
+		//This function is experimental and can move a selected sphere.
+		//This function does not serve any purpose, but is an implementation of moving objects I.e moving surrounding nodes aside later.
+		function moveIntersectedSphere(intersectedObject){
+				var _x = Math.random() * 200 - 40;
+				var _y = Math.random() * 200 - 40;
+				var _z = Math.random() * 200 - 40;
+				
+							
+				//moves the sphere to _x, _y, _z
+				new TWEEN.Tween( intersectedObject.position).to( {
+						x: _x,
+						y: _y,
+						z: _z }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();		
+
+				//moves the label along
+				new TWEEN.Tween( intersectedObject.node.label.position).to( {
+						x: _x,
+						y: _y + 5,
+						z: _z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();	
+				
+				//moving the arrows, not implemented yet. find out a way to select arrows for this node.
+				new TWEEN.Tween( VisualisationJsModule.threeDObjects[1].position).to( {
+						x: _x,
+						y: _y,
+						z: _z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();	
+		};
+					
+		
+		
+		
 				
 		//functions for arrows			
 		function setArrowSourceTarget(arrow) {
@@ -342,7 +379,7 @@ var CSSarrow_broader_color="black";
 						nodes[key].label=createLabelWithSprite( key , nodes[key].distance);
 						
 						
-						createCallbackFunctionForSphere(sphere); 
+						createCallbackFunctionForSphere(sphere, nodelinks, three_links); 
 					}
 				}
 				//save spheres to memory, so they can be recalled
@@ -355,6 +392,7 @@ var CSSarrow_broader_color="black";
 				
 				VisualisationJsModule.containerDiv.on( 'touchstart', onDocumentTouchStart, false );
 				VisualisationJsModule.containerDiv.on( 'click', onDocumentMouseDownD3, false );	
+				VisualisationJsModule.containerDiv.on( 'contextmenu', onDocumentMouseDownD3, false );	
 				
 		}
 		
@@ -477,7 +515,8 @@ var CSSarrow_broader_color="black";
 		arrow.target=currentNodeLink.target;
 		arrow.distance=currentNodeLink.distance;
 		currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
-		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
+		VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance,arrow.position);
+		//VisualisationJsModule.add3DObject(currentNodeLink);
 		
 
 			
@@ -627,6 +666,7 @@ var CSSarrow_broader_color="black";
 		requestAnimationFrame(animate);
 		VisualisationJsModule.renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
 		VisualisationJsModule.controls.update();
+		TWEEN.update();
 
 		for (var label in labels) {
 			labels[label].lookAt(VisualisationJsModule.camera.position); //makes the labels spin around to try to look at the camera

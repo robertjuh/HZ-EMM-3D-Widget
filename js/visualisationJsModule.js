@@ -172,6 +172,7 @@ console.log(d3.select('#' + containerDivId));
 		camera : camera,
 		controls : controls,
 		targetDivId : targetDivId,
+		targetDivId : targetDivId,
 		sliderDivId : sliderDivId,
 		containerDiv : containerDiv,
 		containerDivId : containerDivId,
@@ -200,8 +201,9 @@ console.log(d3.select('#' + containerDivId));
 		  threeDObjects=[];
 		},
 		//functions to set distance for visible yes/no
-		add3DObject(object,distance){
+		add3DObject(object,distance, arrowTarget){
 		  object.distance=distance;
+		  object.arrowTargetPosition = arrowTarget;
 		  this.threeDObjects.push(object);
 		},
 		getStyle: getStyle,
