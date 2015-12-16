@@ -47,7 +47,7 @@ console.log(d3.select('#' + containerDivId));
 			
 		
 	var getStyle = function(CLASSname) {
-			if (currentstylesheet.rules ) { var classes = currentstylesheet.rules; }
+			if (currentstylesheet != 'undefined' && currentstylesheet.rules ) { var classes = currentstylesheet.rules; }
 				else { 
 					try {  if(!currentstylesheet.cssRules)
 							{

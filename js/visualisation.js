@@ -16,7 +16,7 @@ var CSSarrow_broader_color="black";
 	
 	//console.log("target class ");
 	//console.log(d3.select('.' + d3.select('#' + targetDivId)[0][0].className)[0][0]);
-	
+"use strict";	
 	
 /**
  * @author NJK @author robertjuh
