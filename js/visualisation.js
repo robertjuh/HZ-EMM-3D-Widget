@@ -468,7 +468,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				  // add the sphere to the scene
 				  VisualisationJsModule.scene.add(sphere);
 
-				  nodes[key].label=createLabelWithSprite( key , nodes[key].distance);
+				  nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
 				  
 				  
 				  createCallbackFunctionForSphere(sphere); 
@@ -512,12 +512,12 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  
 		  
   //creates label and connect it to node	
-  function createLabelWithSprite( key, distance ){
+  function createLabelWithSprite( key, text,distance ){
 
-	  key=key.replace(/_/g, " ");
+	  text=text.replace(/_/g, " ");
 	  var canvas = document.createElement('canvas');
 	  var context = canvas.getContext('2d');
-	  var textWidth = context.measureText( key ).width;
+	  var textWidth = context.measureText( text ).width;
 	  
 	  var canvas = document.createElement('canvas');
 	  //TODO make width of sprite dependant on width of text
@@ -531,7 +531,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  context.font = VisualisationJsModule.getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
 	    VisualisationJsModule.getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
 	    VisualisationJsModule.getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
-	  context.fillText(key, size / 2, size / 2);
+	  context.fillText(text, size / 2, size / 2);
 
 	  var amap = new THREE.Texture(canvas);
 	  amap.needsUpdate = true;
