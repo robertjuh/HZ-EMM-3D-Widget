@@ -143,7 +143,7 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 
 //visualisation module.
 
-var Visualisation = (function () {//CSS constants
+window.Visualisation = (function () {//CSS constants
   var CSSarrow_related_color="red";
   var CSSsphere_color="rgb(191,172,136)";
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
@@ -856,6 +856,12 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $("#"+CONTAINERDIV).empty();
       containerDiv.appendChild(renderer.domElement);
   }//initGlobalVariables
+  function drawTotalModel(){
+	    createExtraFunctions();
+	    initVariables();
+	    initGlobalVariables(CONTAINERDIV);
+	    drawModel(mw.config.get( 'wgPageName' ));
+  }
 
   var  drawHTMLElements = function(targetDivId){
   //draw html-elements, and give them basic csss-styles to position them
@@ -932,10 +938,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
 	  var timeout=0;
 	  if (!valuesHaveBeenShown){
-	    createExtraFunctions();
-	    initVariables();
-	    initGlobalVariables("containerDiv");
-	    drawModel(mw.config.get( 'wgPageName' ));
+	    drawTotalModel();
 	    timeout=1000;
 	  }
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-collapse' ).text(),"Collapse"));
@@ -1019,9 +1022,14 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  };
   }
   
+  function test(){
+    console.log("test");
+  }
   return  {
     //these properties can be asked by: Visualisation.propertyname
-    drawHTMLElements : drawHTMLElements
+    drawHTMLElements : drawHTMLElements,
+    test:test,
+    drawModel:drawTotalModel
   }
 });
 
