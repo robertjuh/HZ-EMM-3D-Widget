@@ -15,7 +15,6 @@ var divHeight=VisualisationJsModule.height;
 var SLIDERDIV="sliderDiv";
 var containerWidth = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"width",30);
 divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
-console.log(divHeight);
 var slideDepth = 1;
 var tempSliderDepthInt=1;
 
