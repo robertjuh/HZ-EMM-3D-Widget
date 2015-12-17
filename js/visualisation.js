@@ -879,6 +879,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       document.getElementById(targetDivId).appendChild( containerDiv);
 
       initGlobalVariables(CONTAINERDIV); 
+      console.log("1");
 		  
       var sliderDiv='sliderDiv';
       d3.select('#' + targetDivId).append("div")
@@ -892,6 +893,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	      .style("display", "inline-block")
 	      .style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
 	      
+      console.log("2");
 
       var containerDivDescription=CONTAINERDIV;
       //console.log("position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;");
@@ -906,6 +908,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
 	.css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
       $("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
+      console.log("3");
 
       var showdivcontainer=jQuery('<div/>', {
       id: SHOWBUTTONDIV+"container"
