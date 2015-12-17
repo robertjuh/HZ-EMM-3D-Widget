@@ -856,18 +856,23 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $("#"+CONTAINERDIV).empty();
       containerDiv.appendChild(renderer.domElement);
   }//initGlobalVariables
-  function drawTotalModel(){
+  function drawTotalModel(currentPageName){
+        if (typeof currentPageName == 'undefined'){
+	  currentPageName=mw.config.get( 'wgPageName' );
+	}
 	    createExtraFunctions();
 	    initVariables();
 	    initGlobalVariables(CONTAINERDIV);
-	    drawModel(mw.config.get( 'wgPageName' ));
+	    drawModel(currentPageName);
   }
 
   var  drawHTMLElements = function(targetDivId){
   //draw html-elements, and give them basic csss-styles to position them
   //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+
       createExtraFunctions(); //creates extra functions, they only have to be made once.
       //create containerDiv
+      console.log(targetDivId);
       d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
       var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element.
       document.getElementById(targetDivId).appendChild( containerDiv);
@@ -882,7 +887,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	      //TODO find out why vertical-align:top only works when added to css, and not here....
 	      //could it be it has to be changed to style?
 	      .attr("vertical-align", "top")
-	      .attr("height", VisualisationJsModule.height)
+	      .attr("height", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"height",400))
 	      .style("display", "inline-block")
 	      .style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background );
 	      
@@ -1038,6 +1043,6 @@ var visualisationInstance= new Visualisation();
 //start program if html-elements are initialised
 $(document).ready(function() {
   //start the drawing inside a document.ready-function
-  visualisationInstance.drawHTMLElements(TARGETDIVID);
+  //visualisationInstance.drawHTMLElements(TARGETDIVID);
 });
 
