@@ -1043,6 +1043,6 @@ var visualisationInstance= new Visualisation();
 //start program if html-elements are initialised
 $(document).ready(function() {
   //start the drawing inside a document.ready-function
-  //visualisationInstance.drawHTMLElements(TARGETDIVID);
+  visualisationInstance.drawHTMLElements(TARGETDIVID);
 });
 
