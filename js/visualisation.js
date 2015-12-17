@@ -891,7 +891,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	      .attr("vertical-align", "top")
 	      .attr("height", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"height",400))
 	      .style("display", "inline-block")
-	      /*.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background */);
+	      /*.style("background", VisualisationJsModule.getStyle(".sliderAttributes.background").style.background )*/;
 	      
       console.log("2");
 
