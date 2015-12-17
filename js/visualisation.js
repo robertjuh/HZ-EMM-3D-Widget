@@ -884,7 +884,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       var sliderDiv='sliderDiv';
       d3.select('#' + targetDivId).append("div")
 	      .attr("id", sliderDiv)
-	      .attr("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
+	      //.attr("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
 	      .attr("position", "fixed")
 	      //TODO find out why vertical-align:top only works when added to css, and not here....
 	      //could it be it has to be changed to style?
