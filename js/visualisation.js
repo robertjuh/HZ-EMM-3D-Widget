@@ -869,7 +869,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   var  drawHTMLElements = function(targetDivId){
   //draw html-elements, and give them basic csss-styles to position them
   //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
-
+    if (window.EMMElementsDrawn) return;
+      window.EMMElementsDrawn=true;
       createExtraFunctions(); //creates extra functions, they only have to be made once.
       //create containerDiv
       console.log(targetDivId);
@@ -1043,6 +1044,6 @@ var visualisationInstance= new Visualisation();
 //start program if html-elements are initialised
 $(document).ready(function() {
   //start the drawing inside a document.ready-function
-  visualisationInstance.drawHTMLElements(TARGETDIVID);
+  //visualisationInstance.drawHTMLElements(TARGETDIVID);
 });
 
