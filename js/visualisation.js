@@ -814,12 +814,13 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
   var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){
   //draw html-elements, and give them basic csss-styles to position them
-  //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
-	if (window.EMMElementsDrawn) {
-		return;
-	}
+      if (window.EMMElementsDrawn) {
+	      return;
+      }
       window.EMMElementsDrawn=true;
+      
       createExtraFunctions(); //creates extra functions, they only have to be made once.
+
       //create containerDiv and other elements
       jQuery('<div/>', {
 	id: CONTAINERDIV,
@@ -844,9 +845,9 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	id: SHOWBUTTONDIV+"container2"
       }).css("float","right");
 
-    var leftBracket=jQuery('<span/>', {
-		html:"["
-     });
+      var leftBracket=jQuery('<span/>', {
+		  html:"["
+      });
 
       var rightBracket=jQuery('<span/>', {
 	html:"]"
@@ -864,6 +865,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       showdivcontainer.prependTo('#'+BODYCONTENTDIV);
 	      
       //set CSS of elements
+      //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
       $("#"+SLIDERDIVID).css("position", "fixed")
 	      .css("vertical-align", "top")
 	      .css("display", "inline-block");
