@@ -20,10 +20,12 @@ var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
 
-var VisualisationJsModulePrototype = (function (containerDivId, DEPTH, WIDTH, HEIGHT) {
+var VisualisationJsModulePrototype = (function (containerDivId) {
 
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-
+	var DEPTH=visualisationInstance.getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+	var WIDTH=visualisationInstance.getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+	var HEIGHT=visualisationInstance.getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 	// Set camera attributes and create camera
 	var VIEW_ANGLE = 20, //field of view
 	    ASPECT = WIDTH / HEIGHT, 
@@ -778,9 +780,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
       //initalise global module to store global variables
-      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order),
-								getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width),
-								getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height));
+      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
 
       var containerHEIGHT = VisualisationJsModule.height;
       var containerWIDTH = VisualisationJsModule.width; //TODO width and height are set two lines above. Should be used here
@@ -820,7 +820,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	}
       window.EMMElementsDrawn=true;
       createExtraFunctions(); //creates extra functions, they only have to be made once.
-      //create containerDiv 
+      //create containerDiv and other elements
       jQuery('<div/>', {
 	id: CONTAINERDIV,
       }).appendTo('#'+targetDivId);
@@ -863,6 +863,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       showdivcontainer.append(showdivcontainer2);
       showdivcontainer.prependTo('#'+BODYCONTENTDIV);
 	      
+      //set CSS of elements
       $("#"+SLIDERDIVID).css("position", "fixed")
 	      .css("vertical-align", "top")
 	      .css("display", "inline-block");
@@ -876,6 +877,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $("#"+EMMCONTAINERDIV).css("height",""+$("#"+CONTAINERDIV).height()+ "px")
 	.css("width",""+divWidth+ "px").css("display","inline-block");
 
+      //define event on button
       $( '#'+EMMCONTAINERDIV ).hide();
       $( "#"+SHOWBUTTONDIV  ).click(function () {
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
