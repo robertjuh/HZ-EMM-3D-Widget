@@ -784,7 +784,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 //  }//initialiseTHREEComponents
 
   function initGlobalVariables(CONTAINERDIV){
-	  console.log("test");
       //initalise global module to store global variables
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
