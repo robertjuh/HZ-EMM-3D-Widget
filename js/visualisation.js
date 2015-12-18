@@ -16,8 +16,8 @@ var VisualisationJsModule;//global
 
 //CSS constants (integers!)
 var CSSmaxDepth_order=4;
-var CSScontainerAttributes_width=400;
-var CSScontainerAttributes_height=400;	
+var CSScontainerAttributes_width=700;
+var CSScontainerAttributes_height=700;	
 
 var VisualisationJsModulePrototype = (function (containerDivId) {
 	
