@@ -28,7 +28,7 @@ $wgResourceModules['ext.EM3DNavigator'] = array(
 //, 'js/cola.min.js'
 //,
  'js/three.min.js'/*, 'js/d3.v3.js'*/,  'js/OrbitControls.js'//, 'js/OrthographicTrackballControls.js', 'js/TrackballControls.js'
-,  'js/default.js', 'js/visualisation.js', 'js/slider.js', 'js/visualisationJsModule.js', 'js/JSONStyleSheet.js'),
+,  'js/default.js', 'js/visualisation.js', 'js/slider.js', /*'js/visualisationJsModule.js',*/ 'js/JSONStyleSheet.js'),
 	'styles' => array (/*'css/bootstrap.min.css', 'css/bootstrap-theme.min.css',*/ 'css/highlight.css', 'css/style.css', 'css/navigatorStyle.css'),
 	'position' => 'top',
 
