@@ -898,18 +898,22 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       var sliderDiv='sliderDiv';
       d3.select('#' + targetDivId).append("div")
 	      .attr("id", sliderDiv)
-	      .attr("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
-	      .attr("position", "fixed")
-	      //TODO find out why vertical-align:top only works when added to css, and not here....
-	      //could it be it has to be changed to style?
-	      .attr("vertical-align", "top")
-	      .attr("height", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"height",400))
 	      .style("display", "inline-block")
 	      .style("background", VisualisationJsModule.getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
 	      //getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)");//background: rgb(229,222,205)
 	      
-
+      $("#"+sliderDiv).css("width",VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
+	      .css("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
+	      .css("position", "fixed")
+	      //TODO find out why vertical-align:top only works when added to css, and not here....
+	      //could it be it has to be changed to style?
+	      .css("vertical-align", "top")
+	      .css("height", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"height",400));
       var containerDivDescription=CONTAINERDIV;
+      console.log("containerDivDescription).width()");
+      var divWidth=$("#"+containerDivDescription).width();
+      console.log(divWidth);
+      console.log(""+(divWidth-$("#"+sliderDiv).width())+"px");
       jQuery('<div/>', {
       id: EMMCONTAINERDIV/*,
       css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
@@ -919,8 +923,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
       //TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
       $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
-	.css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
-      $("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
+	.css("width",""+divWidth+ "px").css("display","inline-block");
+      $("#"+sliderDiv).css("position","absolute").css("left",""+(divWidth-$("#"+sliderDiv).width())+"px");
 
       var showdivcontainer=jQuery('<div/>', {
       id: SHOWBUTTONDIV+"container"
