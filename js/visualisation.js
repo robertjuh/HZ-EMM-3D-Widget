@@ -10,90 +10,27 @@ var TARGETDIVID = 'bodyContent';
 var CONTAINERDIV = 'containerDiv'; 
 var SHOWBUTTONDIV='showbutton';
 var BODYCONTENTDIV='bodyContent';
+var SLIDERDIVID='sliderDiv';
 var EMMCONTAINERDIV='EMMContainerDiv';	
 var VisualisationJsModule;//global
 
 
 //CSS constants (integers!)
 var CSSmaxDepth_order=4;
-var CSScontainerAttributes_width=700;
-var CSScontainerAttributes_height=700;	
+var CSScontainerAttributes_width=400;
+var CSScontainerAttributes_height=400;	
 
-var VisualisationJsModulePrototype = (function (containerDivId) {
+var VisualisationJsModulePrototype = (function (containerDivId, DEPTH, WIDTH, HEIGHT) {
+/*	  var DEPTH=depth;
+	  var WIDTH=width;
+	  var HEIGHT=height;*/
 	
 	
 console.log("VisualisationJsModulePrototype() containerdivID");
 console.log(containerDivId);
 
 
-	var getStyle = function(CLASSname) {
-					var styleSheets = window.document.styleSheets;
-					var styleSheetsLength = styleSheets.length;
-					for(var i = 0; i < styleSheetsLength; i++){
-						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
-						else { 
-							try {  if(!styleSheets[i].cssRules) {continue;} } 
-							//Note that SecurityError exception is specific to Firefox.
-							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
-							var classes = styleSheets[i].cssRules ;
-						}
-						for (var x = 0; x < classes.length; x++) {
-							if (classes[x].selectorText == CLASSname) {
-								return classes[x];
-								/*var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
-								return ret;*/
-							}
-						}
-					}
-					return null;			
-			}
-	/*
-	 * get attribute in style, if not available return defaultValue
-	 */ 
-	var getStyleAttr = function(CLASSname,attr,defaultValue) {
-	  try {
-	    var text=getStyle(CLASSname).cssText;
-	    //if (CLASSname=='#sliderDiv')console.log(text);
-	    //parse css, get text inbetween brackets
-	    var p=text.indexOf("{");
-	    text=text.substring(p+1);
-	    var p=text.indexOf("}");
-	    text=text.substring(0,p-1);
-	    //split into parts
-	    var listattr = text.split(";");//list with all attributes
-	    var found=false;
-	    var value=null;
-	    for (var i = 0; i < listattr.length; i++) {
-		var attrn = listattr[i].split(":");//becomes key-value pair
-		var key=attrn[0].trim();
-		if (key==attr) {found=true;value=attrn[1].trim();}
-		//Do something
-	    }
-	    if (found) return value;else return defaultValue;
-	  }
-	  catch (e) {
-	    return defaultValue;
-	  }
-  
-	}
-	
-	/*
-	 * get attribute in style as in integer, if not available return defaultValue (must be int)
-	 */ 
-	var getStyleAttrInt = function(CLASSname,attr,defaultValue) {
-	  try {
-	    return parseInt(getStyleAttr(CLASSname,attr,""+defaultValue));
-	  }
-	  catch (e) {
-	    return defaultValue;
-	  }
-	  
-	}
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-	var DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
-	var WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
-	var HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 	
 
 	// Set camera attributes and create camera
@@ -141,10 +78,7 @@ console.log(containerDivId);
 		add3DObject(object,distance){
 		  object.distance=distance;
 		  this.threeDObjects.push(object);
-		},
-		getStyle: getStyle,
-		getStyleAttr:getStyleAttr,
-		getStyleAttrInt:getStyleAttrInt
+		}
 	};
 	
 });
@@ -158,6 +92,8 @@ console.log(VisualisationJsModule);
 
 
 window.Visualisation = (function () {//CSS constants
+var CSScontainerAttributes_width=400;
+var CSScontainerAttributes_height=400;	
   var CSSarrow_related_color="red";
   var CSSsphere_color="rgb(191,172,136)";
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
@@ -189,8 +125,6 @@ window.Visualisation = (function () {//CSS constants
   
   function initVariables(){
     //THREE can only be used if library is read using Resource loader
-    raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
   }
 		  
   //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
@@ -460,12 +394,12 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				  try 
 				  { 
 					  sphereMaterial = new THREE.MeshPhongMaterial({
-						  color : VisualisationJsModule.getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
+						  color : getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
 					  });												
 				  }
 				  catch (e){//if level is too high, set default
 					  sphereMaterial = new THREE.MeshPhongMaterial({
-						  color : VisualisationJsModule.getStyleAttr(".sphere","color",CSSsphere_color)
+						  color : getStyleAttr(".sphere","color",CSSsphere_color)
 					  });
 				  }
 
@@ -546,9 +480,9 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var context = canvas.getContext('2d');
 	  context.fillStyle = '#990000';
 	  context.textAlign = 'center';
-	  context.font = VisualisationJsModule.getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
-	    VisualisationJsModule.getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
-	    VisualisationJsModule.getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
+	  context.font = getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
+	    getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
+	    getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
 	  context.fillText(text, size / 2, size / 2);
 
 	  var amap = new THREE.Texture(canvas);
@@ -597,10 +531,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  for (var i = 0; i < nodelinks.length; i++) {
 									  
 			  if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
-				  three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.related","color",CSSarrow_related_color), nodelinks[i]));					
+				  three_links.push(setArrowData(getStyleAttr(".arrow.related","color",CSSarrow_related_color), nodelinks[i]));					
 			  }
 			  else if(nodelinks[i].type.compareStrings("Eigenschap:Skosem:broader", true, true)){
-				  three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.broader","color",CSSarrow_broader_color), nodelinks[i]));			
+				  three_links.push(setArrowData(getStyleAttr(".arrow.broader","color",CSSarrow_broader_color), nodelinks[i]));			
 			  }
 			  else{
 				  console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
@@ -827,7 +761,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 		  async : true,
 		  data : {
-			  concept : concept.replace(/_/g, " "),
+			  concept : decodeURI(concept.replace(/_/g, " ")),
 			  depth : depth.toString(),
 			  relations : relations,
 			  uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
@@ -850,11 +784,20 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 //  }//initialiseTHREEComponents
 
   function initGlobalVariables(CONTAINERDIV){
+	  console.log("test");
       //initalise global module to store global variables
-      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order),
+								getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width),
+								getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height));
 
       var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieerd
+      var containerWIDTH = VisualisationJsModule.width; //TODO width and height are set two lines above. Should be used here
+      //set width and height of divs. Can only be done here because css is not read earlier
+      $("#"+EMMCONTAINERDIV).css("height",""+containerHEIGHT+ "px").css("width",""+containerWIDTH+ "px");
+      $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(containerWIDTH-$("#"+SLIDERDIVID).width())+"px")
+	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
 
       
       // Create Renderer
@@ -869,14 +812,14 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       $("#"+CONTAINERDIV).empty();
       containerDiv.appendChild(renderer.domElement);
   }//initGlobalVariables
+  
   function drawTotalModel(currentPageName){
         if (typeof currentPageName == 'undefined'){
 	  currentPageName=mw.config.get( 'wgPageName' );
 	}
-	    createExtraFunctions();
-	    initVariables();
-	    initGlobalVariables(CONTAINERDIV);
-	    drawModel(currentPageName);
+	//initVariables();
+	initGlobalVariables(CONTAINERDIV);
+	drawModel(currentPageName);
   }
 
   var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){
@@ -888,64 +831,35 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       window.EMMElementsDrawn=true;
       createExtraFunctions(); //creates extra functions, they only have to be made once.
       //create containerDiv 
-      d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
-      var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element. //TODO van Robert: conainerDiv en divID splitsen
-      document.getElementById(targetDivId).appendChild( containerDiv);
-
-      initGlobalVariables(CONTAINERDIV); 
-	  
-
-      var sliderDiv='sliderDiv';
-      d3.select('#' + targetDivId).append("div")
-	      .attr("id", sliderDiv)
-	      .style("display", "inline-block")
-	      .style("background", VisualisationJsModule.getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
-	      //getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)");//background: rgb(229,222,205)
-	      
-      $("#"+sliderDiv).css("width",VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
-	      .css("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
-	      .css("position", "fixed")
-	      //TODO find out why vertical-align:top only works when added to css, and not here....
-	      //could it be it has to be changed to style?
-	      .css("vertical-align", "top")
-	      .css("height", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"height",400));
-      var containerDivDescription=CONTAINERDIV;
-      console.log("containerDivDescription).width()");
-      var divWidth=$("#"+containerDivDescription).width();
-      console.log(divWidth);
-      console.log(""+(divWidth-$("#"+sliderDiv).width())+"px");
       jQuery('<div/>', {
-      id: EMMCONTAINERDIV/*,
-      css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
+	id: CONTAINERDIV,
+      }).appendTo('#'+targetDivId);
+      //create sliderdiv
+      jQuery('<div/>', {
+	id: SLIDERDIVID,
+      }).appendTo('#'+targetDivId);;
+      jQuery('<div/>', {
+	id: EMMCONTAINERDIV
       }).prependTo('#'+BODYCONTENTDIV);
-      $("#"+containerDivDescription).appendTo('#'+EMMCONTAINERDIV);
-      $("#"+containerDivDescription).css("position","relative");
-      $("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
-      //TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
-      $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
-	.css("width",""+divWidth+ "px").css("display","inline-block");
-      $("#"+sliderDiv).css("position","absolute").css("left",""+(divWidth-$("#"+sliderDiv).width())+"px");
-
+      $("#"+CONTAINERDIV).appendTo('#'+EMMCONTAINERDIV);
+      $("#"+SLIDERDIVID).appendTo('#'+EMMCONTAINERDIV);
       var showdivcontainer=jQuery('<div/>', {
-      id: SHOWBUTTONDIV+"container"
+	id: SHOWBUTTONDIV+"container"
       });
       var showdivtext=jQuery('<span/>', {
-      id: SHOWBUTTONDIV+"text",
-      html:"<b>Model</b>"
+	id: SHOWBUTTONDIV+"text",
+	html:"<b>Model</b>"
       });
       var showdivcontainer2=jQuery('<span/>', {
-      id: SHOWBUTTONDIV+"container2"/*,
-      class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
+	id: SHOWBUTTONDIV+"container2"
       }).css("float","right");
 
     var leftBracket=jQuery('<span/>', {
-		html:"["/*,
-		class:"mw-collapsible-bracket"*/
+		html:"["
      });
 
       var rightBracket=jQuery('<span/>', {
-	html:"]"/*,
-	class:"mw-collapsible-bracket"*/
+	html:"]"
       });
       var showdiv=jQuery('<a/>', {
       id: SHOWBUTTONDIV,
@@ -958,6 +872,20 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       showdivcontainer.append(showdivtext);
       showdivcontainer.append(showdivcontainer2);
       showdivcontainer.prependTo('#'+BODYCONTENTDIV);
+	      
+      $("#"+SLIDERDIVID).css("position", "fixed")
+	      .css("vertical-align", "top")
+	      .css("display", "inline-block");
+      $("#"+CONTAINERDIV).css("position","absolute").css("display", "inline-block");
+      $("#"+EMMCONTAINERDIV).css("position","relative");
+         var divWidth=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+
+      $("#"+SLIDERDIVID).css("width",getStyleAttrInt('#'+SLIDERDIVID,"width",30))
+	      .css("width", getStyleAttrInt('#'+SLIDERDIVID,"width",30))
+	      .css("height", getStyleAttrInt('#'+SLIDERDIVID,"height",400))
+      $("#"+EMMCONTAINERDIV).css("height",""+$("#"+CONTAINERDIV).height()+ "px")
+	.css("width",""+divWidth+ "px").css("display","inline-block");
+
       $( '#'+EMMCONTAINERDIV ).hide();
       $( "#"+SHOWBUTTONDIV  ).click(function () {
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
@@ -994,11 +922,75 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       VisualisationJsModule.scene.add(VisualisationJsModule.camera);
 		      
       createLightingForScene();
-      
-      sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
+      if (typeof window.sliderObject == 'undefined')//TODO check why sliderObject can be created more than once
+      window.sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
       initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
   }
 
+	var getStyle = function(CLASSname) {
+					var styleSheets = window.document.styleSheets;
+					var styleSheetsLength = styleSheets.length;
+					for(var i = 0; i < styleSheetsLength; i++){
+						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
+						else { 
+							try {  if(!styleSheets[i].cssRules) {continue;} } 
+							//Note that SecurityError exception is specific to Firefox.
+							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
+							var classes = styleSheets[i].cssRules ;
+						}
+						for (var x = 0; x < classes.length; x++) {
+							if (classes[x].selectorText == CLASSname) {
+								return classes[x];
+								/*var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
+								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
+								return ret;*/
+							}
+						}
+					}
+					return null;			
+			}
+	/*
+	 * get attribute in style, if not available return defaultValue
+	 */ 
+	var getStyleAttr = function(CLASSname,attr,defaultValue) {
+	  try {
+	    var text=getStyle(CLASSname).cssText;
+	    //if (CLASSname=='#sliderDiv')console.log(text);
+	    //parse css, get text inbetween brackets
+	    var p=text.indexOf("{");
+	    text=text.substring(p+1);
+	    var p=text.indexOf("}");
+	    text=text.substring(0,p-1);
+	    //split into parts
+	    var listattr = text.split(";");//list with all attributes
+	    var found=false;
+	    var value=null;
+	    for (var i = 0; i < listattr.length; i++) {
+		var attrn = listattr[i].split(":");//becomes key-value pair
+		var key=attrn[0].trim();
+		if (key==attr) {found=true;value=attrn[1].trim();}
+		//Do something
+	    }
+	    if (found) return value;else return defaultValue;
+	  }
+	  catch (e) {
+	    return defaultValue;
+	  }
+  
+	}
+	
+	/*
+	 * get attribute in style as in integer, if not available return defaultValue (must be int)
+	 */ 
+	var getStyleAttrInt = function(CLASSname,attr,defaultValue) {
+	  try {
+	    return parseInt(getStyleAttr(CLASSname,attr,""+defaultValue));
+	  }
+	  catch (e) {
+	    return defaultValue;
+	  }
+	  
+	}
 	  
   //creates additional functions	
   function createExtraFunctions(){
@@ -1058,7 +1050,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		//these properties can be asked by: Visualisation.propertyname
 		drawHTMLElements : drawHTMLElements,
 		setDivIdFromWiki : setDivIdFromWiki,
-		drawModel : drawTotalModel
+		drawModel : drawTotalModel,
+		getStyle: getStyle,
+		//getStyleAttr:getStyleAttr,
+		getStyleAttrInt:getStyleAttrInt
+
   }
 });
 
