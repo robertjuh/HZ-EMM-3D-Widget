@@ -919,7 +919,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
       }).prependTo('#'+BODYCONTENTDIV);
       $("#"+containerDivDescription).appendTo('#'+EMMCONTAINERDIV);
-      $("#"+containerDivDescription).css("position","absolute");
+      $("#"+containerDivDescription).css("position","relative");
       $("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
       //TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
       $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
