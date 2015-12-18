@@ -20,6 +20,12 @@ var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
 
 var VisualisationJsModulePrototype = (function (containerDivId) {
+	
+	
+console.log("VisualisationJsModulePrototype() containerdivID");
+console.log(containerDivId);
+
+
 	var getStyle = function(CLASSname) {
 					var styleSheets = window.document.styleSheets;
 					var styleSheetsLength = styleSheets.length;
@@ -98,6 +104,8 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 	    FAR = 10000;
 	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
 	var container = document.getElementById( containerDivId );
+	//var container = document.getElementById("containerdiv");
+	console.log(container);
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
@@ -140,8 +148,14 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 	};
 	
 });
-
+ 
+ 
+ //VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
 //visualisation module.
+
+console.log("VisualisationJsModulePrototype");
+console.log(VisualisationJsModule);
+
 
 window.Visualisation = (function () {//CSS constants
   var CSSarrow_related_color="red";
@@ -166,12 +180,12 @@ window.Visualisation = (function () {//CSS constants
   * 
   * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
   */
-  var startVisualisation = (function(currentPageName){
-    //anton: not used right now.
-    //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
-		  //mouselocation variables
-		  initVariables();
-  });
+//  var startVisualisation = (function(currentPageName){
+//    //anton: not used right now.
+//    //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
+//		  //mouselocation variables 
+//		  initVariables();
+//  });
   
   function initVariables(){
     //THREE can only be used if library is read using Resource loader
@@ -799,8 +813,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    mydepth = newdepth;
 	    VisualisationJsModule.depth=depth;
 	  }
-	  else
-	    clearCanvas();//first time, clear canvas
+	  else //TODO van Robert: waarom staat hier geen scoping?
+	    clearCanvas();//first time, clear canvas   
 	  VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
 	  var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 	  //display loading icon before ajax-call
@@ -829,12 +843,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   /**
   *Initialise the components that are relevant to the canvas/renderer
   */	
-  function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
-    //TODO anton:function not used anymore. can be removed.
-	  drawHTMLElements(TARGETDIVID);
-	  drawModel(currentPageName);
-    
-  }//initialiseTHREEComponents
+//  function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
+//    //TODO anton:function not used anymore. can be removed.
+//	  drawHTMLElements(TARGETDIVID);
+//	  drawModel(currentPageName);  
+//  }//initialiseTHREEComponents
 
   function initGlobalVariables(CONTAINERDIV){
       //initalise global module to store global variables
@@ -852,7 +865,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
       renderer.setClearColor(0x000000, 0);
       renderer.setSize(containerWIDTH, containerHEIGHT);
-      var containerDiv=document.getElementById( CONTAINERDIV );
+      var containerDiv=document.getElementById( CONTAINERDIV ); //TODO van Robert, gets the containerdiv... again...
       $("#"+CONTAINERDIV).empty();
       containerDiv.appendChild(renderer.domElement);
   }//initGlobalVariables
@@ -866,19 +879,22 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    drawModel(currentPageName);
   }
 
-  var  drawHTMLElements = function(targetDivId){
+  var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){
   //draw html-elements, and give them basic csss-styles to position them
   //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
-    if (window.EMMElementsDrawn) return;
+	if (window.EMMElementsDrawn) {
+		return;
+	}
       window.EMMElementsDrawn=true;
       createExtraFunctions(); //creates extra functions, they only have to be made once.
-      //create containerDiv
+      //create containerDiv 
       d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
-      var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element.
+      var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element. //TODO van Robert: conainerDiv en divID splitsen
       document.getElementById(targetDivId).appendChild( containerDiv);
 
       initGlobalVariables(CONTAINERDIV); 
-		  
+	  
+
       var sliderDiv='sliderDiv';
       d3.select('#' + targetDivId).append("div")
 	      .attr("id", sliderDiv)
@@ -918,10 +934,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
       }).css("float","right");
 
-      var leftBracket=jQuery('<span/>', {
-	html:"["/*,
-	class:"mw-collapsible-bracket"*/
-      });
+    var leftBracket=jQuery('<span/>', {
+		html:"["/*,
+		class:"mw-collapsible-bracket"*/
+     });
 
       var rightBracket=jQuery('<span/>', {
 	html:"]"/*,
@@ -943,7 +959,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
 	  var timeout=0;
 	  if (!valuesHaveBeenShown){
-	    drawTotalModel();
+	    drawTotalModel(currentPageNameFromMw);
 	    timeout=1000;
 	  }
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-collapse' ).text(),"Collapse"));
@@ -958,7 +974,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   }//drawHTMLElements
 
   function isBlank(str) {
-      return (!str || /^\s*$/.test(str));
+      return (!str || /^\s*$/.test(str)); //TODO van Robert: wat doet test
   }
   function checkIfEmpty(text,alternative){
     if (isBlank(text)||(text.length==0)||text.charAt(0)=="<") return alternative; else return text;
@@ -967,7 +983,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   function drawModel(currentPageName){
   //draw model
       var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width;
+      var containerWIDTH = VisualisationJsModule.width; //TODO van Robert, deze variabelen worden ook al gedeclareerd in initglobalVariables, 2x.
       VisualisationJsModule.camera.position.y = containerHEIGHT/2;
       VisualisationJsModule.camera.position.x = containerWIDTH/2;			
       VisualisationJsModule.camera.position.z =  Math.pow((containerHEIGHT*containerHEIGHT + containerWIDTH*containerWIDTH), 1/4);			
@@ -1027,18 +1043,23 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  };
   }
   
-  function test(){
-    console.log("test");
-  }
+
+	function setDivIdFromWiki(string1, string2){
+		console.log("het doorgegeven ID is =");
+		console.log(string1);
+		console.log(string2);
+	}
+	
   return  {
-    //these properties can be asked by: Visualisation.propertyname
-    drawHTMLElements : drawHTMLElements,
-    test:test,
-    drawModel:drawTotalModel
+		//these properties can be asked by: Visualisation.propertyname
+		drawHTMLElements : drawHTMLElements,
+		setDivIdFromWiki : setDivIdFromWiki,
+		drawModel : drawTotalModel
   }
 });
 
-var visualisationInstance= new Visualisation();
+var visualisationInstance = new Visualisation();
+//var window.visualisationInstance= new Visualisation(); // . is unidentified token?
 
 //start program if html-elements are initialised
 $(document).ready(function() {
