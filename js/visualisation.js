@@ -765,7 +765,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  
   function initialiseDrawingSequence(concept, depth, newdepth){
     thisconcept=concept;//save in class-variable so it can be used outside function
-		  
+		  console.log(encodeURI(concept.replace(/_/g, " ")));
 	  if ( typeof concept === 'undefined' || concept === '') {
 		  throw "Concept is undefined";
 	  }		
