@@ -16,7 +16,7 @@ class QueryBuilder {
 			  ?s ?p ?o
 			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept }  || EXISTS{ ?s a  uri:Categorie-3ASocKrt_Concept} )
 			}
-			limit 500
+			limit 1500
 		';
 
 	//parameters passed by calling javascript
