@@ -216,15 +216,18 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
   //create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
   function createCallbackFunctionForSphere(sphere){
+    try {
     sphere.callback = function(conceptNameString){
       if (sphere.distance>0){
 	window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
       }
     }		
+    }catch( e ){console.log("error createcallbackfunction"+e)}
   }
 		  
   //functions for arrows			
   function setArrowSourceTarget(arrow) {
+    try{
     var relationDepth=arrow.distance;
     //copy position of sphere connected to source to position of arrow
     var originPosition=arrow.source.sphere.position;
@@ -236,6 +239,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     //Calculate new terminus vectors and set length (initial size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
     arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (10 - (relationDepth*0.8)), (5-(relationDepth*0.8)));
     arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
+    }catch( e ){console.log("error setarrowsourcetarget"+e)}
   }
   //end of functions for arrows -----======-----
   
@@ -298,6 +302,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   //end of functions for mouseEvents -----======-----
   
   function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
+    try{
     var grootte= Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/2)*0.9 ;
     //var grootte= VisualisationJsModule.height ; // zo was het eerst
 
@@ -356,6 +361,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  grootte=Math.floor(grootte/1.5); 
 	  }
     }
+  }catch( e ){console.log("error setcoordinatesspheres"+e)}
   }//setCoordinatesSpheres
   
 	  
@@ -363,6 +369,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   //will create nodes(spheres), labels and arrows and positions them.
   //will omit all nodes with distance < baseLevel
   function visualize(baseLevel,nodes, nodelinks) {
+    try{
 	  setCoordinatesSpheres(baseLevel,nodes,nodelinks);
 	  var three_links = [];
 	  var spheres = [];
@@ -427,6 +434,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 		  VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 		  VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+  }catch( e ){console.log("error visualize"+e)}
   }//visualize
 		  
 		  
@@ -547,6 +555,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   */
   //function for setting the data and creating the new arrow
   function setArrowData(arrowColor, currentNodeLink){
+    try{
 	  var origin = new THREE.Vector3(50, 100, 50);
 	  var terminus = new THREE.Vector3(75, 75, 75);
 	  var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
@@ -576,6 +585,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
 	  VisualisationJsModule.scene.add(arrow);	
 	  return arrow;
+  }catch( e ){console.log("error setarrowdata"+e)}
   }//setArrowData
   
   //adds lightsources to the scene, for aesthetic purposes
@@ -607,14 +617,17 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  };			
   }	
   function changeDepth(depth){
+    try{
     //make objects visible yes/no depending on depth
     var links=VisualisationJsModule.threeDObjects
     links.forEach(function(link){
       link.visible=link.distance<=depth;
     });
+  }catch( e ){console.log("error changedepth"+e)}
   }
   
   function getNodeAndNodelinksFromMemory(jsonResult,baseLevel) {
+    try{
       //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
       //gets nodes and nodelinks from memory
       var nodes=VisualisationJsModule.nodes;
@@ -652,10 +665,12 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       });
       //three return values
       return {nodes:nodes,nodelinks:nodelinks,baseLevel:baseLevel};
+  }catch( e ){console.log("error getnodesandlinksfrommemory"+e)}
   }//getNodeAndNodelinksFromMemory
 
 	//gets called after the ajax call
   var drawNewObjectsWithAjaxData = function (result) {
+    try{
     //end loading icon
     $("body").toggleClass("wait");
 
@@ -691,6 +706,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     nodelinks.forEach(function(link) {
       {
 	//check if link-desccription already replaced with corresponding object
+	try{
 	if (typeof link.source == "string"){
 	  //replace link-desccription with corresponding object
 	    link.source = nodes[link.source] ;
@@ -698,7 +714,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    link.target = nodes[link.target];
 	    //distance is smallest from target and source
 	    if (link.distance<link.target.distance) link.distance=link.target.distance;
-	}
+	};
+	}catch( e ){console.log("error replace source and target of links")}
       }
     });
 
@@ -727,6 +744,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     function render() {
 
     }
+  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
   };//drawNewObjectsWithAjaxData
 
 		  
