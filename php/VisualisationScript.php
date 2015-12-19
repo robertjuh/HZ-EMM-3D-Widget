@@ -28,7 +28,7 @@ $query = $querybuilder -> generateQuery($_POST["relations"]);
 //replace url-encoded chars. Problem: % has been replaced with -
 //this is a workaround. Possible problems occur with a %-sign.
 //see list on http://www.w3schools.com/tags/ref_urlencode.asp
-$convertlist=array("-C3-AF"=>"ï", "-27"=>"'", "-2D"=>"-","-3A"=>":","-C3-AB"=>"ë","%C3%B6","ö");
+$convertlist=array("-C3-AF"=>"ï", "-27"=>"'", "-2D"=>"-","-3A"=>":","-C3-AB"=>"ë","-C3-B6","ö");
 $result=file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query));
 foreach ($convertlist as $key => $val)
   {
