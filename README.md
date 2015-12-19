@@ -20,6 +20,8 @@ You have to include the script d3.v3.js with the script-tag because it is used i
 <script type="text/javascript">
 $(document).ready(function() {
 mw.loader.using( ['ext.EM3DNavigator']).done( function () {
+      var visualisationInstance= new Visualisation();
+      visualisationInstance.drawHTMLElements("<!--{$baseDiv|default:'bodyContent'}-->","<!--{$currentPageName|default:'Pagename niet doorgekregen'}-->");
 }
 );//mw.loader
 

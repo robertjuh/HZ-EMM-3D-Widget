@@ -900,7 +900,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   }//drawHTMLElements
 
   function isBlank(str) {
-      return (!str || /^\s*$/.test(str)); //TODO van Robert: wat doet test
+      return (!str || /^\s*$/.test(str)); //TODO van Robert: wat doet test, anton: de test van de regular expression; dat levert de uitkomst
   }
   function checkIfEmpty(text,alternative){
     if (isBlank(text)||(text.length==0)||text.charAt(0)=="<") return alternative; else return text;
@@ -909,7 +909,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   function drawModel(currentPageName){
   //draw model
       var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width; //TODO van Robert, deze variabelen worden ook al gedeclareerd in initglobalVariables, 2x.
+      var containerWIDTH = VisualisationJsModule.width; 
+      //TODO van Robert, deze variabelen worden ook al gedeclareerd in initglobalVariables, 2x.
+      //anton: meest logisch is om WIDTH en HEIGHT als constanten te bewaren binnen de klasse zelf.
+      //ze worden 3 keer gebruikt, en 1 x geinitialiseerd. Dat kun je allemaal binnen visualisation doen. Spaart aanmaken van lokale variabelen.
       VisualisationJsModule.camera.position.y = containerHEIGHT/2;
       VisualisationJsModule.camera.position.x = containerWIDTH/2;			
       VisualisationJsModule.camera.position.z =  Math.pow((containerHEIGHT*containerHEIGHT + containerWIDTH*containerWIDTH), 1/4);			
