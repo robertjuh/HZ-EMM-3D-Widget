@@ -728,7 +728,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
 		  
   function initialiseDrawingSequence(concept, depth, newdepth){
-    thisconcept=concept;
+    thisconcept=concept;//save in class-variable so it can be used outside function
 		  
 	  if ( typeof concept === 'undefined' || concept === '') {
 		  throw "Concept is undefined";
@@ -809,7 +809,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	}
 	//initVariables();
 	initGlobalVariables(CONTAINERDIV);
-	drawModel(currentPageName);
+	drawModel(currentPageName);//TODO merge drawmodel into this function, and call it drawModel
   }
 
   var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){
