@@ -965,4 +965,3 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 var visualisationInstance = new Visualisation();//TODO not used, can be omitted. Find out if an instance can be created that can be used in global space
 //var window.visualisationInstance= new Visualisation(); // . is unidentified token?
 
-
