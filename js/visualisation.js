@@ -819,8 +819,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       }
       window.EMMElementsDrawn=true;
       
-      createExtraFunctions(); //creates extra functions, they only have to be made once.
-
       //create containerDiv and other elements
       jQuery('<div/>', {
 	id: CONTAINERDIV,
@@ -899,13 +897,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       });
   }//drawHTMLElements
 
-  function isBlank(str) {
-      return (!str || /^\s*$/.test(str)); //TODO van Robert: wat doet test, anton: de test van de regular expression; dat levert de uitkomst
-  }
-  function checkIfEmpty(text,alternative){
-    if (isBlank(text)||(text.length==0)||text.charAt(0)=="<") return alternative; else return text;
-  }
-
   function drawModel(currentPageName){
   //draw model
       var containerHEIGHT = VisualisationJsModule.height;
@@ -924,125 +915,15 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
   }
 
-  //get style based on definition in CSS
-  var getStyle = function(CLASSname) {
-    var styleSheets = window.document.styleSheets;
-    var styleSheetsLength = styleSheets.length;
-    for(var i = 0; i < styleSheetsLength; i++){
-	    if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
-	    else { 
-		    try {  if(!styleSheets[i].cssRules) {continue;} } 
-		    //Note that SecurityError exception is specific to Firefox.
-		    catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
-		    var classes = styleSheets[i].cssRules ;
-	    }
-	    for (var x = 0; x < classes.length; x++) {
-		    if (classes[x].selectorText == CLASSname) {
-			    return classes[x];
-			    /*var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-			    if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
-			    return ret;*/
-		    }
-	    }
-    }
-    return null;			
-  }
-  /*
-    * get attribute in style, if not available return defaultValue
-    */ 
-  var getStyleAttr = function(CLASSname,attr,defaultValue) {
-    try {
-      var text=getStyle(CLASSname).cssText;
-      //if (CLASSname=='#sliderDiv')console.log(text);
-      //parse css, get text inbetween brackets
-      var p=text.indexOf("{");
-      text=text.substring(p+1);
-      var p=text.indexOf("}");
-      text=text.substring(0,p-1);
-      //split into parts
-      var listattr = text.split(";");//list with all attributes
-      var found=false;
-      var value=null;
-      for (var i = 0; i < listattr.length; i++) {
-	  var attrn = listattr[i].split(":");//becomes key-value pair
-	  var key=attrn[0].trim();
-	  if (key==attr) {found=true;value=attrn[1].trim();}
-	  //Do something
-      }
-      if (found) return value;else return defaultValue;
-    }
-    catch (e) {
-      return defaultValue;
-    }
-
-  }
-  
-  /*
-    * get attribute in style as in integer, if not available return defaultValue (must be int)
-    */ 
-  var getStyleAttrInt = function(CLASSname,attr,defaultValue) {
-    try {
-      return parseInt(getStyleAttr(CLASSname,attr,""+defaultValue));
-    }
-    catch (e) {
-      return defaultValue;
-    }
-    
-  }
-	  
-  //creates additional functions	
-  function createExtraFunctions(){
-		  d3.selection.prototype.moveToFront = function() {//not used
-			  return this.each(function() {
-				  this.parentNode.appendChild(this);
-			  });
-		  };
-
-		  d3.selection.prototype.first = function() {//not used
-			  return d3.select(this[0][0]);
-		  };	
-		  
-		  String.prototype.lowerCaseFirstLetter = function() {//not used
-			  return this.charAt(0).toLowerCase() + this.slice(1);
-		  };
-
-		  String.prototype.getLastPartOfUrl= function() {
-			  return this.split("/").pop();
-		  };		
-		  
-		  String.prototype.getFirstPartOfUrl= function() {
-			  var strArray = this.split("/");
-			  strArray.splice(-1, 1); //remove last part of str
-			  var joinedString = strArray.join("/")+"/";
-			  return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
-		  };
-		  String.prototype.isEmpty = function() {//not used
-		      return (this.length === 0 || !this.trim());
-		  };
-		  
-		  //Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.
-		  String.prototype.compareStrings = function (string2, ignoreCase, useLocale) {
-			  var string1 = this;
-			  if (ignoreCase) {
-				  if (useLocale) {
-					  string1 = string1.toLocaleLowerCase();
-					  string2 = string2.toLocaleLowerCase();
-				  }
-				  else {
-					  string1 = string1.toLowerCase();
-					  string2 = string2.toLowerCase();
-				  }
-			  }
-			  return string1 === string2;
-		  };
-  }
-  
 
 	function setDivIdFromWiki(string1, string2){
 		console.log("het doorgegeven ID is =");
 		console.log(string1);
 		console.log(string2);
 	}
+
+  
+
 	
   return  {
 		//these properties can be asked by: Visualisation.propertyname
