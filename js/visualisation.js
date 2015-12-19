@@ -503,6 +503,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
   }//createLabelWithSprite
 	  
+	  //TODO check if used, otherwise can be omitted
   function roundRect(ctx, x, y, w, h, r){
 		  ctx.beginPath();
 		  ctx.moveTo(x+r, y);
