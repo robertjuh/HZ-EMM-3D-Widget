@@ -401,8 +401,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				    var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
 				    sphere.name = nodes[key].name;
 				    sphere.node = nodes[key];
-				    nodes[key].sphere=sphere;
 				    sphere.urlName = nodes[key].url.getLastPartOfUrl();
+				    nodes[key].sphere=sphere;
 				    VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
 				    spheres[key] = sphere;	
 				    VisualisationJsModule.sphereArray.push(sphere);
