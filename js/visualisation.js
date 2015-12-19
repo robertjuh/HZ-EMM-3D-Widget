@@ -764,10 +764,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
 		  
   function initialiseDrawingSequence(concept, depth, newdepth){
-    thisconcept=concept;//save in class-variable so it can be used outside function
-    concept=concept.replace(/&#39;/g, "'")
-		  console.log(concept);
-		  console.log(encodeURI(concept.replace(/_/g, " ")));
+	  thisconcept=concept;//save in class-variable so it can be used outside function
+	  concept=concept.replace(/&#39;/g, "'");//hack-workaround. It appears ' is coded as &#39; in mediawiki........
 	  if ( typeof concept === 'undefined' || concept === '') {
 		  throw "Concept is undefined";
 	  }		
@@ -792,7 +790,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 		  async : true,
 		  data : {
-			  concept : encodeURI(concept.replace(/_/g, " ")),
+			  concept : concept.replace(/_/g, " "),
 			  depth : depth.toString(),
 			  relations : relations,
 			  uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
