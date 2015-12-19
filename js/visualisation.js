@@ -19,23 +19,19 @@ var VisualisationJsModule;//global
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
+// Set camera attributes
+var VIEW_ANGLE = 20, //field of view
+    NEAR = 10,
+    FAR = 10000;
 
-var VisualisationJsModulePrototype = (function (containerDivId) {
+var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIGHT) {
+  //called when drawing starts.
+  //TODO integrate these variables with class visualisation
 
-	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-	var DEPTH=visualisationInstance.getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
-	var WIDTH=visualisationInstance.getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
-	var HEIGHT=visualisationInstance.getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
-	// Set camera attributes and create camera
-	var VIEW_ANGLE = 20, //field of view
-	    ASPECT = WIDTH / HEIGHT, 
-		//ASPECT  = $VisualisationJsModule.container[0].clientWidth / $VisualisationJsModule.container[0].clientHeight,
-	    NEAR = 10,
-	    FAR = 10000;
+	// create camera
+	var ASPECT = WIDTH / HEIGHT;
 	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
 	var container = document.getElementById( containerDivId );
-	//var container = document.getElementById("containerdiv");
-	console.log(container);
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
@@ -44,8 +40,6 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 	
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
-		height : HEIGHT,
-		width : WIDTH,
 		depth : DEPTH,
 		newDepth : newDepth,
 		scene : scene,
@@ -57,11 +51,6 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,
 		
-		getContainerSize: function () {
-			var size = [WIDTH,HEIGHT]
-			return size;			
-		},
-
 		//can ask CSS propertys in code as: VisualisationJsModule.getStyle(".className").style.color;
 		
 		init3DObjects: function(){
@@ -77,13 +66,7 @@ var VisualisationJsModulePrototype = (function (containerDivId) {
 });
  
  
- //VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
-//visualisation module.
-
-console.log("VisualisationJsModulePrototype");
-console.log(VisualisationJsModule);
-
-
+//main class Visualisation
 window.Visualisation = (function () {//CSS constants
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
@@ -95,6 +78,15 @@ var CSScontainerAttributes_height=400;
   var CSScontainerAttributes_fontweight="normal";
   var CSSarrow_related_color="red";
   var CSSarrow_broader_color="black";
+	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
+  var DEPTH=CSSmaxDepth_order;
+  var WIDTH=CSScontainerAttributes_width;
+  var HEIGHT=CSScontainerAttributes_height;
+	var VIEW_ANGLE = 20, //field of view
+	    ASPECT = WIDTH / HEIGHT, 
+	    NEAR = 10,
+	    FAR = 10000;
+	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
   var renderer;//global
   var	mouse;//global
   var	raycaster;//global
@@ -107,18 +99,38 @@ var CSScontainerAttributes_height=400;
   * @author NJK @author robertjuh
   * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
   * 
-  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
+  * VisualisationJsModule contains some global variables that are relevant to the THREEjs drawing sequence.
   */
-//  var startVisualisation = (function(currentPageName){
-//    //anton: not used right now.
-//    //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
-//		  //mouselocation variables 
-//		  initVariables();
-//  });
+
+  function initGlobalVariables(CONTAINERDIV){
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      	DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+	WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+	HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
+
+      //initalise global module to store global variables
+      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,DEPTH,WIDTH,HEIGHT);
+
+      //set width and height of divs. Can only be done here because css is not read earlier
+      $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
+      $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(WIDTH-$("#"+SLIDERDIVID).width())+"px")
+	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
+
+      
+      // Create Renderer
+      renderer = new THREE.WebGLRenderer({
+	      alpha : true,
+	      antialiasing : true
+      });
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setSize(WIDTH, HEIGHT);
+      var containerDiv=document.getElementById( CONTAINERDIV ); //TODO van Robert, gets the containerdiv... again...
+      $("#"+CONTAINERDIV).empty();
+      containerDiv.appendChild(renderer.domElement);
+  }//initGlobalVariables
   
-  function initVariables(){
-    //THREE can only be used if library is read using Resource loader
-  }
 		  
   //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
   function filterFirstSpheregeometryWithRay(event, mouse){			
@@ -250,9 +262,9 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
 	  var min=-100;
 	  var max=50;
-	  var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
-	      yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
-	      zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);
+	  var xScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]),
+	      yScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]),
+	      zScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
 		  
 	  
 	  //first see what the new position of base-node will be, because that is positioned on 0,0,0
@@ -303,8 +315,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   
   function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
     try{
-    var grootte= Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/2)*0.9 ;
-    //var grootte= VisualisationJsModule.height ; // zo was het eerst
+    var grootte= Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/2)*0.9 ;
 
     //- bepaal het maximum niveau van alle nodes
     var root=null;
@@ -792,49 +803,21 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    }).done(drawNewObjectsWithAjaxData);
   }//initialiseDrawingSequence
 				    
-  /**
-  *Initialise the components that are relevant to the canvas/renderer
-  */	
-//  function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
-//    //TODO anton:function not used anymore. can be removed.
-//	  drawHTMLElements(TARGETDIVID);
-//	  drawModel(currentPageName);  
-//  }//initialiseTHREEComponents
 
-  function initGlobalVariables(CONTAINERDIV){
-      raycaster = new THREE.Raycaster();
-      mouse = new THREE.Vector2();
-      //initalise global module to store global variables
-      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
-
-      var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width; //TODO width and height are set two lines above. Should be used here
-      //set width and height of divs. Can only be done here because css is not read earlier
-      $("#"+EMMCONTAINERDIV).css("height",""+containerHEIGHT+ "px").css("width",""+containerWIDTH+ "px");
-      $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(containerWIDTH-$("#"+SLIDERDIVID).width())+"px")
-	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
-
-      
-      // Create Renderer
-      renderer = new THREE.WebGLRenderer({
-	      alpha : true,
-	      antialiasing : true
-      });
-
-      renderer.setClearColor(0x000000, 0);
-      renderer.setSize(containerWIDTH, containerHEIGHT);
-      var containerDiv=document.getElementById( CONTAINERDIV ); //TODO van Robert, gets the containerdiv... again...
-      $("#"+CONTAINERDIV).empty();
-      containerDiv.appendChild(renderer.domElement);
-  }//initGlobalVariables
-  
-  function drawTotalModel(currentPageName){
-        if (typeof currentPageName == 'undefined'){
-	  currentPageName=mw.config.get( 'wgPageName' );
-	}
-	//initVariables();
-	initGlobalVariables(CONTAINERDIV);
-	drawModel(currentPageName);//TODO merge drawmodel into this function, and call it drawModel
+  function drawModel(currentPageName){
+      if (typeof currentPageName == 'undefined'){
+	currentPageName=mw.config.get( 'wgPageName' );
+      }
+      initGlobalVariables(CONTAINERDIV);
+      VisualisationJsModule.camera.position.y = HEIGHT/2;
+      VisualisationJsModule.camera.position.x = WIDTH/2;			
+      VisualisationJsModule.camera.position.z =  Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/4);			
+      VisualisationJsModule.scene.add(VisualisationJsModule.camera);
+		      
+      createLightingForScene();
+      if (typeof window.sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
+      window.sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
+      initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
   }
 
   var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){
@@ -908,7 +891,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
 	  var timeout=0;
 	  if (!valuesHaveBeenShown){
-	    drawTotalModel(currentPageNameFromMw);
+	    drawModel(currentPageNameFromMw);
 	    timeout=1000;
 	  }
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-collapse' ).text(),"Collapse"));
@@ -921,24 +904,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	}
       });
   }//drawHTMLElements
-
-  function drawModel(currentPageName){
-  //draw model
-      var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width; 
-      //TODO van Robert, deze variabelen worden ook al gedeclareerd in initglobalVariables, 2x.
-      //anton: meest logisch is om WIDTH en HEIGHT als constanten te bewaren binnen de klasse zelf.
-      //ze worden 3 keer gebruikt, en 1 x geinitialiseerd. Dat kun je allemaal binnen visualisation doen. Spaart aanmaken van lokale variabelen.
-      VisualisationJsModule.camera.position.y = containerHEIGHT/2;
-      VisualisationJsModule.camera.position.x = containerWIDTH/2;			
-      VisualisationJsModule.camera.position.z =  Math.pow((containerHEIGHT*containerHEIGHT + containerWIDTH*containerWIDTH), 1/4);			
-      VisualisationJsModule.scene.add(VisualisationJsModule.camera);
-		      
-      createLightingForScene();
-      if (typeof window.sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
-      window.sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
-      initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
-  }
 
 
 	function setDivIdFromWiki(string1, string2){
@@ -954,7 +919,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		//these properties can be asked by: Visualisation.propertyname
 		drawHTMLElements : drawHTMLElements,
 		setDivIdFromWiki : setDivIdFromWiki,
-		drawModel : drawTotalModel,
+		drawModel : drawModel,
 		getStyle: getStyle,
 		//getStyleAttr:getStyleAttr,
 		getStyleAttrInt:getStyleAttrInt
