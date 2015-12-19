@@ -310,9 +310,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     var root=null;
     var max=0;
     for (var key in nodes) {
+      try{
       if(nodes[key].distance>max)max=nodes[key].distance;
     //- zoek op node met niveau 0 (er is er maar 1!)
       if(nodes[key].distance==0)root=key;
+      }catch( e ){console.log("error for (var key in nodes) 1"+e)}
     }
     //range is van -200 tot 100
     //zet root in het midden
@@ -325,6 +327,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       //volgend niveau staat iedere keer minder dan de helft verder weg
       if (currentniveau>=baseLevel)
 	for (var key in nodes) 
+	  try{
 	  if (nodes[key].distance==currentniveau){
 	      //genereer een random vector v van lengte = grootte
 	      //possible negative values give better dispersion
@@ -357,6 +360,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		nodes[key].z=Math.floor(nodes[key].z+opponent.z);
 	      } else console.log(nodes[key],"toch niet gevonden!");
 	  }
+      }catch( e ){console.log("error for (var key in nodes) 2"+e)}
       if (currentniveau<3){//otherwise spheres get too close
 		  grootte=Math.floor(grootte/1.5); 
 	  }
