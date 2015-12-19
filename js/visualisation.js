@@ -110,7 +110,7 @@ var CSScontainerAttributes_height=400;
 	HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 
       //initalise global module to store global variables
-      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,DEPTH,WIDTH,HEIGHT);
+      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,DEPTH,WIDTH,HEIGHT);//best start with depth=1 in css, otherwise nodes in level 1 may be omitted
 
       //set width and height of divs. Can only be done here because css is not read earlier
       $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
@@ -126,9 +126,9 @@ var CSScontainerAttributes_height=400;
 
       renderer.setClearColor(0x000000, 0);
       renderer.setSize(WIDTH, HEIGHT);
-      var containerDiv=document.getElementById( CONTAINERDIV ); //TODO van Robert, gets the containerdiv... again...
       $("#"+CONTAINERDIV).empty();
-      containerDiv.appendChild(renderer.domElement);
+      //add renderer to container
+      VisualisationJsModule.container.appendChild(renderer.domElement);
   }//initGlobalVariables
   
 		  
