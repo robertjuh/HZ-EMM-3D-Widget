@@ -397,22 +397,24 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				  }
 
 				  //create the sphere
-				  var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
-				  sphere.name = nodes[key].name;
-				  sphere.node = nodes[key];
-				  nodes[key].sphere=sphere;
-				  sphere.urlName = nodes[key].url.getLastPartOfUrl();
-				  VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
-				  spheres[key] = sphere;	
-				  VisualisationJsModule.sphereArray.push(sphere);
+				  try {
+				    var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
+				    sphere.name = nodes[key].name;
+				    sphere.node = nodes[key];
+				    nodes[key].sphere=sphere;
+				    sphere.urlName = nodes[key].url.getLastPartOfUrl();
+				    VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
+				    spheres[key] = sphere;	
+				    VisualisationJsModule.sphereArray.push(sphere);
 
-				  // add the sphere to the scene
-				  VisualisationJsModule.scene.add(sphere);
+				    // add the sphere to the scene
+				    VisualisationJsModule.scene.add(sphere);
 
-				  nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
-				  
-				  
-				  createCallbackFunctionForSphere(sphere); 
+				    nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
+				    
+				    
+				    createCallbackFunctionForSphere(sphere); 
+				  } catch(e){console.log("error creating node for"+nodes[key]);}
 			  }
 		  }
 		  //save spheres to memory, so they can be recalled
