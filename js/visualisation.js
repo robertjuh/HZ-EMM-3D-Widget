@@ -45,12 +45,9 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 		camera : camera,
 		controls : controls,
 		container : container,
-		//sphereArray : sphereArray,
-		//three arrays to contain the visible objects of the model. Distance of all objects is set.
+		//array to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,
-		
-		//can ask CSS propertys in code as: VisualisationJsModule.getStyle(".className").style.color;
 		
 		init3DObjects: function(){
 		  threeDObjects=[];
