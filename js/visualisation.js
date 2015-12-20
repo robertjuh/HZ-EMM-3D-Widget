@@ -35,7 +35,6 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
 	var threeDObjects=[];
-	var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
 	var newDepth;
 	
 	return  {
@@ -46,7 +45,7 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 		camera : camera,
 		controls : controls,
 		container : container,
-		sphereArray : sphereArray,
+		//sphereArray : sphereArray,
 		//three arrays to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
 		threeDObjects: threeDObjects,
@@ -90,7 +89,9 @@ var CSScontainerAttributes_height=400;
   var renderer;//global
   var	mouse;//global
   var	raycaster;//global
-  var labels;//global
+  var labels=[];//global
+  var spheres = [];//global
+  var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
   var sliderObject;
   var valuesHaveBeenShown=false;
   var thisconcept;
@@ -137,7 +138,7 @@ var CSScontainerAttributes_height=400;
 		  normalizeCurrentMouseCoordinates(event, mouse);						
 		  raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
 
-		  var intersects = raycaster.intersectObjects( VisualisationJsModule.sphereArray ); 
+		  var intersects = raycaster.intersectObjects( sphereArray ); 
 
 		  if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
 			  checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
@@ -258,7 +259,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   
   // Initializes calculations and spaces nodes according to a forced layout
   // takes variables from the startvisualisation method
-  function initialiseConstraints(nodes, spheres, three_links) {
+  function initialiseConstraints(nodes, three_links) {
 
 	  var min=-100;
 	  var max=50;
@@ -313,7 +314,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   }
   //end of functions for mouseEvents -----======-----
   
-  function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
+  function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {//TODO change name to setCoordinatesNodes
     try{
     var grootte= Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/2)*0.9 ;
 
@@ -387,11 +388,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     try{
 	  setCoordinatesSpheres(baseLevel,nodes,nodelinks);
 	  var three_links = [];
-	  var spheres = [];
 	  if (baseLevel>0){
 	    //three_links and spheres have already been created
 	    //so get them from memory
-	    spheres = VisualisationJsModule.spheres;
+	    //spheres = VisualisationJsModule.spheres;
 	    three_links = VisualisationJsModule.three_links;
 	  }
 		  // Create spheres based on nodes.
@@ -427,7 +427,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				    nodes[key].sphere=sphere;
 				    VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
 				    spheres[key] = sphere;	
-				    VisualisationJsModule.sphereArray.push(sphere);
+				    sphereArray.push(sphere);
 
 				    // add the sphere to the scene
 				    VisualisationJsModule.scene.add(sphere);
@@ -440,11 +440,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 			  }
 		  }
 		  //save spheres to memory, so they can be recalled
-		  VisualisationJsModule.spheres=spheres;
+		  //VisualisationJsModule.spheres=spheres;
 	  
 		  
 		  createArrows(three_links, nodelinks);
-		  initialiseConstraints(nodes, spheres, three_links);
+		  initialiseConstraints(nodes, three_links);
 		  VisualisationJsModule.three_links=three_links;
 		  VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 		  VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -646,7 +646,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
       //gets nodes and nodelinks from memory
       var nodes=VisualisationJsModule.nodes;
-      var labels=VisualisationJsModule.labels;
+      //labels=VisualisationJsModule.labels;
       var nodelinks=VisualisationJsModule.nodelinks;
 
       //depth calculated to largest distance of old ones
@@ -705,7 +705,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  VisualisationJsModule.init3DObjects();
 		  
 	  //Contains arrows
-	  labels = []; //Contains label sprites			
+	  //labels = []; //Contains label sprites			
 	  
 	  var nodes = jsonResult.nodes;
 	  var nodelinks = jsonResult.relations;
@@ -740,7 +740,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
     console.log("initialized all");
     VisualisationJsModule.nodes=nodes;
-    VisualisationJsModule.labels=labels;
+    //VisualisationJsModule.labels=labels;
     VisualisationJsModule.nodelinks=nodelinks;
     
     // Animate the webGL objects for rendering
