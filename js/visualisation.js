@@ -14,7 +14,7 @@ var SLIDERDIVID='sliderDiv';
 var EMMCONTAINERDIV='EMMContainerDiv';	
 var VisualisationJsModule;//global
 
-
+//TODO checkout b800eb2 goes back to 1, this latest does not!
 //CSS constants (integers!)
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
