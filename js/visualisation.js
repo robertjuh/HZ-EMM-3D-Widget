@@ -28,22 +28,12 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
   //called when drawing starts.
   //TODO integrate these variables with class visualisation
 
-	// create camera
-	var ASPECT = WIDTH / HEIGHT;
-	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
-	//var container = document.getElementById( containerDivId );
-	var controls = new THREE.OrbitControls(camera, document.getElementById( containerDivId ));
-	var scene = new THREE.Scene;
 	var newDepth;
 	
 	return  {
 		//these properties can be asked by: VisualisationJsModule.propertyname
 		depth : DEPTH,
 		newDepth : newDepth,
-		scene : scene,
-		camera : camera,
-		controls : controls,
-	//	container : container,
 	};
 	
 });
@@ -81,6 +71,9 @@ var CSScontainerAttributes_height=400;
   var sliderObject;
   var valuesHaveBeenShown=false;
   var thisconcept;
+  var camera;
+  var controls;
+  var scene;
 	  
   /**
   * @author NJK @author robertjuh
@@ -97,7 +90,12 @@ var CSScontainerAttributes_height=400;
 	HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 
       //initalise global module to store global variables
+	var containervar=document.getElementById( CONTAINERDIV );
       VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,DEPTH,WIDTH,HEIGHT);//best start with depth=1 in css, otherwise nodes in level 1 may be omitted
+	var ASPECT = WIDTH / HEIGHT;
+	camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+	controls = new THREE.OrbitControls(camera, containervar);
+	scene = new THREE.Scene;
 
       //set width and height of divs. Can only be done here because css is not read earlier
       $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
@@ -115,14 +113,14 @@ var CSScontainerAttributes_height=400;
       renderer.setSize(WIDTH, HEIGHT);
       $("#"+CONTAINERDIV).empty();
       //add renderer to container
-      document.getElementById( CONTAINERDIV ).appendChild(renderer.domElement);
+      containervar.appendChild(renderer.domElement);
   }//initGlobalVariables
   
 		  
   //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
   function filterFirstSpheregeometryWithRay(event, mouse){			
 		  normalizeCurrentMouseCoordinates(event, mouse);						
-		  raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
+		  raycaster.setFromCamera( mouse, camera);
 
 		  var intersects = raycaster.intersectObjects( sphereArray ); 
 
@@ -134,9 +132,9 @@ var CSScontainerAttributes_height=400;
   function colorSelectedSphere(event, mouse){
 		  normalizeCurrentMouseCoordinates(event,mouse);
 		  
-		  raycaster.setFromCamera( mouse, VisualisationJsModule.camera );
+		  raycaster.setFromCamera( mouse, camera );
 		  
-		  var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 	
+		  var intersects = raycaster.intersectObjects( scene.children ); 	
 
 		  checkGeometryTypeAndSlice(intersects)	
 	  }	
@@ -275,7 +273,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  setArrowSourceTarget(three_links[j]);
 	  }
 
-	  renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
+	  renderer.render(scene, camera);
   }//initialiseConstraints
   
   
@@ -417,7 +415,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				    sphereArray.push(sphere);
 
 				    // add the sphere to the scene
-				    VisualisationJsModule.scene.add(sphere);
+				    scene.add(sphere);
 
 				    nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
 				    
@@ -507,7 +505,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
 	  labels[key] = sprite;
 	  sprite.position.set(10,10,0);
-	  VisualisationJsModule.scene.add( sprite );
+	  scene.add( sprite );
 	  add3DObject(sprite,distance);		
 	  //node.label=sprite;
 	  
@@ -586,7 +584,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  }
 	  
 	  
-	  VisualisationJsModule.scene.add(arrow);	
+	  scene.add(arrow);	
 	  return arrow;
   }catch( e ){console.log("error setarrowdata"+e)}
   }//setArrowData
@@ -596,26 +594,26 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  // Instantiate light sources
 	  var pointLight1 = new THREE.PointLight(0xFFFFFF);
 	  pointLight1.position.set(0,50,500);
-	  VisualisationJsModule.scene.add(pointLight1);
+	  scene.add(pointLight1);
 	  var pointLight2 = new THREE.PointLight(0xFFFFFF);
 	  pointLight2.position.set(0,500,-500);
-	  VisualisationJsModule.scene.add(pointLight2);
+	  scene.add(pointLight2);
 	  var pointLight3 = new THREE.PointLight(0xFFFFFF);
 	  pointLight3.position.set(500,500,0);
-	  VisualisationJsModule.scene.add(pointLight3);
+	  scene.add(pointLight3);
 	  var pointLight4 = new THREE.PointLight(0xFFFFFF);
 	  pointLight4.position.set(-500,50,0);
-	  VisualisationJsModule.scene.add(pointLight4);
+	  scene.add(pointLight4);
 	  var pointLight5 = new THREE.PointLight(0xFFFFFF);
 	  pointLight5.position.set(0,-100,0);
-	  VisualisationJsModule.scene.add(pointLight5);
+	  scene.add(pointLight5);
   }
 
   function clearCanvas(){
-		  for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) {						
+		  for( var i = scene.children.length - 1; i >= 0; i--) {						
 			  //does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
-			  if(VisualisationJsModule.scene.children[i].geometry != null | VisualisationJsModule.scene.children[i].type == "Object3D"){
-				  VisualisationJsModule.scene.remove(VisualisationJsModule.scene.children[i]);	
+			  if(scene.children[i].geometry != null | scene.children[i].type == "Object3D"){
+				  scene.remove(scene.children[i]);	
 			  }
 		  };			
   }	
@@ -722,7 +720,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       }
     });
 
-    VisualisationJsModule.camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
     visualize(baseLevel,nodes, nodelinks);
     animate();
     changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
@@ -734,11 +732,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     // Animate the webGL objects for rendering
     function animate() {
 	    requestAnimationFrame(animate);
-	    renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
-	    VisualisationJsModule.controls.update();
+	    renderer.render(scene, camera);
+	    controls.update();
 
 	    for (var label in labels) {
-		    labels[label].lookAt(VisualisationJsModule.camera.position); //makes the labels spin around to try to look at the camera
+		    labels[label].lookAt(camera.position); //makes the labels spin around to try to look at the camera
 	    }
 	    render();
     }
@@ -797,10 +795,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	currentPageName=mw.config.get( 'wgPageName' );
       }
       initGlobalVariables(CONTAINERDIV);
-      VisualisationJsModule.camera.position.y = HEIGHT/2;
-      VisualisationJsModule.camera.position.x = WIDTH/2;			
-      VisualisationJsModule.camera.position.z =  Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/4);			
-      VisualisationJsModule.scene.add(VisualisationJsModule.camera);
+      camera.position.y = HEIGHT/2;
+      camera.position.x = WIDTH/2;			
+      camera.position.z =  Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/4);			
+      scene.add(camera);
 		      
       createLightingForScene();
       if (typeof window.sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
