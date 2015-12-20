@@ -31,10 +31,9 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 	// create camera
 	var ASPECT = WIDTH / HEIGHT;
 	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
-	var container = document.getElementById( containerDivId );
-	var controls = new THREE.OrbitControls(camera, container);
+	//var container = document.getElementById( containerDivId );
+	var controls = new THREE.OrbitControls(camera, document.getElementById( containerDivId ));
 	var scene = new THREE.Scene;
-	//var threeDObjects=[];
 	var newDepth;
 	
 	return  {
@@ -44,19 +43,7 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 		scene : scene,
 		camera : camera,
 		controls : controls,
-		container : container,
-		//array to contain the visible objects of the model. Distance of all objects is set.
-		//used to make objects visible or not
-		/*threeDObjects: threeDObjects,
-		
-		init3DObjects: function(){
-		  threeDObjects=[];
-		},
-		//functions to set distance for visible yes/no
-		add3DObject(object,distance){
-		  object.distance=distance;
-		  this.threeDObjects.push(object);
-		}*/
+	//	container : container,
 	};
 	
 });
@@ -128,7 +115,7 @@ var CSScontainerAttributes_height=400;
       renderer.setSize(WIDTH, HEIGHT);
       $("#"+CONTAINERDIV).empty();
       //add renderer to container
-      VisualisationJsModule.container.appendChild(renderer.domElement);
+      document.getElementById( CONTAINERDIV ).appendChild(renderer.domElement);
   }//initGlobalVariables
   
 		  
@@ -446,9 +433,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  createArrows(three_links, nodelinks);
 		  initialiseConstraints(nodes, three_links);
 		  //VisualisationJsModule.three_links=three_links;
-		  VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
-		  VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-		  VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+		  var container = document.getElementById( CONTAINERDIV );
+		  container.addEventListener( 'mouseup', onDocumentMouseUp, false );
+		  container.addEventListener( 'touchstart', onDocumentTouchStart, false );
+		  container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
   }catch( e ){console.log("error visualize"+e)}
   }//visualize
 		  
