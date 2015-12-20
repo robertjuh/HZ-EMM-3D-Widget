@@ -92,6 +92,7 @@ var CSScontainerAttributes_height=400;
   var labels=[];//global
   var spheres = [];//global
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
+  var three_links = [];
   var sliderObject;
   var valuesHaveBeenShown=false;
   var thisconcept;
@@ -387,12 +388,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   function visualize(baseLevel,nodes, nodelinks) {
     try{
 	  setCoordinatesSpheres(baseLevel,nodes,nodelinks);
-	  var three_links = [];
-	  if (baseLevel>0){
+	  if (baseLevel>0){//TODO: can be removed?
 	    //three_links and spheres have already been created
 	    //so get them from memory
 	    //spheres = VisualisationJsModule.spheres;
-	    three_links = VisualisationJsModule.three_links;
+	    //three_links = VisualisationJsModule.three_links;
 	  }
 		  // Create spheres based on nodes.
 		  for (var key in nodes) {
@@ -445,7 +445,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  
 		  createArrows(three_links, nodelinks);
 		  initialiseConstraints(nodes, three_links);
-		  VisualisationJsModule.three_links=three_links;
+		  //VisualisationJsModule.three_links=three_links;
 		  VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 		  VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 		  VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
