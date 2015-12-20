@@ -92,7 +92,7 @@ var CSScontainerAttributes_height=400;
   var labels=[];//global
   var spheres = [];//global
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
-  var three_links = [];
+  var three_links = [];//global
   var sliderObject;
   var valuesHaveBeenShown=false;
   var thisconcept;
@@ -260,7 +260,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   
   // Initializes calculations and spaces nodes according to a forced layout
   // takes variables from the startvisualisation method
-  function initialiseConstraints(nodes, three_links) {
+  //scales the nodes according to their initial postions, and sets the position of the arrows
+  function initialiseConstraints(nodes, three_links) {//TODO name can become scaleNodesAndArrows
 
 	  var min=-100;
 	  var max=50;
@@ -395,6 +396,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    //three_links = VisualisationJsModule.three_links;
 	  }
 		  // Create spheres based on nodes.
+		  //TODO move to separate function, variable: nodes
 		  for (var key in nodes) {
 			  if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
 				  var val = nodes[key];
