@@ -34,7 +34,7 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 	var container = document.getElementById( containerDivId );
 	var controls = new THREE.OrbitControls(camera, container);
 	var scene = new THREE.Scene;
-	var threeDObjects=[];
+	//var threeDObjects=[];
 	var newDepth;
 	
 	return  {
@@ -47,7 +47,7 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 		container : container,
 		//array to contain the visible objects of the model. Distance of all objects is set.
 		//used to make objects visible or not
-		threeDObjects: threeDObjects,
+		/*threeDObjects: threeDObjects,
 		
 		init3DObjects: function(){
 		  threeDObjects=[];
@@ -56,7 +56,7 @@ var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIG
 		add3DObject(object,distance){
 		  object.distance=distance;
 		  this.threeDObjects.push(object);
-		}
+		}*/
 	};
 	
 });
@@ -90,6 +90,7 @@ var CSScontainerAttributes_height=400;
   var spheres = [];//global
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
   var three_links = [];//global
+  var threeDObjects=[];
   var sliderObject;
   var valuesHaveBeenShown=false;
   var thisconcept;
@@ -424,7 +425,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 				    sphere.node = nodes[key];
 				    sphere.urlName = nodes[key].url.getLastPartOfUrl();
 				    nodes[key].sphere=sphere;
-				    VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
+				    add3DObject(sphere,nodes[key].distance);
 				    spheres[key] = sphere;	
 				    sphereArray.push(sphere);
 
@@ -519,7 +520,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  labels[key] = sprite;
 	  sprite.position.set(10,10,0);
 	  VisualisationJsModule.scene.add( sprite );
-	  VisualisationJsModule.add3DObject(sprite,distance);		
+	  add3DObject(sprite,distance);		
 	  //node.label=sprite;
 	  
 	  
@@ -583,7 +584,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  arrow.target=currentNodeLink.target;
 	  arrow.distance=currentNodeLink.distance;
 	  currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
-	  VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
+	  add3DObject(arrow,currentNodeLink.distance);
 	  
 
 		  
@@ -633,7 +634,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   function changeDepth(depth){
     try{
     //make objects visible yes/no depending on depth
-    var links=VisualisationJsModule.threeDObjects
+    var links=threeDObjects;
     links.forEach(function(link){
       link.visible=link.distance<=depth;
     });
@@ -692,7 +693,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       result='{"relations":[],"nodes":{"'+thisconcept+'":{"name":"'+thisconcept+
       '","distance":0,"url":"http:\/\/195.93.238.56\/wiki\/hzportfolio\/wiki\/index.php\/KNKR_Oncologen"}}}';
 
-    VisualisationJsModule.init3DObjects();
+    init3DObjects();
 
     var baseLevel=0;
 
@@ -701,7 +702,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     if (typeof VisualisationJsModule.nodes == 'undefined'){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
-	  VisualisationJsModule.init3DObjects();
+	  init3DObjects();
 		  
 	  //Contains arrows
 	  //labels = []; //Contains label sprites			
@@ -911,6 +912,14 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		console.log(string2);
 	}
 
+		function init3DObjects(){
+		  threeDObjects=[];
+		};
+		//functions to set distance for visible yes/no
+		function add3DObject(object,distance){
+		  object.distance=distance;
+		  threeDObjects.push(object);
+		};
   
 
 	
