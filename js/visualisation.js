@@ -14,7 +14,6 @@ var SLIDERDIVID='sliderDiv';
 var EMMCONTAINERDIV='EMMContainerDiv';	
 var VisualisationJsModule;//global
 
-//TODO checkout b800eb2 goes back to 1, this latest does not!
 //CSS constants (integers!)
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
@@ -618,13 +617,13 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  };			
   }	
   function changeDepth(depth){
-    try{
     //make objects visible yes/no depending on depth
     var links=threeDObjects;
+    try{
     links.forEach(function(link){
-      link.visible=link.distance<=depth;
+	link.visible=link.distance<=depth;
     });
-  }catch( e ){console.log("error changedepth"+e)}
+    }catch( e ){console.log("error changedepth"+e)}
   }
   
   function getNodeAndNodelinksFromMemory(jsonResult,baseLevel) {
@@ -679,7 +678,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       result='{"relations":[],"nodes":{"'+thisconcept+'":{"name":"'+thisconcept+
       '","distance":0,"url":"http:\/\/195.93.238.56\/wiki\/hzportfolio\/wiki\/index.php\/KNKR_Oncologen"}}}';
 
-    init3DObjects();
+    //init3DObjects();
 
     var baseLevel=0;
 
@@ -688,7 +687,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     if (typeof VisualisationJsModule.nodes == 'undefined'){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
-	  init3DObjects();
+	  //init3DObjects();
 		  
 	  //Contains arrows
 	  //labels = []; //Contains label sprites			
