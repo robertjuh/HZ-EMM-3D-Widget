@@ -1,7 +1,4 @@
 /**
- * VisualisationJsModule.js
-* Module of visualisation.js where most THREE.JS related tools are declared, the size of the canvas and
-* all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
 //Global constant
@@ -12,7 +9,6 @@ var SHOWBUTTONDIV='showbutton';
 var BODYCONTENTDIV='bodyContent';
 var SLIDERDIVID='sliderDiv';
 var EMMCONTAINERDIV='EMMContainerDiv';	
-var VisualisationJsModule;//global
 
 //CSS constants (integers!)
 var CSSmaxDepth_order=4;
@@ -23,20 +19,6 @@ var VIEW_ANGLE = 20, //field of view
     NEAR = 10,
     FAR = 10000;
 
-var VisualisationJsModulePrototype = (function (containerDivId, DEPTH,WIDTH,HEIGHT) {
-  //called when drawing starts.
-  //TODO integrate these variables with class visualisation
-
-	var newDepth;
-	
-	return  {
-		//these properties can be asked by: VisualisationJsModule.propertyname
-		depth : DEPTH,
-		newDepth : newDepth,
-	};
-	
-});
- 
  
 //main class Visualisation
 window.Visualisation = (function () {//CSS constants
@@ -51,7 +33,7 @@ var CSScontainerAttributes_height=400;
   var CSSarrow_related_color="red";
   var CSSarrow_broader_color="black";
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-  var DEPTH=CSSmaxDepth_order;
+   var DEPTH=CSSmaxDepth_order;
   var WIDTH=CSScontainerAttributes_width;
   var HEIGHT=CSScontainerAttributes_height;
 	var VIEW_ANGLE = 20, //field of view
@@ -62,6 +44,8 @@ var CSScontainerAttributes_height=400;
   var renderer;//global
   var	mouse;//global
   var	raycaster;//global
+  var globalnodes;
+  var globalnodelinks;
   var labels=[];//global
   var spheres = [];//global
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
@@ -69,39 +53,36 @@ var CSScontainerAttributes_height=400;
   var threeDObjects=[];
   var sliderObject;
   var valuesHaveBeenShown=false;
-  var thisconcept;
+  var thisconcept;//TODO: is currentPageName, refactor thisconcept so it is renamed to currentPageName
   var camera;
   var controls;
   var scene;
+	var GLOBALDEPTH;//global
 	  
   /**
   * @author NJK @author robertjuh
   * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
-  * 
-  * VisualisationJsModule contains some global variables that are relevant to the THREEjs drawing sequence.
   */
 
   function initGlobalVariables(CONTAINERDIV){
+      //initalise global variables
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
-      	DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
-	WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
-	HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
+      DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+      WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+      HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 
-      //initalise global module to store global variables
-	var containervar=document.getElementById( CONTAINERDIV );
-      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV,DEPTH,WIDTH,HEIGHT);//best start with depth=1 in css, otherwise nodes in level 1 may be omitted
-	var ASPECT = WIDTH / HEIGHT;
-	camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
-	controls = new THREE.OrbitControls(camera, containervar);
-	scene = new THREE.Scene;
+      var containervar=document.getElementById( CONTAINERDIV );
+      var ASPECT = WIDTH / HEIGHT;
+      camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+      controls = new THREE.OrbitControls(camera, containervar);
+      scene = new THREE.Scene;
 
       //set width and height of divs. Can only be done here because css is not read earlier
       $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
       $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(WIDTH-$("#"+SLIDERDIVID).width())+"px")
 	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
 
-      
       // Create Renderer
       renderer = new THREE.WebGLRenderer({
 	      alpha : true,
@@ -374,8 +355,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  if (baseLevel>0){//TODO: can be removed?
 	    //three_links and spheres have already been created
 	    //so get them from memory
-	    //spheres = VisualisationJsModule.spheres;
-	    //three_links = VisualisationJsModule.three_links;
 	  }
 		  // Create spheres based on nodes.
 		  //TODO move to separate function, variable: nodes
@@ -424,43 +403,16 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 			  }
 		  }
 		  //save spheres to memory, so they can be recalled
-		  //VisualisationJsModule.spheres=spheres;
 	  
 		  
 		  createArrows(three_links, nodelinks);
 		  initialiseConstraints(nodes, three_links);
-		  //VisualisationJsModule.three_links=three_links;
 		  var container = document.getElementById( CONTAINERDIV );
 		  container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 		  container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 		  container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
   }catch( e ){console.log("error visualize"+e)}
   }//visualize
-		  
-		  
-  /*	function createLabel(key,distance){
-			  var canvas1 = document.createElement('canvas');
-			  var context1 = canvas1.getContext('2d');
-			  context1.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
-			  context1.fillStyle = VisualisationJsModule.getStyle(".nodeTextLabel").style.color;
-			  context1.fillText(key, 10, 30);
-			  var texture1 = new THREE.Texture(canvas1);
-			  texture1.needsUpdate = true;
-			  texture1.magFilter = THREE.NearestFilter;
-			  texture1.minFilter = THREE.LinearMipMapLinearFilter;
-			  texture1.minFilter = THREE.NearestFilter;
-			  var material1 = new THREE.MeshBasicMaterial({
-				  map : texture1,
-				  side : THREE.DoubleSide
-			  });
-			  material1.transparent = true;
-			  var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
-			  
-			  labels[key] = mesh1;
-			  VisualisationJsModule.scene.add(mesh1);	
-			  VisualisationJsModule.add3DObject(mesh1,distance);
-	  }*/
-		  
 		  
   //creates label and connect it to node	
   function createLabelWithSprite( key, text,distance ){
@@ -571,18 +523,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
 	  add3DObject(arrow,currentNodeLink.distance);
 	  
-
-		  
-	  //sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
-	  //This code become rudimentary if there are new types introduced
-		  if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){	
-		    //commented out by anton
-		    //color red was arbitrarily added to some arrows
-		    //TODO: see what next line does. If not necessary: omit it!
-			  //arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
-		  }
-	  
-	  
 	  scene.add(arrow);	
 	  return arrow;
   }catch( e ){console.log("error setarrowdata"+e)}
@@ -630,9 +570,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     try{
       //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
       //gets nodes and nodelinks from memory
-      var nodes=VisualisationJsModule.nodes;
-      //labels=VisualisationJsModule.labels;
-      var nodelinks=VisualisationJsModule.nodelinks;
+      var nodes=globalnodes;
+      var nodelinks=globalnodelinks;
 
       //depth calculated to largest distance of old ones
       for (var key in nodes) {
@@ -650,10 +589,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	nodeFound=true;
       }
       if(!nodeFound)
-	baseLevel=VisualisationJsModule.depth;
+	baseLevel=DEPTH;
 
       //add new nodelinks to old ones
-      var nodelinks=VisualisationJsModule.nodelinks;
+      var nodelinks=globalnodelinks;
       jsonResult.relations.forEach(function(link) {
 	var found=false;
 	nodelinks.forEach(function(linkold) {
@@ -684,7 +623,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
     var jsonResult = JSON.parse(result);
     console.log(jsonResult);
-    if (typeof VisualisationJsModule.nodes == 'undefined'){
+    if (typeof globalnodes == 'undefined'){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
 	  //init3DObjects();
@@ -722,11 +661,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     camera.updateProjectionMatrix();
     visualize(baseLevel,nodes, nodelinks);
     animate();
-    changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
+    changeDepth(GLOBALDEPTH);//initial position in depth-slider is 1
     console.log("initialized all");
-    VisualisationJsModule.nodes=nodes;
-    //VisualisationJsModule.labels=labels;
-    VisualisationJsModule.nodelinks=nodelinks;
+    globalnodes=nodes;
+    globalnodelinks=nodelinks;
     
     // Animate the webGL objects for rendering
     function animate() {
@@ -759,11 +697,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var mydepth =1 ;	
 	  if (typeof newdepth !== 'undefined'){
 	    mydepth = newdepth;
-	    VisualisationJsModule.depth=depth;
+	    DEPTH=depth;
 	  }
 	  else //TODO van Robert: waarom staat hier geen scoping?
 	    clearCanvas();//first time, clear canvas   
-	  VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
+	  GLOBALDEPTH=mydepth;//TODO is newdepth a good description? And it should become a class-variable
 	  var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 	  //display loading icon before ajax-call
 	  $("body").toggleClass("wait");	
@@ -801,8 +739,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		      
       createLightingForScene();
       if (typeof window.sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
-      window.sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
-      initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
+      window.sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,DEPTH); //creates the slider for the depth
+      initialiseDrawingSequence(currentPageName,DEPTH);
   }
 
   var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){

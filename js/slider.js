@@ -5,11 +5,11 @@
 * @author Robert Walhout
 */
 
-var createSlider = (function(higherFunction, lowerDepthFunction, concept,depth){
+var createSlider = (function(higherFunction, lowerDepthFunction, concept,depth,height){
 		//console.log(targetDivId);
   
 var MAXDEPTH=4;
-var divHeight=VisualisationJsModule.height;
+var divHeight=height;
 
 //TODO set width container in css
 var SLIDERDIV="sliderDiv";
