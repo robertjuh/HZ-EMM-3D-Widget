@@ -40,10 +40,15 @@ var CSScontainerAttributes_height=400;
 	    ASPECT = WIDTH / HEIGHT, 
 	    NEAR = 10,
 	    FAR = 10000;
-	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+  //variables for drawing
   var renderer;//global
   var	mouse;//global
   var	raycaster;//global
+  var camera;
+  var controls;
+  var scene;
+  //following vars contain data for nodes and model
   var nodes;
   var nodelinks;
   var labels=[];//global
@@ -51,12 +56,11 @@ var CSScontainerAttributes_height=400;
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
   var three_links = [];//global
   var threeDObjects=[];
+  
+  
   var sliderObject;
   var valuesHaveBeenShown=false;
   var thisconcept;//TODO: is currentPageName, refactor thisconcept so it is renamed to currentPageName
-  var camera;
-  var controls;
-  var scene;
 	var GLOBALDEPTH;//global
 	  
   /**
@@ -224,7 +228,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   // Initializes calculations and spaces nodes according to a forced layout
   // takes variables from the startvisualisation method
   //scales the nodes according to their initial postions, and sets the position of the arrows
-  function initialiseConstraints(nodes, three_links) {//TODO name can become scaleNodesAndArrows
+  function scaleNodesAndArrows(nodes, three_links) {
 
 	  var min=-100;
 	  var max=50;
@@ -254,7 +258,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  }
 
 	  renderer.render(scene, camera);
-  }//initialiseConstraints
+  }//scaleNodesAndArrows
   
   
   //MouseEvents start -----====-----		
@@ -279,7 +283,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   }
   //end of functions for mouseEvents -----======-----
   
-  function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {//TODO change name to setCoordinatesNodes
+  function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
     try{
     var grootte= Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/2)*0.9 ;
 
@@ -357,63 +361,75 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    //so get them from memory
 	  }
 		  // Create spheres based on nodes.
-		  //TODO move to separate function, variable: nodes
-		  for (var key in nodes) {
-			  if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
-				  var val = nodes[key];
-				  
-				  // set up the sphere vars
-				  var radius = 5 - (nodes[key].distance)*0.93, //nodes get smaller as their depth increases
-				      segments = 32,
-				      rings = 32;
+		  createSpheresBasedOnNodes(nodes,baseLevel);
 
-				  // create the sphere's material and color
-				  var sphereMaterial;
-				  try 
-				  { 
-					  sphereMaterial = new THREE.MeshPhongMaterial({
-						  color : getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
-					  });												
-				  }
-				  catch (e){//if level is too high, set default
-					  sphereMaterial = new THREE.MeshPhongMaterial({
-						  color : getStyleAttr(".sphere","color",CSSsphere_color)
-					  });
-				  }
-
-				  //create the sphere
-				  try {
-				    var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
-				    sphere.name = nodes[key].name;
-				    sphere.node = nodes[key];
-				    sphere.urlName = nodes[key].url.getLastPartOfUrl();
-				    nodes[key].sphere=sphere;
-				    add3DObject(sphere,nodes[key].distance);
-				    spheres[key] = sphere;	
-				    sphereArray.push(sphere);
-
-				    // add the sphere to the scene
-				    scene.add(sphere);
-
-				    nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
-				    
-				    
-				    createCallbackFunctionForSphere(sphere); 
-				  } catch(e){console.log("error creating node for"+nodes[key]);}
-			  }
-		  }
 		  //save spheres to memory, so they can be recalled
 	  
 		  
 		  createArrows(three_links, nodelinks);
-		  initialiseConstraints(nodes, three_links);
+		  scaleNodesAndArrows(nodes, three_links);
 		  var container = document.getElementById( CONTAINERDIV );
 		  container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 		  container.addEventListener( 'touchstart', onDocumentTouchStart, false );
 		  container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
   }catch( e ){console.log("error visualize"+e)}
   }//visualize
-		  
+
+  /*
+   * createSpheresBasedOnNodes
+   */
+  function createSpheresBasedOnNodes(nodes,baseLevel){
+    //TODO document this with description
+    try{
+    for (var key in nodes) {
+	    if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
+		    var val = nodes[key];
+		    
+		    // set up the sphere vars
+		    var radius = 5 - (nodes[key].distance)*0.93, //nodes get smaller as their depth increases
+			segments = 32,
+			rings = 32;
+
+		    // create the sphere's material and color
+		    var sphereMaterial;
+		    try 
+		    { 
+			    sphereMaterial = new THREE.MeshPhongMaterial({
+				    color : getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
+			    });												
+		    }
+		    catch (e){//if level is too high, set default
+			    sphereMaterial = new THREE.MeshPhongMaterial({
+				    color : getStyleAttr(".sphere","color",CSSsphere_color)
+			    });
+		    }
+
+		    //create the sphere
+		    try {
+		      var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
+		      sphere.name = nodes[key].name;
+		      sphere.node = nodes[key];
+		      sphere.urlName = nodes[key].url.getLastPartOfUrl();
+		      nodes[key].sphere=sphere;
+		      add3DObject(sphere,nodes[key].distance);
+		      spheres[key] = sphere;	
+		      sphereArray.push(sphere);
+
+		      // add the sphere to the scene
+		      scene.add(sphere);
+		      
+		      //modify node. uses array, so there's no need to return value from function
+
+		      nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
+		      
+		      
+		      createCallbackFunctionForSphere(sphere); 
+		    } catch(e){console.log("error creating node for"+nodes[key]);}
+	    }
+    }
+  }catch( e ){console.log("error createSpheresBasedOnNodes"+e)}
+  }
+  
   //creates label and connect it to node	
   function createLabelWithSprite( key, text,distance ){
 
@@ -428,7 +444,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
 	  var canvas = document.createElement('canvas');
 	  //TODO make width of sprite dependant on width of text
-	  //size is now hard-coded!?
+	  //TODO size is now hard-coded!?
 	  var size = 350;
 	  canvas.width = size;
 	  canvas.height = size;
@@ -823,7 +839,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  //slide down after one second; smooth animation
 	  setTimeout(function(){$( '#'+EMMCONTAINERDIV ).slideDown( "slow" );}, timeout);
 	} else {
-	  valuesHaveBeenShown=true;
+	  //valuesHaveBeenShown=true;
 	  $( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand"));
 	}
