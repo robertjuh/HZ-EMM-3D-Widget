@@ -44,8 +44,8 @@ var CSScontainerAttributes_height=400;
   var renderer;//global
   var	mouse;//global
   var	raycaster;//global
-  var globalnodes;
-  var globalnodelinks;
+  var nodes;
+  var nodelinks;
   var labels=[];//global
   var spheres = [];//global
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
@@ -570,8 +570,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     try{
       //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
       //gets nodes and nodelinks from memory
-      var nodes=globalnodes;
-      var nodelinks=globalnodelinks;
+      //var nodes=globalnodes;
+      //var nodelinks=globalnodelinks;
 
       //depth calculated to largest distance of old ones
       for (var key in nodes) {
@@ -592,7 +592,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	baseLevel=DEPTH;
 
       //add new nodelinks to old ones
-      var nodelinks=globalnodelinks;
+      //var nodelinks=globalnodelinks;
       jsonResult.relations.forEach(function(link) {
 	var found=false;
 	nodelinks.forEach(function(linkold) {
@@ -623,7 +623,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
     var jsonResult = JSON.parse(result);
     console.log(jsonResult);
-    if (typeof globalnodes == 'undefined'){
+    //TODO use 	  valuesHaveBeenShown=true; to indicate first iteration has been made. nodes and nodelinks must be global, and globalnodes can be removed.
+    if (!valuesHaveBeenShown){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
 	  //init3DObjects();
@@ -631,15 +632,16 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  //Contains arrows
 	  //labels = []; //Contains label sprites			
 	  
-	  var nodes = jsonResult.nodes;
-	  var nodelinks = jsonResult.relations;
+	  nodes = jsonResult.nodes;
+	  nodelinks = jsonResult.relations;
     } else {
       //read nodes from memory
       var ret=getNodeAndNodelinksFromMemory(jsonResult,baseLevel);
       //parse return value
-      var nodes=ret.nodes,nodelinks=ret.nodelinks;
+      nodes=ret.nodes,nodelinks=ret.nodelinks;
       baseLevel=ret.baseLevel;
     }
+    valuesHaveBeenShown=true;
 
     // replace the description of the source and target of the links with the actual nodes.
     nodelinks.forEach(function(link) {
@@ -663,8 +665,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     animate();
     changeDepth(GLOBALDEPTH);//initial position in depth-slider is 1
     console.log("initialized all");
-    globalnodes=nodes;
-    globalnodelinks=nodelinks;
+    //globalnodes=nodes;
+    //globalnodelinks=nodelinks;
     
     // Animate the webGL objects for rendering
     function animate() {
