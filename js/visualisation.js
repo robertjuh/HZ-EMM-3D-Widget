@@ -14,6 +14,8 @@ var EMMCONTAINERDIV='EMMContainerDiv';
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
+//size of labels of spheres
+var LABELSIZE = 400;
 // Set camera attributes
 var VIEW_ANGLE = 20, //field of view
     NEAR = 10,
@@ -24,14 +26,15 @@ var VIEW_ANGLE = 20, //field of view
 window.Visualisation = (function () {//CSS constants
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
-  var CSSarrow_related_color="red";
   var CSSsphere_color="rgb(191,172,136)";
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
+  var CSSarrow_related_color="red";
+  var CSSarrow_broader_color="black";
+  var CSSarrowColors={"Eigenschap:Skos:related":{css:".arrow.related",color:CSSarrow_related_color},
+		      "Eigenschap:Skosem:broader":{css:".arrow.broader",color:CSSarrow_broader_color}};
   var CSScontainerAttributes_fontsize="20px";
   var CSScontainerAttributes_fontfamily="Times";
   var CSScontainerAttributes_fontweight="normal";
-  var CSSarrow_related_color="red";
-  var CSSarrow_broader_color="black";
 	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
    var DEPTH=CSSmaxDepth_order;
   var WIDTH=CSScontainerAttributes_width;
@@ -49,22 +52,19 @@ var CSScontainerAttributes_height=400;
   var controls;
   var scene;
   //following vars contain data for nodes and model
-  var nodes;
-  var nodelinks;
-  var labels=[];//global
-  var spheres = [];//global
+  var nodes;//array of all nodex
+  var nodelinks;//array of all links
   var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
-  var three_links = [];//global
-  var threeDObjects=[];
+  var threeDObjects=[];//Array will be filled with all visible objects, all contain property distance
   
   
   var sliderObject;
   var valuesHaveBeenShown=false;
-  var thisconcept;//TODO: is currentPageName, refactor thisconcept so it is renamed to currentPageName
-	var GLOBALDEPTH;//global
+  var currentPageName;//current concept
+  var GLOBALDEPTH;//global
 	  
   /**
-  * @author NJK @author robertjuh
+  * @author NJK @author robertjuh @author Anton Bil
   * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
   */
 
@@ -98,6 +98,10 @@ var CSScontainerAttributes_height=400;
       $("#"+CONTAINERDIV).empty();
       //add renderer to container
       containervar.appendChild(renderer.domElement);
+      //add listeners
+      containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
+      containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
+      containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );			
   }//initGlobalVariables
   
 		  
@@ -228,7 +232,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   // Initializes calculations and spaces nodes according to a forced layout
   // takes variables from the startvisualisation method
   //scales the nodes according to their initial postions, and sets the position of the arrows
-  function scaleNodesAndArrows(nodes, three_links) {
+  function scaleNodesAndArrows(nodes) {
 
 	  var min=-100;
 	  var max=50;
@@ -246,15 +250,15 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  for (var key in nodes) {
 		  //scale to new location and do a translation to place nodes in the middle
 	  
-		  spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
-		  var p=spheres[key].position;
+		  nodes[key].sphere.position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
+		  var p=nodes[key].sphere.position;
 		  nodes[key].label.position.set(p.x, p.y+5 , p.z-5 );				
 	  }
 	  
-	  //three_links is copy of nodelinks, so they also contain source and target of relation, and distance.
+	  //set arrow for every nodelink
 	  
-	  for (var j = 0; j < three_links.length; j++) {			  
-		  setArrowSourceTarget(three_links[j]);
+	  for (var j = 0; j < nodelinks.length; j++) {		  
+		  setArrowSourceTarget(nodelinks[j].three_link);
 	  }
 
 	  renderer.render(scene, camera);
@@ -283,7 +287,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   }
   //end of functions for mouseEvents -----======-----
   
-  function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
+  /*
+   * setCoordinatesNodes
+   * sets base coordinates for all nodes
+   */
+  function setCoordinatesNodes(baseLevel,nodes,nodelinks) {
     try{
     var grootte= Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/2)*0.9 ;
 
@@ -352,34 +360,23 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
   // Visualize RDF data
   //will create nodes(spheres), labels and arrows and positions them.
-  //will omit all nodes with distance < baseLevel
-  function visualize(baseLevel,nodes, nodelinks) {
+  function createSpheresAndArrowsBasedOnNodesAndLinks(baseLevel,nodes, nodelinks) {
     try{
-	  setCoordinatesSpheres(baseLevel,nodes,nodelinks);
-	  if (baseLevel>0){//TODO: can be removed?
-	    //three_links and spheres have already been created
-	    //so get them from memory
-	  }
-		  // Create spheres based on nodes.
-		  createSpheresBasedOnNodes(nodes,baseLevel);
+	  setCoordinatesNodes(baseLevel,nodes,nodelinks);
+	  // Create spheres based on nodes.
+	  createSpheresBasedOnNodes(nodes,baseLevel);
 
-		  //save spheres to memory, so they can be recalled
-	  
-		  
-		  createArrows(three_links, nodelinks);
-		  scaleNodesAndArrows(nodes, three_links);
-		  var container = document.getElementById( CONTAINERDIV );
-		  container.addEventListener( 'mouseup', onDocumentMouseUp, false );
-		  container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-		  container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+	  //create arrows based on nodelinks
+	  createArrows(nodelinks);
+	  scaleNodesAndArrows(nodes);
   }catch( e ){console.log("error visualize"+e)}
   }//visualize
 
   /*
    * createSpheresBasedOnNodes
+   * create sphere for every node, and saves it within a node
    */
   function createSpheresBasedOnNodes(nodes,baseLevel){
-    //TODO document this with description
     try{
     for (var key in nodes) {
 	    if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
@@ -412,7 +409,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		      sphere.urlName = nodes[key].url.getLastPartOfUrl();
 		      nodes[key].sphere=sphere;
 		      add3DObject(sphere,nodes[key].distance);
-		      spheres[key] = sphere;	
+		      //spheres[key] = sphere;	
 		      sphereArray.push(sphere);
 
 		      // add the sphere to the scene
@@ -444,17 +441,15 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
 	  var canvas = document.createElement('canvas');
 	  //TODO make width of sprite dependant on width of text
-	  //TODO size is now hard-coded!?
-	  var size = 350;
-	  canvas.width = size;
-	  canvas.height = size;
+	  canvas.width = LABELSIZE;
+	  canvas.height = LABELSIZE;
 	  var context = canvas.getContext('2d');
 	  context.fillStyle = '#990000';
 	  context.textAlign = 'center';
 	  context.font = getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
 	    getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
 	    getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
-	  context.fillText(text, size / 2, size / 2);
+	  context.fillText(text, LABELSIZE / 2, LABELSIZE / 2);
 
 	  var amap = new THREE.Texture(canvas);
 	  amap.needsUpdate = true;
@@ -469,8 +464,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var sprite = new THREE.Sprite(mat);
 	  sprite.scale.set(50,50,1.2); //grootte van text
 	  sprite.textWidth=textWidth;
-	  
-	  labels[key] = sprite;
+	  nodes[key].label = sprite;
 	  sprite.position.set(10,10,0);
 	  scene.add( sprite );
 	  add3DObject(sprite,distance);		
@@ -481,44 +475,21 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
   }//createLabelWithSprite
 	  
-	  //TODO check if used, otherwise can be omitted
-  function roundRect(ctx, x, y, w, h, r){
-		  ctx.beginPath();
-		  ctx.moveTo(x+r, y);
-		  ctx.lineTo(x+w-r, y);
-		  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-		  ctx.lineTo(x+w, y+h-r);
-		  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-		  ctx.lineTo(x+r, y+h);
-		  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-		  ctx.lineTo(x, y+r);
-		  ctx.quadraticCurveTo(x, y, x+r, y);
-		  ctx.closePath();
-		  ctx.fill();
-		  ctx.stroke();   
-  }
-	  
   
-  function createArrows(three_links, nodelinks){	
+  function createArrows(nodelinks){	
 	  for (var i = 0; i < nodelinks.length; i++) {
-									  
-			  if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
-				  three_links.push(setArrowData(getStyleAttr(".arrow.related","color",CSSarrow_related_color), nodelinks[i]));					
-			  }
-			  else if(nodelinks[i].type.compareStrings("Eigenschap:Skosem:broader", true, true)){
-				  three_links.push(setArrowData(getStyleAttr(".arrow.broader","color",CSSarrow_broader_color), nodelinks[i]));			
-			  }
-			  else{
-				  console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
-				  return;
-			  };			
+	    try{
+			    var link=setArrowData(getStyleAttr(CSSarrowColors[nodelinks[i].type].css,"color",CSSarrowColors[nodelinks[i].type].color), nodelinks[i]);
+			    nodelinks[i].three_link=link;
+	    }catch(e){console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");}
+	    									  
 	  }			
   }
   
   
   /*
   * Function for adding an arrow to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
-  * Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the three_links data.
+  * Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the nodelinks.three_link data.
   *
   */
   //function for setting the data and creating the new arrow
@@ -628,10 +599,14 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     try{
     //end loading icon
     $("body").toggleClass("wait");
+    //TODO: wait icon is changed to a "finger"; change it to arrow.
 
-    if (result.length==0) 
-      result='{"relations":[],"nodes":{"'+thisconcept+'":{"name":"'+thisconcept+
+    if (result.length==0) {
+      //TODO change to new ip-address, and see if this can be done cleaner
+      result='{"relations":[],"nodes":{"'+currentPageName+'":{"name":"'+currentPageName+
       '","distance":0,"url":"http:\/\/195.93.238.56\/wiki\/hzportfolio\/wiki\/index.php\/KNKR_Oncologen"}}}';
+      console.log("no result; panic: what should be displayed? Just do something...");
+    }
 
     //init3DObjects();
 
@@ -639,14 +614,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
     var jsonResult = JSON.parse(result);
     console.log(jsonResult);
-    //TODO use 	  valuesHaveBeenShown=true; to indicate first iteration has been made. nodes and nodelinks must be global, and globalnodes can be removed.
+    //check if first time to draw
     if (!valuesHaveBeenShown){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
-	  //init3DObjects();
-		  
-	  //Contains arrows
-	  //labels = []; //Contains label sprites			
 	  
 	  nodes = jsonResult.nodes;
 	  nodelinks = jsonResult.relations;
@@ -657,12 +628,13 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       nodes=ret.nodes,nodelinks=ret.nodelinks;
       baseLevel=ret.baseLevel;
     }
+    //next time read from memory
     valuesHaveBeenShown=true;
 
     // replace the description of the source and target of the links with the actual nodes.
     nodelinks.forEach(function(link) {
       {
-	//check if link-desccription already replaced with corresponding object
+	//check if link-description already replaced with corresponding object
 	try{
 	if (typeof link.source == "string"){
 	  //replace link-desccription with corresponding object
@@ -677,35 +649,33 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     });
 
     camera.updateProjectionMatrix();
-    visualize(baseLevel,nodes, nodelinks);
-    animate();
+    createSpheresAndArrowsBasedOnNodesAndLinks(baseLevel,nodes, nodelinks);
+    //will omit all nodes with distance < baseLevel
     changeDepth(GLOBALDEPTH);//initial position in depth-slider is 1
     console.log("initialized all");
-    //globalnodes=nodes;
-    //globalnodelinks=nodelinks;
-    
+
+    animate();
     // Animate the webGL objects for rendering
     function animate() {
 	    requestAnimationFrame(animate);
 	    renderer.render(scene, camera);
 	    controls.update();
 
-	    for (var label in labels) {
-		    labels[label].lookAt(camera.position); //makes the labels spin around to try to look at the camera
+	    for (var key in nodes) {
+		    nodes[key].label.lookAt(camera.position); //makes the labels spin around to try to look at the camera
 	    }
-	    render();
     }
 
-    // Extension of default render function, runs continuously, add code here if needed
-    function render() {
-
-    }
   }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
   };//drawNewObjectsWithAjaxData
 
 		  
+  /*
+   * initialiseDrawingSequence
+   * can be called from init, and from slider.
+   * if called from slider, newDepth is defined, otherwise it is undefined
+   */
   function initialiseDrawingSequence(concept, depth, newdepth){
-	  thisconcept=concept;//save in class-variable so it can be used outside function
 	  concept=concept.replace(/&#39;/g, "'");//hack-workaround. It appears ' is coded as &#39; in mediawiki........
 	  if ( typeof concept === 'undefined' || concept === '') {
 		  throw "Concept is undefined";
@@ -719,7 +689,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  }
 	  else //TODO van Robert: waarom staat hier geen scoping?
 	    clearCanvas();//first time, clear canvas   
-	  GLOBALDEPTH=mydepth;//TODO is newdepth a good description? And it should become a class-variable
+	  GLOBALDEPTH=mydepth;
 	  var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 	  //display loading icon before ajax-call
 	  $("body").toggleClass("wait");	
@@ -745,10 +715,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   }//initialiseDrawingSequence
 				    
 
-  function drawModel(currentPageName){
-      if (typeof currentPageName == 'undefined'){
-	currentPageName=mw.config.get( 'wgPageName' );
+  function drawModel(initcurrentPageName){
+      if (typeof initcurrentPageName == 'undefined'){
+	initcurrentPageName=mw.config.get( 'wgPageName' );
       }
+      currentPageName=initcurrentPageName;//save in class-variable so it can be used outside function
       initGlobalVariables(CONTAINERDIV);
       camera.position.y = HEIGHT/2;
       camera.position.x = WIDTH/2;			
@@ -756,8 +727,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       scene.add(camera);
 		      
       createLightingForScene();
-      if (typeof window.sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
-      window.sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,DEPTH); //creates the slider for the depth
+      if (typeof sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
+	sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,DEPTH); //creates the slider for the depth
       initialiseDrawingSequence(currentPageName,DEPTH);
   }
 
