@@ -30,8 +30,8 @@ var CSScontainerAttributes_height=400;
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
   var CSSarrow_related_color="red";
   var CSSarrow_broader_color="black";
-  var CSSarrowColors={"Eigenschap:Skos:related":{css:".arrow.related",color:CSSarrow_related_color},
-		      "Eigenschap:Skosem:broader":{css:".arrow.broader",color:CSSarrow_broader_color}};
+  var CSSarrowColors={"Eigenschap:Skos:related":{css:".arrow.related",color:CSSarrow_related_color,arrow:false},
+		      "Eigenschap:Skosem:broader":{css:".arrow.broader",color:CSSarrow_broader_color,arrow:true}};
   var CSScontainerAttributes_fontsize="20px";
   var CSScontainerAttributes_fontfamily="Times";
   var CSScontainerAttributes_fontweight="normal";
@@ -499,7 +499,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var terminus = new THREE.Vector3(75, 75, 75);
 	  var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 	  var distance = origin.distanceTo(terminus);
-	  var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); 		
+	  if (CSSarrowColors[currentNodeLink.type].arrow)
+	  var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor);
+	  else{
+	  var arrow = new THREE.ArrowHelper2(direction, origin, distance, arrowColor,0,0);
+	  }
 	  arrow.userData = {
 				  target : currentNodeLink.target.name,
 				  source : currentNodeLink.source.name
