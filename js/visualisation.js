@@ -841,7 +841,6 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		setDivIdFromWiki : setDivIdFromWiki,
 		drawModel : drawModel,
 		getStyle: getStyle,
-		//getStyleAttr:getStyleAttr,
 		getStyleAttrInt:getStyleAttrInt
 
   }
