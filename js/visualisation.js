@@ -500,9 +500,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 	  var distance = origin.distanceTo(terminus);
 	  if (CSSarrowColors[currentNodeLink.type].arrow)
-	  var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor);
+	    var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor);
 	  else{
-	  var arrow = new THREE.ArrowHelper2(direction, origin, distance, arrowColor,0,0);
+	    //introduced a copy of THREE.ArrowHelper which draws lines without arrows
+	    var arrow = new THREE.ArrowHelper2(direction, origin, distance, arrowColor,0,0);
 	  }
 	  arrow.userData = {
 				  target : currentNodeLink.target.name,
