@@ -141,7 +141,6 @@ function checkGeometryTypeAndSlice(intersects, event){
 	switch(intersects[0].object.geometry.type){
 		case 'SphereGeometry':
 			intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
-			console.log("van hier");
 				intersects[0].object.callback(intersects[0].object.urlName,event);
 
 			//console.log("je heb geklikt op een geometry:");
