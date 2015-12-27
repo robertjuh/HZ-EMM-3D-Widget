@@ -113,7 +113,7 @@ var CSScontainerAttributes_height=400;
 		  var intersects = raycaster.intersectObjects( sphereArray ); 
 
 		  if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
-			  checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
+			  checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName,event));			
 		  }			
 	  }
 	  
@@ -124,12 +124,12 @@ var CSScontainerAttributes_height=400;
 		  
 		  var intersects = raycaster.intersectObjects( scene.children ); 	
 
-		  checkGeometryTypeAndSlice(intersects)	
+		  checkGeometryTypeAndSlice(intersects,event)	
 	  }	
 		  
 		  
 //TODO onderstaande functie volledig opschonen omdat er nu alleen nog spheres worden meegenomen in intersects (intersectable objects.
-function checkGeometryTypeAndSlice(intersects, urlname){
+function checkGeometryTypeAndSlice(intersects, event){
     var intersectLength = intersects.length;
     //If there is an intersection, and it is a sphere, apply click event.
     //Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
@@ -141,8 +141,8 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	switch(intersects[0].object.geometry.type){
 		case 'SphereGeometry':
 			intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
-			
-				intersects[0].object.callback(intersects[0].object.urlName);
+			console.log("van hier");
+				intersects[0].object.callback(intersects[0].object.urlName,event);
 
 			//console.log("je heb geklikt op een geometry:");
 			//console.log(intersects[0].object.geometry.type);
@@ -202,9 +202,12 @@ function checkGeometryTypeAndSlice(intersects, urlname){
   //create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
   function createCallbackFunctionForSphere(sphere){
     try {
-    sphere.callback = function(conceptNameString){
+    sphere.callback = function(conceptNameString,event){
       if (sphere.distance>0){
-	window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
+	if (event.button==0)//left mouse key
+	  window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
+	else (console.log("Other button pushed:"+event.button));
+	//TODO: conceptNameString van be omitted from function-call, can be exchanged with sphere.node.page;
       }
     }		
     }catch( e ){console.log("error createcallbackfunction"+e)}
@@ -276,6 +279,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 
   //colors the ball that is being clicked, serves no real purpose yet.
   function onDocumentMouseDown(event){
+    //event.button==0:lmouse, 2:rmouse
 	  event.preventDefault();
 	  colorSelectedSphere(event, mouse); //Mouse and camera are global variables.
   }
