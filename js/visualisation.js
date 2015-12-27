@@ -62,6 +62,9 @@ var CSScontainerAttributes_height=400;
   var valuesHaveBeenShown=false;
   var currentPageName;//current concept
   var GLOBALDEPTH;//global
+  //scaling of coordinates
+  var xScale,yScale,zScale;
+
 	  
   /**
   * @author NJK @author robertjuh @author Anton Bil
@@ -205,13 +208,66 @@ function checkGeometryTypeAndSlice(intersects, event){
       if (sphere.distance>0){
 	if (event.button==0)//left mouse key
 	  window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
-	else (console.log("Other button pushed:"+event.button));
-	//TODO: conceptNameString van be omitted from function-call, can be exchanged with sphere.node.page;
+	if (event.button==2) {moveIntersectedSphere(sphere);}
       }
+	//TODO: conceptNameString van be omitted from function-call, can be exchanged with sphere.node.page;
     }		
-    }catch( e ){console.log("error createcallbackfunction"+e)}
+    }catch( e ){console.log("error create callbackfunction"+e)}
   }
 		  
+		//This function is experimental and can move a selected sphere.
+		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
+		function moveIntersectedSphere(intersectedObject){
+		  	      var v3=randomVector(100);
+				intersectedObject.node.x=intersectedObject.node.x+v3.x;
+				intersectedObject.node.y=intersectedObject.node.y+v3.y;
+				intersectedObject.node.z=intersectedObject.node.z+v3.z;
+				var v=scale(intersectedObject.node);
+				var _x = v.x;
+				var _y = v.y;
+				var _z = v.z;
+							
+				//moves the sphere to _x, _y, _z
+				new TWEEN.Tween( intersectedObject.position).to( {
+						x: _x,
+						y: _y,
+						z: _z }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();		
+
+				//moves the label along
+				new TWEEN.Tween( intersectedObject.node.label.position).to( {
+						x: _x,
+						y: _y + 5,
+						z: _z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();	
+				intersectedObject.position.x=_x;
+				intersectedObject.position.y=_y;
+				intersectedObject.position.z=_z;
+				try{
+				intersectedObject.node.sourcelist.forEach(function(link) {
+				  var visible=link.visible;
+				  link.visible=false;
+				  setArrowSourceTarget(link.arrow);
+				  link.visible=visible;
+				});
+				}catch(e){}
+				try{
+				intersectedObject.node.targetlist.forEach(function(link) {
+				  var visible=link.visible;
+				  link.visible=false;
+				  setArrowSourceTarget(link.arrow);
+				  link.visible=visible;
+				});
+				}catch(e){}
+	      //animate the arrows, not implemented yet. find out a way to animate relations also.
+				/*new TWEEN.Tween( VisualisationJsModule.threeDObjects[1].position).to( {
+						x: _x,
+						y: _y,
+						z: _z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();	*/
+		};
+					
+		
   //functions for arrows			
   function setArrowSourceTarget(arrow) {
     try{
@@ -231,30 +287,36 @@ function checkGeometryTypeAndSlice(intersects, event){
   //end of functions for arrows -----======-----
   
   
+  /*
+   * setScaling
+   * done only once
+   */
+  function setScaling(){
+	  var min=-100;
+	  var max=50;
+	  xScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
+	      yScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
+	      zScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
+  }
+  
+  function scale(node){
+    //first see what the new position of base-node will be, because that is positioned on 0,0,0
+    return new THREE.Vector3(xScale(node.x)-xScale(0), yScale(node.y)-yScale(0) , zScale(node.z)-zScale(0));
+  }
   // Initializes calculations and spaces nodes according to a forced layout
   // takes variables from the startvisualisation method
   //scales the nodes according to their initial postions, and sets the position of the arrows
   function scaleNodesAndArrows(nodes) {
 
-	  var min=-100;
-	  var max=50;
-	  var xScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]),
-	      yScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]),
-	      zScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
-		  
+    //TODO set it to a place in intialisation, because it only has to be done once.
+	  setScaling();
 	  
-	  //first see what the new position of base-node will be, because that is positioned on 0,0,0
-	  //base for translation of nodes
-	  var xcomp=xScale(0),
-	      ycomp=yScale(0),
-	      zcomp=yScale(0);
 			  
 	  for (var key in nodes) {
 		  //scale to new location and do a translation to place nodes in the middle
-	  
-		  nodes[key].sphere.position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
-		  var p=nodes[key].sphere.position;
-		  nodes[key].label.position.set(p.x, p.y+5 , p.z-5 );				
+		  var v=scale(nodes[key]);
+		  nodes[key].sphere.position.set(v.x, v.y , v.z );
+		  nodes[key].label.position.set(v.x, v.y+5 , v.z-5 );				
 	  }
 	  
 	  //set arrow for every nodelink
@@ -290,6 +352,17 @@ function checkGeometryTypeAndSlice(intersects, event){
   }
   //end of functions for mouseEvents -----======-----
   
+	    function randomVector(grootte){
+	      var x = Math.floor((Math.random() * 100) + 1-50);
+	      var y = Math.floor((Math.random() * 100) + 1-50);
+	      var z = Math.floor((Math.random() * 100) + 1-50);
+	      var v1 = new THREE.Vector3(x, y, z);
+	      
+	      v1=v1.normalize ();//vector is now size 1
+	      
+	      
+	      return new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
+	    }
   /*
    * setCoordinatesNodes
    * sets base coordinates for all nodes
@@ -323,15 +396,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 	  if (nodes[key].distance==currentniveau){
 	      //genereer een random vector v van lengte = grootte
 	      //possible negative values give better dispersion
-	      var x = Math.floor((Math.random() * 100) + 1-50);
-	      var y = Math.floor((Math.random() * 100) + 1-50);
-	      var z = Math.floor((Math.random() * 100) + 1-50);
-	      var v1 = new THREE.Vector3(x, y, z);
-	      
-	      v1=v1.normalize ();//vector is now size 1
-	      
-	      
-	      var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
+	      var v3=randomVector(grootte);
 	      nodes[key].x=v3.x;
 	      nodes[key].y=v3.y;
 	      nodes[key].z=v3.z;
@@ -498,6 +563,7 @@ function checkGeometryTypeAndSlice(intersects, event){
   //function for setting the data and creating the new arrow
   function setArrowData(arrowColor, currentNodeLink){
     try{
+	  if (currentNodeLink.hasOwnProperty('arrow'))return;//do not draw more than one arrow for relation/link
 	  var origin = new THREE.Vector3(50, 100, 50);
 	  var terminus = new THREE.Vector3(75, 75, 75);
 	  var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
@@ -646,9 +712,24 @@ function checkGeometryTypeAndSlice(intersects, event){
 	try{
 	if (typeof link.source == "string"){
 	  //replace link-desccription with corresponding object
-	    link.source = nodes[link.source] ;
+	    var source=nodes[link.source];
+	    if (!(source.hasOwnProperty('sourcelist'))) {
+	      source.sourcelist=[];
+	    }
+				source.sourcelist.forEach(function(nlink) {
+				  if (nlink.source==source && nlink.target==nodes[link.target]&&nlink.type==link.type)
+				  {console.log("dubbele relatie");console.log(link);}
+				});
+	    
+	    link.source = source ;
+	    source.sourcelist.push(link);
 	    link.distance=link.source.distance;
-	    link.target = nodes[link.target];
+	    var target=nodes[link.target];
+	    link.target = target;
+	    if (!(target.hasOwnProperty('targetlist'))) {
+	      target.targetlist=[];
+	    }
+	    target.targetlist.push(link);
 	    //distance is smallest from target and source
 	    if (link.distance<link.target.distance) link.distance=link.target.distance;
 	};
@@ -668,6 +749,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 	    requestAnimationFrame(animate);
 	    renderer.render(scene, camera);
 	    controls.update();
+	    TWEEN.update();
 
 	    for (var key in nodes) {
 		    nodes[key].label.lookAt(camera.position); //makes the labels spin around to try to look at the camera
