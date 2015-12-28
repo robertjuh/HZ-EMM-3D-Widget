@@ -127,7 +127,7 @@ var CSScontainerAttributes_height=400;
 		  
 		  var intersects = raycaster.intersectObjects( scene.children ); 	
 
-		  checkGeometryTypeAndSlice(intersects,event)	
+		  return checkGeometryTypeAndSlice(intersects,event)	
 	  }	
 		  
 		  
@@ -148,7 +148,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 
 			//console.log("je heb geklikt op een geometry:");
 			//console.log(intersects[0].object.geometry.type);
-			return;
+			return true;
 			//break;
 		case 'PlaneGeometry':
 			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere								
@@ -163,6 +163,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 	}
       }
     }
+    return false;
   }
 	
 	
@@ -218,10 +219,19 @@ function checkGeometryTypeAndSlice(intersects, event){
 		//This function is experimental and can move a selected sphere.
 		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
 		function moveIntersectedSphere(intersectedObject){
+		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
+			      /*var choice = prompt("Please enter choice\n1.push up\n2.push down\n3.push left\n4.push right\n5.push forward\n6.push back\n", "1");
+    
+			      if (choice != null) {
+			      var ch=parseInt(choice);
+			      if (ch<0)ch=0;
+			      if(ch>6)ch=0;
+			      var choices=[[0,0,0],[0,100,0],[0,-100,0],[-100,0,0],[100,0,0],[0,0,100],[0,0,-100]];*/
+
 		  	      var v3=randomVector(100);
-				intersectedObject.node.x=intersectedObject.node.x+v3.x;
-				intersectedObject.node.y=intersectedObject.node.y+v3.y;
-				intersectedObject.node.z=intersectedObject.node.z+v3.z;
+				intersectedObject.node.x=intersectedObject.node.x+v3.x;//choices[ch][0];//
+				intersectedObject.node.y=intersectedObject.node.y+v3.y;//choices[ch][1];//
+				intersectedObject.node.z=intersectedObject.node.z+v3.z;//choices[ch][2];//
 				var v=scale(intersectedObject.node);
 				var _x = v.x;
 				var _y = v.y;
@@ -265,6 +275,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 						y: _y,
 						z: _z  }, 2000 )
 					.easing( TWEEN.Easing.Elastic.Out).start();	*/
+  //  }
 		};
 					
 		
