@@ -113,14 +113,11 @@ var CSScontainerAttributes_height=400;
 	
   var keyup=function(event) {
     pressedkey="";
-    console.log("key up");
-};
+  };
   var keydown=function(event) {
     var key = event.keyCode;
-    console.log(key);
     pressedkey=String.fromCharCode(key);
-    console.log(String.fromCharCode(key));
-};
+  };
   //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
   function filterFirstSpheregeometryWithRay(event, mouse){			
 		  normalizeCurrentMouseCoordinates(event, mouse);						
@@ -235,13 +232,11 @@ function checkGeometryTypeAndSlice(intersects, event){
 		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
 			      
 			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100]};
-			      var choice=[100,100,100];
-			      try{
-				console.log();
-				choice=choices[pressedkey];
-			      } catch(e){
-				choice=randomVector(100);
-			      }
+			      var choice=choices[pressedkey];
+				if ( typeof choice === 'undefined' ){
+				  var v3=randomVector(100);
+				  choice=[v3.x,v3.y,v3.z];
+				}
 
 				intersectedObject.node.x=intersectedObject.node.x+choice[0];//v3.x;//
 				intersectedObject.node.y=intersectedObject.node.y+choice[1];//v3.y;//
