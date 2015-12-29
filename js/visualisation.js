@@ -64,6 +64,7 @@ var CSScontainerAttributes_height=400;
   var GLOBALDEPTH;//global
   //scaling of coordinates
   var xScale,yScale,zScale;
+  var pressedkey="";
 
 	  
   /**
@@ -104,10 +105,22 @@ var CSScontainerAttributes_height=400;
       //add listeners
       containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
       containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
-      containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+      containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
+      window.addEventListener('keydown', keydown, false);
+      window.addEventListener('keyup', keyup, false);
   }//initGlobalVariables
   
-		  
+	
+  var keyup=function(event) {
+    pressedkey="";
+    console.log("key up");
+};
+  var keydown=function(event) {
+    var key = event.keyCode;
+    console.log(key);
+    pressedkey=String.fromCharCode(key);
+    console.log(String.fromCharCode(key));
+};
   //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
   function filterFirstSpheregeometryWithRay(event, mouse){			
 		  normalizeCurrentMouseCoordinates(event, mouse);						
@@ -220,18 +233,19 @@ function checkGeometryTypeAndSlice(intersects, event){
 		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
 		function moveIntersectedSphere(intersectedObject){
 		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
-			      /*var choice = prompt("Please enter choice\n1.push up\n2.push down\n3.push left\n4.push right\n5.push forward\n6.push back\n", "1");
-    
-			      if (choice != null) {
-			      var ch=parseInt(choice);
-			      if (ch<0)ch=0;
-			      if(ch>6)ch=0;
-			      var choices=[[0,0,0],[0,100,0],[0,-100,0],[-100,0,0],[100,0,0],[0,0,100],[0,0,-100]];*/
+			      
+			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100]};
+			      var choice=[100,100,100];
+			      try{
+				console.log();
+				choice=choices[pressedkey];
+			      } catch(e){
+				choice=randomVector(100);
+			      }
 
-		  	      var v3=randomVector(100);
-				intersectedObject.node.x=intersectedObject.node.x+v3.x;//choices[ch][0];//
-				intersectedObject.node.y=intersectedObject.node.y+v3.y;//choices[ch][1];//
-				intersectedObject.node.z=intersectedObject.node.z+v3.z;//choices[ch][2];//
+				intersectedObject.node.x=intersectedObject.node.x+choice[0];//v3.x;//
+				intersectedObject.node.y=intersectedObject.node.y+choice[1];//v3.y;//
+				intersectedObject.node.z=intersectedObject.node.z+choice[2];//v3.z;//
 				var v=scale(intersectedObject.node);
 				var _x = v.x;
 				var _y = v.y;
