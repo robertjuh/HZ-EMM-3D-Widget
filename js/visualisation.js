@@ -100,6 +100,9 @@ var CSScontainerAttributes_height=400;
 
       renderer.setClearColor(0x000000, 0);
       renderer.setSize(WIDTH, HEIGHT);
+      //set scaling, only has to be done once.
+      setScaling();
+
       $("#"+CONTAINERDIV).empty();
       //add renderer to container
       containervar.appendChild(renderer.domElement);
@@ -109,6 +112,7 @@ var CSScontainerAttributes_height=400;
       containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
       window.addEventListener('keydown', keydown, false);
       window.addEventListener('keyup', keyup, false);
+	  
   }//initGlobalVariables
   
 	
@@ -123,6 +127,7 @@ var CSScontainerAttributes_height=400;
   var keydown=function(event) {
     var key = event.keyCode;
     //TODO: up and down also move the screen up and down. see if key-events can be split up. Otherwise stick to xsedaf
+    //better: use shift-arrows. Already implemented.
     if (key==37) pressedkey="left";else
     if (key==38) pressedkey="up";else
     if (key==39) pressedkey="right";else
@@ -240,7 +245,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 	  if (event.button==0)//left mouse key
 	    window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
       }
-	//TODO: conceptNameString van be omitted from function-call, can be exchanged with sphere.node.page;
+	//TODO: conceptNameString can be omitted from function-call, can be exchanged with sphere.node.page;
     }		
     }catch( e ){console.log("error create callbackfunction"+e)}
   }
@@ -249,7 +254,13 @@ function checkGeometryTypeAndSlice(intersects, event){
 		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
 		function moveIntersectedSphere(intersectedObject){
 		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
+			      if (!(intersectedObject==selectedSphere))
+				try{
+				  selectedSphere.material.color=new THREE.Color(getSphereColor(selectedSphere.node.distance));
+				}catch(e){}
 			      selectedSphere=intersectedObject;
+			      //TODO color purple must become constant; preferred to set this color using css
+			      selectedSphere.material.color.setHex( 0xff00ff );
 			      //TODO move choices to top (they are constants), and give it another meaningful name.
 			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
 				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgup":[0,0,100],"pgdn":[0,0,-100]
@@ -259,7 +270,6 @@ function checkGeometryTypeAndSlice(intersects, event){
 				  //var v3=randomVector(100);
 				  //choice=[v3.x,v3.y,v3.z];
 				  choice=[0,0,0];//do nothing
-				  //TODO give a selected node a different color, so you can see it is selected
 				}
 
 				intersectedObject.node.x=intersectedObject.node.x+choice[0];//v3.x;//
@@ -352,9 +362,6 @@ function checkGeometryTypeAndSlice(intersects, event){
   //scales the nodes according to their initial postions, and sets the position of the arrows
   function scaleNodesAndArrows(nodes) {
 
-    //TODO set it to a place in intialisation, because it only has to be done once.
-	  setScaling();
-	  
 			  
 	  for (var key in nodes) {
 		  //scale to new location and do a translation to place nodes in the middle
@@ -484,6 +491,18 @@ function checkGeometryTypeAndSlice(intersects, event){
   }catch( e ){console.log("error visualize"+e)}
   }//visualize
 
+  function getSphereColor(distance){
+    var color = CSSsphere_color;
+    try{
+      color=getStyleAttr(".sphere.level"+distance,"color",CSSsphere_colors[distance])
+    }
+      catch (e){//if level is too high, set default
+	color = getStyleAttr(".sphere","color",CSSsphere_color)
+      }
+      return color;
+  }
+
+
   /*
    * createSpheresBasedOnNodes
    * create sphere for every node, and saves it within a node
@@ -500,18 +519,10 @@ function checkGeometryTypeAndSlice(intersects, event){
 			rings = 32;
 
 		    // create the sphere's material and color
-		    var sphereMaterial;
-		    try 
-		    { 
-			    sphereMaterial = new THREE.MeshPhongMaterial({
-				    color : getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
+		    var sphereColor=getSphereColor(nodes[key].distance);
+		    var sphereMaterial = new THREE.MeshPhongMaterial({
+				    color : sphereColor
 			    });												
-		    }
-		    catch (e){//if level is too high, set default
-			    sphereMaterial = new THREE.MeshPhongMaterial({
-				    color : getStyleAttr(".sphere","color",CSSsphere_color)
-			    });
-		    }
 
 		    //create the sphere
 		    try {
