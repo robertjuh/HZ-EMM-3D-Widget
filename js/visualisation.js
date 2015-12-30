@@ -118,6 +118,9 @@ var CSScontainerAttributes_height=400;
     var key = event.keyCode;
     pressedkey=String.fromCharCode(key);
   };
+  var keyIsPressed=function(){
+    if (pressedkey.length>0) return pressedkey; else return false;
+  }
   //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
   function filterFirstSpheregeometryWithRay(event, mouse){			
 		  normalizeCurrentMouseCoordinates(event, mouse);						
@@ -153,7 +156,8 @@ function checkGeometryTypeAndSlice(intersects, event){
     }else{				 
 	switch(intersects[0].object.geometry.type){
 		case 'SphereGeometry':
-			intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
+		  //anton: do not change color anymore
+			//intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
 				intersects[0].object.callback(intersects[0].object.urlName,event);
 
 			//console.log("je heb geklikt op een geometry:");
@@ -217,9 +221,10 @@ function checkGeometryTypeAndSlice(intersects, event){
     try {
     sphere.callback = function(conceptNameString,event){
       if (sphere.distance>0){
-	if (event.button==0)//left mouse key
-	  window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
-	if (event.button==2) {moveIntersectedSphere(sphere);}
+	if (event.button==2 ||(event.button==0 && keyIsPressed())) {moveIntersectedSphere(sphere);}
+	else
+	  if (event.button==0)//left mouse key
+	    window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
       }
 	//TODO: conceptNameString van be omitted from function-call, can be exchanged with sphere.node.page;
     }		
