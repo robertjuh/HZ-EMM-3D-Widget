@@ -65,6 +65,7 @@ var CSScontainerAttributes_height=400;
   //scaling of coordinates
   var xScale,yScale,zScale;
   var pressedkey="";
+  var selectedSphere;
 
 	  
   /**
@@ -114,6 +115,10 @@ var CSScontainerAttributes_height=400;
   var keyup=function(event) {
     pressedkey="";
   };
+  var getAllowedKey=function(key){
+    var char=String.fromCharCode(key);
+    if ("ASXEDF".indexOf(char)>=0){return char;console.log(char);} else return "";
+  }
   var keydown=function(event) {
     var key = event.keyCode;
     //TODO: up and down also move the screen up and down. see if key-events can be split up. Otherwise stick to xsedaf
@@ -123,7 +128,8 @@ var CSScontainerAttributes_height=400;
     if (key==40) pressedkey="down";else
     if (key==33) pressedkey="pgup";else
     if (key==34) pressedkey="pgdn";else
-    pressedkey=String.fromCharCode(key);
+    pressedkey=getAllowedKey(key);
+    if (event.shiftKey&&selectedSphere&&pressedkey.length>0)moveIntersectedSphere(selectedSphere)
   };
   var keyIsPressed=function(){
     if (pressedkey.length>0) return pressedkey; else return false;
@@ -242,14 +248,16 @@ function checkGeometryTypeAndSlice(intersects, event){
 		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
 		function moveIntersectedSphere(intersectedObject){
 		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
-			      
+			      selectedSphere=intersectedObject;
 			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
-				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgpup":[0,0,100],"pgdn":[0,0,-100]
+				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgup":[0,0,100],"pgdn":[0,0,-100]
 			      };
 			      var choice=choices[pressedkey];
 				if ( typeof choice === 'undefined' ){
-				  var v3=randomVector(100);
-				  choice=[v3.x,v3.y,v3.z];
+				  //var v3=randomVector(100);
+				  //choice=[v3.x,v3.y,v3.z];
+				  choice=[0,0,0];//do nothing
+				  //TODO give a selected node a different color, so you can see it is selected
 				}
 
 				intersectedObject.node.x=intersectedObject.node.x+choice[0];//v3.x;//
