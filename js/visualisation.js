@@ -117,6 +117,7 @@ var CSScontainerAttributes_height=400;
   };
   var getAllowedKey=function(key){
     var char=String.fromCharCode(key);
+    //TODO allowedkeys in constant, combined with choices.
     if ("ASXEDF".indexOf(char)>=0){return char;console.log(char);} else return "";
   }
   var keydown=function(event) {
@@ -249,6 +250,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 		function moveIntersectedSphere(intersectedObject){
 		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
 			      selectedSphere=intersectedObject;
+			      //TODO move choices to top (they are constants), and give it another meaningful name.
 			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
 				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgup":[0,0,100],"pgdn":[0,0,-100]
 			      };
