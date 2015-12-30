@@ -116,6 +116,13 @@ var CSScontainerAttributes_height=400;
   };
   var keydown=function(event) {
     var key = event.keyCode;
+    //TODO: up and down also move the screen up and down. see if key-events can be split up. Otherwise stick to xsedaf
+    if (key==37) pressedkey="left";else
+    if (key==38) pressedkey="up";else
+    if (key==39) pressedkey="right";else
+    if (key==40) pressedkey="down";else
+    if (key==33) pressedkey="pgup";else
+    if (key==34) pressedkey="pgdn";else
     pressedkey=String.fromCharCode(key);
   };
   var keyIsPressed=function(){
@@ -236,7 +243,9 @@ function checkGeometryTypeAndSlice(intersects, event){
 		function moveIntersectedSphere(intersectedObject){
 		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
 			      
-			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100]};
+			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
+				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgpup":[0,0,100],"pgdn":[0,0,-100]
+			      };
 			      var choice=choices[pressedkey];
 				if ( typeof choice === 'undefined' ){
 				  var v3=randomVector(100);
