@@ -35,7 +35,7 @@ $wgExtensionCredits['semantic'][] = array(
 
 	// The version of the extension, which will appear on Special:Version.
 	// This can be a number or a string.
-	'version' => 0.9, 
+	'version' => 0.91, 
 
 	// Your name, which will appear on Special:Version.
 	'author' => 'Robert Walhout, Anton Bil',
