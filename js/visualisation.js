@@ -26,6 +26,8 @@ var VIEW_ANGLE = 20, //field of view
 window.Visualisation = (function () {//CSS constants
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
+  //TODO SELECTEDSPHERECOLOR: preferred to set this color using css
+  var SELECTEDSPHERECOLOR="rgb(128,0,128)";
   var CSSsphere_color="rgb(191,172,136)";
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
   var CSSarrow_related_color="red";
@@ -246,6 +248,9 @@ function checkGeometryTypeAndSlice(intersects, event){
 	    window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
       }
 	//TODO: conceptNameString can be omitted from function-call, can be exchanged with sphere.node.page;
+	//this is more complicated than it looks. sphere.node.page is the url from the original page.
+	//it is possible that the current url is not the same as the url from the triple store.
+	//this is the case for the test-site anyway.
     }		
     }catch( e ){console.log("error create callbackfunction"+e)}
   }
@@ -259,8 +264,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 				  selectedSphere.material.color=new THREE.Color(getSphereColor(selectedSphere.node.distance));
 				}catch(e){}
 			      selectedSphere=intersectedObject;
-			      //TODO color purple must become constant; preferred to set this color using css
-			      selectedSphere.material.color.setHex( 0xff00ff );
+			      selectedSphere.material.color=new THREE.Color(SELECTEDSPHERECOLOR);
 			      //TODO move choices to top (they are constants), and give it another meaningful name.
 			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
 				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgup":[0,0,100],"pgdn":[0,0,-100]
