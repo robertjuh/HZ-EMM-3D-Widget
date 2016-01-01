@@ -26,7 +26,6 @@ var VIEW_ANGLE = 20, //field of view
 window.Visualisation = (function () {//CSS constants
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
-  //TODO SELECTEDSPHERECOLOR: preferred to set this color using css
   var SELECTEDSPHERECOLOR="rgb(128,0,128)";
   var CSSsphere_color="rgb(191,172,136)";
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
@@ -94,6 +93,7 @@ var CSScontainerAttributes_height=400;
       $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(WIDTH-$("#"+SLIDERDIVID).width())+"px")
 	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
 
+      SELECTEDSPHERECOLOR=getStyleAttr(".sphere.selected","color",SELECTEDSPHERECOLOR);
       // Create Renderer
       renderer = new THREE.WebGLRenderer({
 	      alpha : true,
@@ -254,7 +254,48 @@ function checkGeometryTypeAndSlice(intersects, event){
     }		
     }catch( e ){console.log("error create callbackfunction"+e)}
   }
-		  
+	
+  function changePosition(node,move,first){
+	  node.x=node.x+move[0];//v3.x;//
+	  node.y=node.y+move[1];//v3.y;//
+	  node.z=node.z+move[2];//v3.z;//
+	  var newPosition=scale(node);
+	  var _x = newPosition.x;
+	  var _y = newPosition.y;
+	  var _z = newPosition.z;
+	  if (!first){//do not change position of first node, it must be animated....
+	    node.sphere.position.x=_x;
+	    node.sphere.position.y=_y;
+	    node.sphere.position.z=_z;
+	    node.label.position.x=_x;
+	    node.label.position.y=_y+5;
+	    node.label.position.z=_z;
+	  }
+				  
+	  //moves the sphere to _x, _y, _z
+	  try{
+	  node.sourcelist.forEach(function(link) {
+	    if (link.distance>node.distance){changePosition(link.target,move,false)}
+	    var visible=link.visible;
+	    link.visible=false;
+	    setArrowSourceTarget(link.arrow);
+	    link.visible=visible;
+	  });
+	  }catch(e){/*console.log(e.stack);*/}
+	  //TODO looks like a relation gets twice the length as a broader relation. 
+	  //Perhaps it is part of two lists? Check this out!
+	  try{
+	  node.targetlist.forEach(function(link) {
+	    if (link.distance>node.distance){changePosition(link.source,move,false)}
+	    var visible=link.visible;
+	    link.visible=false;
+	    setArrowSourceTarget(link.arrow);
+	    link.visible=visible;
+	  });
+	  }catch(e){/*console.log(e.stack);*/}
+	  return newPosition;
+  }
+
 		//This function is experimental and can move a selected sphere.
 		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
 		function moveIntersectedSphere(intersectedObject){
@@ -265,57 +306,34 @@ function checkGeometryTypeAndSlice(intersects, event){
 				}catch(e){}
 			      selectedSphere=intersectedObject;
 			      selectedSphere.material.color=new THREE.Color(SELECTEDSPHERECOLOR);
-			      //TODO move choices to top (they are constants), and give it another meaningful name.
-			      var choices={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
+			      //TODO move moveKeys to top (they are constants).
+			      var moveKeys={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
 				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgup":[0,0,100],"pgdn":[0,0,-100]
 			      };
-			      var choice=choices[pressedkey];
-				if ( typeof choice === 'undefined' ){
+			      var move=moveKeys[pressedkey];
+				if ( typeof move === 'undefined' ){
 				  //var v3=randomVector(100);
-				  //choice=[v3.x,v3.y,v3.z];
-				  choice=[0,0,0];//do nothing
+				  //move=[v3.x,v3.y,v3.z];
+				  move=[0,0,0];//do nothing
 				}
-
-				intersectedObject.node.x=intersectedObject.node.x+choice[0];//v3.x;//
-				intersectedObject.node.y=intersectedObject.node.y+choice[1];//v3.y;//
-				intersectedObject.node.z=intersectedObject.node.z+choice[2];//v3.z;//
-				var v=scale(intersectedObject.node);
-				var _x = v.x;
-				var _y = v.y;
-				var _z = v.z;
-							
-				//moves the sphere to _x, _y, _z
+				
+				var newPosition=changePosition(intersectedObject.node,move,true);
+				
+				//animate object;
 				new TWEEN.Tween( intersectedObject.position).to( {
-						x: _x,
-						y: _y,
-						z: _z }, 2000 )
+						x: newPosition.x,
+						y: newPosition.y,
+						z: newPosition.z }, 2000 )
 					.easing( TWEEN.Easing.Elastic.Out).start();		
 
 				//moves the label along
 				new TWEEN.Tween( intersectedObject.node.label.position).to( {
-						x: _x,
-						y: _y + 5,
-						z: _z  }, 2000 )
-					.easing( TWEEN.Easing.Elastic.Out).start();	
-				intersectedObject.position.x=_x;
-				intersectedObject.position.y=_y;
-				intersectedObject.position.z=_z;
-				try{
-				intersectedObject.node.sourcelist.forEach(function(link) {
-				  var visible=link.visible;
-				  link.visible=false;
-				  setArrowSourceTarget(link.arrow);
-				  link.visible=visible;
-				});
-				}catch(e){}
-				try{
-				intersectedObject.node.targetlist.forEach(function(link) {
-				  var visible=link.visible;
-				  link.visible=false;
-				  setArrowSourceTarget(link.arrow);
-				  link.visible=visible;
-				});
-				}catch(e){}
+						x: newPosition.x,
+						y: newPosition.y + 5,
+						z: newPosition.z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();
+				//update arrows to new position node
+				changePosition(intersectedObject.node,[0,0,0]);
 	      //animate the arrows, not implemented yet. find out a way to animate relations also.
 				/*new TWEEN.Tween( VisualisationJsModule.threeDObjects[1].position).to( {
 						x: _x,
@@ -565,9 +583,11 @@ function checkGeometryTypeAndSlice(intersects, event){
 	  var canvas = document.createElement('canvas');
 	  var context = canvas.getContext('2d');
 	  var textWidth = context.measureText( text ).width;
+	  //console.log(textWidth);
 	  
 	  var canvas = document.createElement('canvas');
 	  //TODO make width of sprite dependant on width of text
+	  //could it be it can be calculated using textWidth and fontsize?
 	  canvas.width = LABELSIZE;
 	  canvas.height = LABELSIZE;
 	  var context = canvas.getContext('2d');
