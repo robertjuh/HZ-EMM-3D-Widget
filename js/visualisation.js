@@ -157,10 +157,82 @@ var CSScontainerAttributes_height=400;
 			mouse.x = (  (e[0])  / renderer.domElement.width ) * 2 - 1;			
 			mouse.y = - (  (e[1]) / renderer.domElement.height ) * 2 + 1;			
 		}
+
+  function initGlobalVariables(CONTAINERDIV){
+      //initalise global variables
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+      WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+      HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
+	  var d3containervar = d3.select("#containerDiv"); 
+      var containervar=document.getElementById( CONTAINERDIV );
+      var ASPECT = WIDTH / HEIGHT;
+      camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+      controls = new THREE.OrbitControls(camera, containervar);
+      scene = new THREE.Scene;
+
+      //set width and height of divs. Can only be done here because css is not read earlier
+      $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
+      $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(WIDTH-$("#"+SLIDERDIVID).width())+"px")
+	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
+
+      SELECTEDSPHERECOLOR=getStyleAttr(".sphere.selected","color",SELECTEDSPHERECOLOR);
+      // Create Renderer
+      renderer = new THREE.WebGLRenderer({
+	      alpha : true,
+	      antialiasing : true
+      });
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setSize(WIDTH, HEIGHT);
+      //set scaling, only has to be done once.
+      setScaling();
+
+      $("#"+CONTAINERDIV).empty();
+      //add renderer to container
+      containervar.appendChild(renderer.domElement);
+      //add listeners
+     // containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
+     // containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
+     // containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
+	  d3containervar.on( 'contextmenu', onDocumentRightMouseDown, false );	
+	  //d3containervar.on( 'mouseup', onDocumentMouseUp, false );	
+	  d3containervar.on( 'click', onDocumentMouseDown, false );	    
+
+	  window.addEventListener('keydown', keydown, false);
+      window.addEventListener('keyup', keyup, false);
+	  
+  }//initGlobalVariables
+  
+	
+  var keyup=function(event) {
+    pressedkey="";
+  };
+  var getAllowedKey=function(key){
+    var char=String.fromCharCode(key);
+    //TODO allowedkeys in constant, combined with choices.
+    if ("ASXEDF".indexOf(char)>=0){return char;console.log(char);} else return "";
+  }
+  var keydown=function(event) {
+    var key = event.keyCode;
+    //TODO: up and down also move the screen up and down. see if key-events can be split up. Otherwise stick to xsedaf
+    //better: use shift-arrows. Already implemented.
+    if (key==37) pressedkey="left";else
+    if (key==38) pressedkey="up";else
+    if (key==39) pressedkey="right";else
+    if (key==40) pressedkey="down";else
+    if (key==33) pressedkey="pgup";else
+    if (key==34) pressedkey="pgdn";else
+    pressedkey=getAllowedKey(key);
+    if (event.shiftKey&&selectedSphere&&pressedkey.length>0)moveIntersectedSphere(selectedSphere)
+  };
+  var keyIsPressed=function(){
+    if (pressedkey.length>0) return pressedkey; else return false;
+  }
 	  
 	  
 	  function colorSelectedSphere(event, mouse){
-		  console.log(mouse);
 		  normalizeCurrentMouseCoordinates(event,mouse);
 		  
 		  raycaster.setFromCamera( mouse, camera );
@@ -168,6 +240,8 @@ var CSScontainerAttributes_height=400;
 		  var intersects = raycaster.intersectObjects( sphereArray); 	
 
 		  checkGeometryTypeAndSlice(intersects);	
+
+		  return checkGeometryTypeAndSlice(intersects,event)	
 	  }	
 	  
 	  function checkGeometryTypeAndSlice(intersects){
@@ -178,7 +252,7 @@ var CSScontainerAttributes_height=400;
 				if(intersects == 0 || intersects[0].object.geometry.type == null){	
 					return;
 				}else{			 
-						intersects[0].object.callback(intersects[0].object);
+					intersects[0].object.callback(intersects[0].object);
 				}		
 			}
 		}
@@ -186,31 +260,11 @@ var CSScontainerAttributes_height=400;
 
 
 
-  //create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
-  function createCallbackFunctionForSphere(sphere){
-	  
-    try {
-    sphere.callback = function(conceptNameString,event){
-      if (sphere.distance>0){
-	if (event.button==2 ||(event.button==0 && keyIsPressed())) {
-		moveIntersectedSphere(sphere);}
-	else
-	  if (event.button==0)//left mouse key
-	    window.location = window.location.href.getFirstPartOfUrl() + sphere.urlName; //of conceptnamestring
-      }
-	//TODO: conceptNameString can be omitted from function-call, can be exchanged with sphere.node.page;
-	//this is more complicated than it looks. sphere.node.page is the url from the original page.
-	//it is possible that the current url is not the same as the url from the triple store.
-	//this is the case for the test-site anyway.
-    }		
-	console.log("callbackfunction wordt aangeroepen");
-	console.log(sphere);
-    }catch( e ){console.log("error create callbackfunction"+e)}
-  }
   
   		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
 		//Clickevents on objects on the canvas are registered here
-		function createCallbackFunctionForSphere2(sphere, nodelinks, three_links){		
+		function createCallbackFunctionForSphere(sphere, nodelinks, three_links){		
+			try{
 			//sphere.callback = function(conceptNameString){
 			sphere.callback = function(intersectedObject){
 				//if user leftclicked a sphere
@@ -224,8 +278,11 @@ var CSScontainerAttributes_height=400;
 					moveIntersectedSphere(intersectedObject);					
 				}		
 			}		
-		}
-  	
+		
+			}catch( e ){console.log("error create callbackfunction"+e)}}
+	
+
+	
   function changePosition(node,move,first){
 	  node.x=node.x+move[0];//v3.x;//
 	  node.y=node.y+move[1];//v3.y;//
@@ -388,7 +445,6 @@ var CSScontainerAttributes_height=400;
   }
   
   function onDocumentRightMouseDown(){
-	  console.log("d3 rightmousedown");
 		colorSelectedSphere(d3.mouse(this), mouse); //Mouse and camera are global variables.
   }
   
@@ -534,7 +590,7 @@ var CSScontainerAttributes_height=400;
 		      nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
 		      
 		      
-		      createCallbackFunctionForSphere2(sphere); 
+		      createCallbackFunctionForSphere(sphere); 
 		    } catch(e){console.log("error creating node for"+nodes[key]);}
 	    }
     }
