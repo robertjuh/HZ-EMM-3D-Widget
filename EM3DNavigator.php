@@ -20,6 +20,32 @@ mw.loader.using( ['ext.EM3DNavigator']).done( function () {
 </script>
 </includeonly>
 */
+$wgExtensionCredits['semantic'][] = array(
+
+	'path' => __FILE__,
+
+	// The name of the extension, which will appear on Special:Version.
+	'name' => 'EMM Visualisator 3D',
+
+	// A description of the extension, which will appear on Special:Version.
+	'description' => 'EMM Visualisator 3D',
+
+	// Alternatively, you can specify a message key for the description.
+	//'descriptionmsg' => 'vueconvertapi-desc',
+
+	// The version of the extension, which will appear on Special:Version.
+	// This can be a number or a string.
+	'version' => 0.91, 
+
+	// Your name, which will appear on Special:Version.
+	'author' => 'Robert Walhout, Anton Bil',
+
+	// The URL to a wiki page/web page with information about the extension,
+	// which will appear on Special:Version.
+	'url' => 'https://www.mediawiki.org/wiki/API:Extensions',
+
+);
+
 $wgResourceModules['ext.EM3DNavigator'] = array(
 	'scripts' =>  array(//'js/jquery-2.1.1.min.js'
 //, 'js/jquery.cookie.js'
@@ -28,7 +54,7 @@ $wgResourceModules['ext.EM3DNavigator'] = array(
 //, 'js/cola.min.js'
 //,
  'js/three.min.js'/*, 'js/d3.v3.js'*/,  'js/OrbitControls.js'//, 'js/OrthographicTrackballControls.js', 'js/TrackballControls.js'
-,  'js/default.js', 'js/visualisation.js', 'js/slider.js', 'js/visualisationJsModule.js', 'js/JSONStyleSheet.js'),
+,  'js/default.js', 'js/visualisation.js', 'js/slider.js', /*'js/visualisationJsModule.js',*/ 'js/JSONStyleSheet.js'),
 	'styles' => array (/*'css/bootstrap.min.css', 'css/bootstrap-theme.min.css',*/ 'css/highlight.css', 'css/style.css', 'css/navigatorStyle.css'),
 	'position' => 'top',
 

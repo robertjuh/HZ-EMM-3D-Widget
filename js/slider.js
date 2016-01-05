@@ -5,16 +5,16 @@
 * @author Robert Walhout
 */
 
-var createSlider = (function(higherFunction, lowerDepthFunction, concept,depth){
+var createSlider = (function(higherFunction, lowerDepthFunction, concept,depth,height){
 		//console.log(targetDivId);
   
 var MAXDEPTH=4;
-var divHeight=VisualisationJsModule.height;
+var divHeight=height;
 
 //TODO set width container in css
 var SLIDERDIV="sliderDiv";
-var containerWidth = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"width",30);
-divHeight = VisualisationJsModule.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
+var containerWidth = visualisationInstance.getStyleAttrInt('#'+SLIDERDIV,"width",30);
+divHeight = visualisationInstance.getStyleAttrInt('#'+SLIDERDIV,"height",divHeight);
 var slideDepth = 1;
 var tempSliderDepthInt=1;
 
@@ -52,8 +52,8 @@ vis.selectAll("polygon")
     .attr("id", "sliderArea")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
-    .attr("fill",  VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.background )
-    .attr("stroke", VisualisationJsModule.getStyle(".sliderAttributes.sliderPolygon").style.color )
+    .attr("fill",  visualisationInstance.getStyle(".sliderAttributes.sliderPolygon").style.background )
+    .attr("stroke", visualisationInstance.getStyle(".sliderAttributes.sliderPolygon").style.color )
     .attr("stroke-width",2);
 
 
@@ -88,7 +88,7 @@ var rectangleAttributes = sliderRect
                           .attr("y", function (d) { return d.ry; })
                           .attr("height", function (d) { return d.height; })
                           .attr("width", function (d) { return d.width; })
-                         .style("fill", VisualisationJsModule.getStyle(".sliderAttributes.sliderButton").style.color );
+                         .style("fill", visualisationInstance.getStyle(".sliderAttributes.sliderButton").style.color );
 	
 
 

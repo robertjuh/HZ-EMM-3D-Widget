@@ -1,7 +1,4 @@
 /**
- * VisualisationJsModule.js
-* Module of visualisation.js where most THREE.JS related tools are declared, the size of the canvas and
-* all objects related to drawing, viewing and rendering. Also some styling.
 * @author Robert Walhout
 */
 //Global constant
@@ -10,294 +7,317 @@ var TARGETDIVID = 'bodyContent';
 var CONTAINERDIV = 'containerDiv'; 
 var SHOWBUTTONDIV='showbutton';
 var BODYCONTENTDIV='bodyContent';
+var SLIDERDIVID='sliderDiv';
 var EMMCONTAINERDIV='EMMContainerDiv';	
-var VisualisationJsModule;//global
-
 
 //CSS constants (integers!)
 var CSSmaxDepth_order=4;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
+//size of labels of spheres
+var LABELSIZE = 400;
+// Set camera attributes
+var VIEW_ANGLE = 20, //field of view
+    NEAR = 10,
+    FAR = 10000;
 
-var VisualisationJsModulePrototype = (function (containerDivId) {
-	
-	
-console.log("VisualisationJsModulePrototype() containerdivID");
-console.log(containerDivId);
-
-
-	var getStyle = function(CLASSname) {
-					var styleSheets = window.document.styleSheets;
-					var styleSheetsLength = styleSheets.length;
-					for(var i = 0; i < styleSheetsLength; i++){
-						if (styleSheets[i].rules ) { var classes = styleSheets[i].rules; }
-						else { 
-							try {  if(!styleSheets[i].cssRules) {continue;} } 
-							//Note that SecurityError exception is specific to Firefox.
-							catch(e) { if(e.name == 'SecurityError') { console.log("SecurityError. Cant readd: "+ styleSheets[i].href);  continue; }}
-							var classes = styleSheets[i].cssRules ;
-						}
-						for (var x = 0; x < classes.length; x++) {
-							if (classes[x].selectorText == CLASSname) {
-								return classes[x];
-								/*var ret = (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText ;
-								if(ret.indexOf(classes[x].selectorText) == -1){ret = classes[x].selectorText + "{" + ret + "}";}
-								return ret;*/
-							}
-						}
-					}
-					return null;			
-			}
-	/*
-	 * get attribute in style, if not available return defaultValue
-	 */ 
-	var getStyleAttr = function(CLASSname,attr,defaultValue) {
-	  try {
-	    var text=getStyle(CLASSname).cssText;
-	    //if (CLASSname=='#sliderDiv')console.log(text);
-	    //parse css, get text inbetween brackets
-	    var p=text.indexOf("{");
-	    text=text.substring(p+1);
-	    var p=text.indexOf("}");
-	    text=text.substring(0,p-1);
-	    //split into parts
-	    var listattr = text.split(";");//list with all attributes
-	    var found=false;
-	    var value=null;
-	    for (var i = 0; i < listattr.length; i++) {
-		var attrn = listattr[i].split(":");//becomes key-value pair
-		var key=attrn[0].trim();
-		if (key==attr) {found=true;value=attrn[1].trim();}
-		//Do something
-	    }
-	    if (found) return value;else return defaultValue;
-	  }
-	  catch (e) {
-	    return defaultValue;
-	  }
-  
-	}
-	
-	/*
-	 * get attribute in style as in integer, if not available return defaultValue (must be int)
-	 */ 
-	var getStyleAttrInt = function(CLASSname,attr,defaultValue) {
-	  try {
-	    return parseInt(getStyleAttr(CLASSname,attr,""+defaultValue));
-	  }
-	  catch (e) {
-	    return defaultValue;
-	  }
-	  
-	}
-	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
-	var DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
-	var WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
-	var HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
-	
-
-	// Set camera attributes and create camera
-	var VIEW_ANGLE = 20, //field of view
-	    ASPECT = WIDTH / HEIGHT, 
-		//ASPECT  = $VisualisationJsModule.container[0].clientWidth / $VisualisationJsModule.container[0].clientHeight,
-	    NEAR = 10,
-	    FAR = 10000;
-	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
-	var container = document.getElementById( containerDivId );
-	//var container = document.getElementById("containerdiv");
-	console.log(container);
-	var controls = new THREE.OrbitControls(camera, container);
-	var scene = new THREE.Scene;
-	var threeDObjects=[];
-	var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
-	var newDepth;
-	
-	return  {
-		//these properties can be asked by: VisualisationJsModule.propertyname
-		height : HEIGHT,
-		width : WIDTH,
-		depth : DEPTH,
-		newDepth : newDepth,
-		scene : scene,
-		camera : camera,
-		controls : controls,
-		container : container,
-		sphereArray : sphereArray,
-		//three arrays to contain the visible objects of the model. Distance of all objects is set.
-		//used to make objects visible or not
-		threeDObjects: threeDObjects,
-		
-		getContainerSize: function () {
-			var size = [WIDTH,HEIGHT]
-			return size;			
-		},
-
-		//can ask CSS propertys in code as: VisualisationJsModule.getStyle(".className").style.color;
-		
-		init3DObjects: function(){
-		  threeDObjects=[];
-		},
-		//functions to set distance for visible yes/no
-		add3DObject(object,distance){
-		  object.distance=distance;
-		  this.threeDObjects.push(object);
-		},
-		getStyle: getStyle,
-		getStyleAttr:getStyleAttr,
-		getStyleAttrInt:getStyleAttrInt
-	};
-	
-});
  
- 
- //VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
-//visualisation module.
-
-console.log("VisualisationJsModulePrototype");
-console.log(VisualisationJsModule);
-
-
+//main class Visualisation
 window.Visualisation = (function () {//CSS constants
-  var CSSarrow_related_color="red";
+var CSScontainerAttributes_width=400;
+var CSScontainerAttributes_height=400;	
+  var SELECTEDSPHERECOLOR="rgb(128,0,128)";
   var CSSsphere_color="rgb(191,172,136)";
   var CSSsphere_colors=["rgb(76,151,214)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)","rgb(191,172,136)"];
+  var CSSarrow_related_color="red";
+  var CSSarrow_broader_color="black";
+  var CSSarrowColors={"Eigenschap:Skos:related":{css:".arrow.related",color:CSSarrow_related_color,arrow:false},
+		      "Eigenschap:Skosem:broader":{css:".arrow.broader",color:CSSarrow_broader_color,arrow:true}};
   var CSScontainerAttributes_fontsize="20px";
   var CSScontainerAttributes_fontfamily="Times";
   var CSScontainerAttributes_fontweight="normal";
-  var CSSarrow_related_color="red";
-  var CSSarrow_broader_color="black";
+	//These variables determine the initial state of the visualisation, depth = the depth that will be loaded initially.
+   var DEPTH=CSSmaxDepth_order;
+  var WIDTH=CSScontainerAttributes_width;
+  var HEIGHT=CSScontainerAttributes_height;
+	var VIEW_ANGLE = 20, //field of view
+	    ASPECT = WIDTH / HEIGHT, 
+	    NEAR = 10,
+	    FAR = 10000;
+	var camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+  //variables for drawing
   var renderer;//global
   var	mouse;//global
   var	raycaster;//global
-  var labels;//global
+  var camera;
+  var controls;
+  var scene;
+  //following vars contain data for nodes and model
+  var nodes;//array of all nodex
+  var nodelinks;//array of all links
+  var sphereArray=[]; //Array will be filled with spheres; the objects that will be intersected through on mouse events
+  var threeDObjects=[];//Array will be filled with all visible objects, all contain property distance
+  
+  
   var sliderObject;
   var valuesHaveBeenShown=false;
-  var thisconcept;
+  var currentPageName;//current concept
+  var GLOBALDEPTH;//global
+  //scaling of coordinates
+  var xScale,yScale,zScale;
+  var pressedkey="";
+  var selectedSphere;
+
 	  
   /**
-  * @author NJK @author robertjuh
+  * @author NJK @author robertjuh @author Anton Bil
   * This script is responsible for drawing the 3d objects to the canvas and initialising an ajax call. 
-  * 
-  * VisualisationJsModule (located in visualisationJsModule.js) contains all global variables that are relevant to the THREEjs drawing sequence.
   */
-//  var startVisualisation = (function(currentPageName){
-//    //anton: not used right now.
-//    //setTimeout(function(){startVisualisation(currentPageName)}, 1000);
-//		  //mouselocation variables 
-//		  initVariables();
-//  });
-  
-  function initVariables(){
-    //THREE can only be used if library is read using Resource loader
-    raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
-  }
-		  
-  //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
-  function filterFirstSpheregeometryWithRay(event, mouse){			
-		  normalizeCurrentMouseCoordinates(event, mouse);						
-		  raycaster.setFromCamera( mouse, VisualisationJsModule.camera);
 
-		  var intersects = raycaster.intersectObjects( VisualisationJsModule.sphereArray ); 
+  function initGlobalVariables(CONTAINERDIV){
+      //initalise global variables
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+	  console.log("mouse");
+	  console.log(mouse);
+      DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+      WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+      HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 
-		  if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
-			  checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName));			
-		  }			
-	  }
+      var containervar=document.getElementById( CONTAINERDIV );
+	  var d3containervar = d3.select("#containerDiv"); 
+      var ASPECT = WIDTH / HEIGHT;
+      camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+      controls = new THREE.OrbitControls(camera, containervar);
+      scene = new THREE.Scene;
+
+      //set width and height of divs. Can only be done here because css is not read earlier
+      $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
+      $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(WIDTH-$("#"+SLIDERDIVID).width())+"px")
+	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
+
+      SELECTEDSPHERECOLOR=getStyleAttr(".sphere.selected","color",SELECTEDSPHERECOLOR);
+      // Create Renderer
+      renderer = new THREE.WebGLRenderer({
+	      alpha : true,
+	      antialiasing : true
+      });
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setSize(WIDTH, HEIGHT);
+      //set scaling, only has to be done once.
+      setScaling();
+
+      $("#"+CONTAINERDIV).empty();
+      //add renderer to container
+      containervar.appendChild(renderer.domElement);
+      //add listeners
+      //containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
+      containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
+      //containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
+      window.addEventListener('keydown', keydown, false);
+      window.addEventListener('keyup', keyup, false);
+	 		
+	  	d3containervar.on( 'contextmenu', onDocumentRightMouseDown, false );	
+	  	//d3containervar.on( 'mouseup', onDocumentMouseUp, false );	
+	    d3containervar.on( 'click', onDocumentMouseDown, false );	
+
 	  
-  function colorSelectedSphere(event, mouse){
+  }//initGlobalVariables
+  
+	
+  var keyup=function(event) {
+    pressedkey="";
+  };
+  var getAllowedKey=function(key){
+    var char=String.fromCharCode(key);
+    //TODO allowedkeys in constant, combined with choices.
+    if ("ASXEDF".indexOf(char)>=0){return char;console.log(char);} else return "";
+  }
+  var keydown=function(event) {
+    var key = event.keyCode;
+    //TODO: up and down also move the screen up and down. see if key-events can be split up. Otherwise stick to xsedaf
+    //better: use shift-arrows. Already implemented.
+    if (key==37) pressedkey="left";else
+    if (key==38) pressedkey="up";else
+    if (key==39) pressedkey="right";else
+    if (key==40) pressedkey="down";else
+    if (key==33) pressedkey="pgup";else
+    if (key==34) pressedkey="pgdn";else
+    pressedkey=getAllowedKey(key);
+    if (event.shiftKey&&selectedSphere&&pressedkey.length>0)moveIntersectedSphere(selectedSphere)
+  };
+  var keyIsPressed=function(){
+    if (pressedkey.length>0) return pressedkey; else return false;
+  }
+	  
+	  	//uses d3.mouse(this)[0],[1] to find the mouse coordinates on the current element
+		//uses the mouse variable which is a THREE.Vector2
+		function normalizeCurrentMouseCoordinates(e, mouse){
+			mouse.x = (  (e[0])  / renderer.domElement.width ) * 2 - 1;			
+			mouse.y = - (  (e[1]) / renderer.domElement.height ) * 2 + 1;			
+		}
+	  
+	  
+	  function colorSelectedSphere(event, mouse){
+		  console.log(mouse);
 		  normalizeCurrentMouseCoordinates(event,mouse);
 		  
-		  raycaster.setFromCamera( mouse, VisualisationJsModule.camera );
+		  raycaster.setFromCamera( mouse, camera );
 		  
-		  var intersects = raycaster.intersectObjects( VisualisationJsModule.scene.children ); 	
+		  var intersects = raycaster.intersectObjects( sphereArray); 	
 
-		  checkGeometryTypeAndSlice(intersects)	
+		  checkGeometryTypeAndSlice(intersects);	
 	  }	
+	  
+	  function checkGeometryTypeAndSlice(intersects){
+			var intersectLength = intersects.length;
+			//If there is an intersection, and it is a sphere, apply click event.
+			//Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
+			for (var i = 0; i <= intersectLength; i++) {
+				if(intersects == 0 || intersects[0].object.geometry.type == null){	
+					return;
+				}else{			 
+						intersects[0].object.callback(intersects[0].object);
+				}		
+			}
+		}
 		  
-		  
-//TODO onderstaande functie volledig opschonen omdat er nu alleen nog spheres worden meegenomen in intersects (intersectable objects.
-function checkGeometryTypeAndSlice(intersects, urlname){
-    var intersectLength = intersects.length;
-    //If there is an intersection, and it is a sphere, apply click event.
-    //Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
-    for (var i = 0; i <= intersectLength; i++) {
 
-    if(intersects == 0 || intersects[0].object.geometry.type == null){	
-	    return;
-    }else{				 
-	switch(intersects[0].object.geometry.type){
-		case 'SphereGeometry':
-			intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
-			
-				intersects[0].object.callback(intersects[0].object.urlName);
-
-			//console.log("je heb geklikt op een geometry:");
-			//console.log(intersects[0].object.geometry.type);
-			return;
-			//break;
-		case 'PlaneGeometry':
-			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere								
-			break;
-		case 'BufferGeometry':
-			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
-			break;
-		case 'CylinderGeometry':
-			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere		
-		    break;
-		default:					
-	}
-      }
-    }
-  }
-	
-	
-
-
-  //get offset for dom-element, while looping over all parent elements and summing all offsets
-  function getOffset( el ) {
-      var _x = 0;
-      var _y = 0;
-      while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
-	  _x += el.offsetLeft - el.scrollLeft;
-	  _y += el.offsetTop - el.scrollTop;
-	  el = el.offsetParent;
-      }
-      return { top: _y, left: _x };
-  }
-  //function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
-  //uses the mouse variable which is a THREE.Vector2
-  function normalizeCurrentMouseCoordinates(e, mouse){
-  var x = getOffset( e.target ).left; 
-      /*console.log($("#EMMContainerDiv").offset().left,$("#EMMContainerDiv").offset().top);
-      console.log(getOffset( e.target ).left,getOffset( e.target ).top);//1
-      console.log($(document).scrollLeft(),$(document).scrollTop());//2
-      console.log(e.clientX,e.clientY);//3
-      console.log(e.layerX,e.layerY);
-      console.log( (e.clientX - (getOffset( e.target ).left-$(document).scrollLeft())),( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()))   );*/
-			  var x=(e.clientX - (getOffset( e.target ).left-$(document).scrollLeft()));
-			  if (x>e.layerX)x=e.layerX;
-			  var y=( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()));
-			  if (y>e.layerY)y=e.layerY;
-			  /*mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - (renderer.domElement.offsetLeft )) / renderer.domElement.width ) * 2 - 1;			
-			  mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - (renderer.domElement.offsetTop)) / renderer.domElement.height ) * 2 + 1;	*/		
-			  mouse.x = ( (x) / renderer.domElement.width ) * 2 - 1;			
-			  mouse.y = - ( (y) / renderer.domElement.height ) * 2 + 1;			
-      //console.log(mouse.x,mouse.y);
-  }
 
 
   //create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
   function createCallbackFunctionForSphere(sphere){
-    sphere.callback = function(conceptNameString){
+	  
+    try {
+    sphere.callback = function(conceptNameString,event){
       if (sphere.distance>0){
-	window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
+	if (event.button==2 ||(event.button==0 && keyIsPressed())) {
+		moveIntersectedSphere(sphere);}
+	else
+	  if (event.button==0)//left mouse key
+	    window.location = window.location.href.getFirstPartOfUrl() + sphere.urlName; //of conceptnamestring
       }
+	//TODO: conceptNameString can be omitted from function-call, can be exchanged with sphere.node.page;
+	//this is more complicated than it looks. sphere.node.page is the url from the original page.
+	//it is possible that the current url is not the same as the url from the triple store.
+	//this is the case for the test-site anyway.
     }		
+	console.log("callbackfunction wordt aangeroepen");
+	console.log(sphere);
+    }catch( e ){console.log("error create callbackfunction"+e)}
   }
-		  
+  
+  		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
+		//Clickevents on objects on the canvas are registered here
+		function createCallbackFunctionForSphere2(sphere, nodelinks, three_links){		
+			//sphere.callback = function(conceptNameString){
+			sphere.callback = function(intersectedObject){
+				//if user leftclicked a sphere
+				if(d3.event.type == 'click'){
+					clearCanvas();
+					window.location = window.location.href.getFirstPartOfUrl() + intersectedObject.urlName; //navigate to the clicked object
+				}				
+
+				//if user rightclicked a sphere
+				if(d3.event.type == 'contextmenu'){			
+					moveIntersectedSphere(intersectedObject);					
+				}		
+			}		
+		}
+  	
+  function changePosition(node,move,first){
+	  node.x=node.x+move[0];//v3.x;//
+	  node.y=node.y+move[1];//v3.y;//
+	  node.z=node.z+move[2];//v3.z;//
+	  var newPosition=scale(node);
+	  var _x = newPosition.x;
+	  var _y = newPosition.y;
+	  var _z = newPosition.z;
+	  if (!first){//do not change position of first node, it must be animated....
+	    node.sphere.position.x=_x;
+	    node.sphere.position.y=_y;
+	    node.sphere.position.z=_z;
+	    node.label.position.x=_x;
+	    node.label.position.y=_y+5;
+	    node.label.position.z=_z;
+	  }
+				  
+	  //moves the sphere to _x, _y, _z
+	  try{
+	  node.sourcelist.forEach(function(link) {
+	    if (link.distance>node.distance){changePosition(link.target,move,false)}
+	    var visible=link.visible;
+	    link.visible=false;
+	    setArrowSourceTarget(link.arrow);
+	    link.visible=visible;
+	  });
+	  }catch(e){/*console.log(e.stack);*/}
+	  //TODO looks like a relation gets twice the length as a broader relation. 
+	  //Perhaps it is part of two lists? Check this out!
+	  try{
+	  node.targetlist.forEach(function(link) {
+	    if (link.distance>node.distance){changePosition(link.source,move,false)}
+	    var visible=link.visible;
+	    link.visible=false;
+	    setArrowSourceTarget(link.arrow);
+	    link.visible=visible;
+	  });
+	  }catch(e){/*console.log(e.stack);*/}
+	  return newPosition;
+  }
+
+		//This function is experimental and can move a selected sphere.
+		//This function is an implementation of moving objects I.e moving surrounding nodes aside later.
+		function moveIntersectedSphere(intersectedObject){
+		  //problem with following approach is, that it comes inbetween mousedown and mouseup. This breaks mouse propagation
+			      if (!(intersectedObject==selectedSphere))
+				try{
+				  selectedSphere.material.color=new THREE.Color(getSphereColor(selectedSphere.node.distance));
+				}catch(e){}
+			      selectedSphere=intersectedObject;
+			      selectedSphere.material.color=new THREE.Color(SELECTEDSPHERECOLOR);
+			      //TODO move moveKeys to top (they are constants).
+			      var moveKeys={"E":[0,100,0],"X":[0,-100,0],"S":[-100,0,0],"D":[100,0,0],"A":[0,0,100],"F":[0,0,-100],
+				"up":[0,100,0],"down":[0,-100,0],"left":[-100,0,0],"right":[100,0,0],"pgup":[0,0,100],"pgdn":[0,0,-100]
+			      };
+			      var move=moveKeys[pressedkey];
+				if ( typeof move === 'undefined' ){
+				  //var v3=randomVector(100);
+				  //move=[v3.x,v3.y,v3.z];
+				  move=[0,0,0];//do nothing
+				}
+				
+				var newPosition=changePosition(intersectedObject.node,move,true);
+				
+				//animate object;
+				new TWEEN.Tween( intersectedObject.position).to( {
+						x: newPosition.x,
+						y: newPosition.y,
+						z: newPosition.z }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();		
+
+				//moves the label along
+				new TWEEN.Tween( intersectedObject.node.label.position).to( {
+						x: newPosition.x,
+						y: newPosition.y + 5,
+						z: newPosition.z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();
+				//update arrows to new position node
+				changePosition(intersectedObject.node,[0,0,0]);
+	      //animate the arrows, not implemented yet. find out a way to animate relations also.
+				/*new TWEEN.Tween( VisualisationJsModule.threeDObjects[1].position).to( {
+						x: _x,
+						y: _y,
+						z: _z  }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();	*/
+  //  }
+		};
+					
+		
   //functions for arrows			
   function setArrowSourceTarget(arrow) {
+    try{
     var relationDepth=arrow.distance;
     //copy position of sphere connected to source to position of arrow
     var originPosition=arrow.source.sphere.position;
@@ -309,43 +329,48 @@ function checkGeometryTypeAndSlice(intersects, urlname){
     //Calculate new terminus vectors and set length (initial size: arrow.setLength(arrow.position.distanceTo(newTarget) - 5, 10, 5);
     arrow.setLength(arrow.position.distanceTo(newTarget) - arrow.target.sphere.geometry.boundingSphere.radius , (10 - (relationDepth*0.8)), (5-(relationDepth*0.8)));
     arrow.setDirection(new THREE.Vector3().subVectors(newTarget, arrow.position).normalize());
+    }catch( e ){console.log("error setarrowsourcetarget"+e)}
   }
   //end of functions for arrows -----======-----
   
   
-  // Initializes calculations and spaces nodes according to a forced layout
-  // takes variables from the startvisualisation method
-  function initialiseConstraints(nodes, spheres, three_links) {
-
+  /*
+   * setScaling
+   * done only once
+   */
+  function setScaling(){
 	  var min=-100;
 	  var max=50;
-	  var xScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
-	      yScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]),
-	      zScale = d3.scale.linear().domain([0, VisualisationJsModule.height+1]).range([min, max]);
-		  
-	  
-	  //first see what the new position of base-node will be, because that is positioned on 0,0,0
-	  //base for translation of nodes
-	  var xcomp=xScale(0),
-	      ycomp=yScale(0),
-	      zcomp=yScale(0);
+	  xScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
+	      yScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
+	      zScale = d3.scale.linear().domain([0, HEIGHT+1]).range([min, max]);
+  }
+  
+  function scale(node){
+    //first see what the new position of base-node will be, because that is positioned on 0,0,0
+    return new THREE.Vector3(xScale(node.x)-xScale(0), yScale(node.y)-yScale(0) , zScale(node.z)-zScale(0));
+  }
+  // Initializes calculations and spaces nodes according to a forced layout
+  // takes variables from the startvisualisation method
+  //scales the nodes according to their initial postions, and sets the position of the arrows
+  function scaleNodesAndArrows(nodes) {
+
 			  
 	  for (var key in nodes) {
 		  //scale to new location and do a translation to place nodes in the middle
-	  
-		  spheres[key].position.set(xScale(nodes[key].x)-xcomp, yScale(nodes[key].y)-ycomp , zScale(nodes[key].z)-zcomp );
-		  var p=spheres[key].position;
-		  nodes[key].label.position.set(p.x, p.y+5 , p.z-5 );				
+		  var v=scale(nodes[key]);
+		  nodes[key].sphere.position.set(v.x, v.y , v.z );
+		  nodes[key].label.position.set(v.x, v.y+5 , v.z-5 );				
 	  }
 	  
-	  //three_links is copy of nodelinks, so they also contain source and target of relation, and distance.
+	  //set arrow for every nodelink
 	  
-	  for (var j = 0; j < three_links.length; j++) {			  
-		  setArrowSourceTarget(three_links[j]);
+	  for (var j = 0; j < nodelinks.length; j++) {		  
+		  setArrowSourceTarget(nodelinks[j].three_link);
 	  }
 
-	  renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
-  }//initialiseConstraints
+	  renderer.render(scene, camera);
+  }//scaleNodesAndArrows
   
   
   //MouseEvents start -----====-----		
@@ -354,33 +379,49 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  event.preventDefault();
 		  event.clientX = event.touches[0].clientX;
 		  event.clientY = event.touches[0].clientY;
-		  onDocumentMouseUp( event );
+		  onDocumentMouseDown( event );
   }
 
   //colors the ball that is being clicked, serves no real purpose yet.
-  function onDocumentMouseDown(event){
-	  event.preventDefault();
-	  colorSelectedSphere(event, mouse); //Mouse and camera are global variables.
+  function onDocumentMouseDown(){
+	  colorSelectedSphere(d3.mouse(this), mouse); //Mouse and camera are global variables.
   }
   
-  //calls the callback function on mouse up, on the appointed sphere. Mouse and camera are global variables.
-  function onDocumentMouseUp(event){
-	  event.preventDefault();	
-	  //filterFirstSpheregeometryWithRay(event, mouse);
+  function onDocumentRightMouseDown(){
+	  console.log("d3 rightmousedown");
+		colorSelectedSphere(d3.mouse(this), mouse); //Mouse and camera are global variables.
   }
+  
   //end of functions for mouseEvents -----======-----
   
-  function setCoordinatesSpheres(baseLevel,nodes,nodelinks) {
-    var grootte= Math.pow((VisualisationJsModule.height*VisualisationJsModule.height + VisualisationJsModule.width*VisualisationJsModule.width), 1/2)*0.9 ;
-    //var grootte= VisualisationJsModule.height ; // zo was het eerst
+	    function randomVector(grootte){
+	      var x = Math.floor((Math.random() * 100) + 1-50);
+	      var y = Math.floor((Math.random() * 100) + 1-50);
+	      var z = Math.floor((Math.random() * 100) + 1-50);
+	      var v1 = new THREE.Vector3(x, y, z);
+	      
+	      v1=v1.normalize ();//vector is now size 1
+	      
+	      
+	      return new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
+	    }
+  /*
+   * setCoordinatesNodes
+   * sets base coordinates for all nodes
+   */
+  function setCoordinatesNodes(baseLevel,nodes,nodelinks) {
+    try{
+    var grootte= Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/2)*0.9 ;
 
     //- bepaal het maximum niveau van alle nodes
     var root=null;
     var max=0;
     for (var key in nodes) {
+      try{
       if(nodes[key].distance>max)max=nodes[key].distance;
     //- zoek op node met niveau 0 (er is er maar 1!)
       if(nodes[key].distance==0)root=key;
+      }catch( e ){console.log("error for (var key in nodes) 1"+e)}
     }
     //range is van -200 tot 100
     //zet root in het midden
@@ -393,18 +434,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       //volgend niveau staat iedere keer minder dan de helft verder weg
       if (currentniveau>=baseLevel)
 	for (var key in nodes) 
+	  try{
 	  if (nodes[key].distance==currentniveau){
 	      //genereer een random vector v van lengte = grootte
 	      //possible negative values give better dispersion
-	      var x = Math.floor((Math.random() * 100) + 1-50);
-	      var y = Math.floor((Math.random() * 100) + 1-50);
-	      var z = Math.floor((Math.random() * 100) + 1-50);
-	      var v1 = new THREE.Vector3(x, y, z);
-	      
-	      v1=v1.normalize ();//vector is now size 1
-	      
-	      
-	      var v3 = new THREE.Vector3(v1.x*grootte, v1.y*grootte, v1.z*grootte);//v3 has now size grootte
+	      var v3=randomVector(grootte);
 	      nodes[key].x=v3.x;
 	      nodes[key].y=v3.y;
 	      nodes[key].z=v3.z;
@@ -425,106 +459,88 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		nodes[key].z=Math.floor(nodes[key].z+opponent.z);
 	      } else console.log(nodes[key],"toch niet gevonden!");
 	  }
+      }catch( e ){console.log("error for (var key in nodes) 2"+e)}
       if (currentniveau<3){//otherwise spheres get too close
 		  grootte=Math.floor(grootte/1.5); 
 	  }
     }
+  }catch( e ){console.log("error setcoordinatesspheres"+e)}
   }//setCoordinatesSpheres
   
 	  
   // Visualize RDF data
   //will create nodes(spheres), labels and arrows and positions them.
-  //will omit all nodes with distance < baseLevel
-  function visualize(baseLevel,nodes, nodelinks) {
-	  setCoordinatesSpheres(baseLevel,nodes,nodelinks);
-	  var three_links = [];
-	  var spheres = [];
-	  if (baseLevel>0){
-	    //three_links and spheres have already been created
-	    //so get them from memory
-	    spheres = VisualisationJsModule.spheres;
-	    three_links = VisualisationJsModule.three_links;
-	  }
-		  // Create spheres based on nodes.
-		  for (var key in nodes) {
-			  if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
-				  var val = nodes[key];
-				  
-				  // set up the sphere vars
-				  var radius = 5 - (nodes[key].distance)*0.93, //nodes get smaller as their depth increases
-				      segments = 32,
-				      rings = 32;
+  function createSpheresAndArrowsBasedOnNodesAndLinks(baseLevel,nodes, nodelinks) {
+    try{
+	  setCoordinatesNodes(baseLevel,nodes,nodelinks);
+	  // Create spheres based on nodes.
+	  createSpheresBasedOnNodes(nodes,baseLevel);
 
-				  // create the sphere's material and color
-				  var sphereMaterial;
-				  try 
-				  { 
-					  sphereMaterial = new THREE.MeshPhongMaterial({
-						  color : VisualisationJsModule.getStyleAttr(".sphere.level"+nodes[key].distance,"color",CSSsphere_colors[nodes[key].distance])
-					  });												
-				  }
-				  catch (e){//if level is too high, set default
-					  sphereMaterial = new THREE.MeshPhongMaterial({
-						  color : VisualisationJsModule.getStyleAttr(".sphere","color",CSSsphere_color)
-					  });
-				  }
-
-				  //create the sphere
-				  var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
-				  sphere.name = nodes[key].name;
-				  sphere.node = nodes[key];
-				  nodes[key].sphere=sphere;
-				  sphere.urlName = nodes[key].url.getLastPartOfUrl();
-				  VisualisationJsModule.add3DObject(sphere,nodes[key].distance);
-				  spheres[key] = sphere;	
-				  VisualisationJsModule.sphereArray.push(sphere);
-
-				  // add the sphere to the scene
-				  VisualisationJsModule.scene.add(sphere);
-
-				  nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
-				  
-				  
-				  createCallbackFunctionForSphere(sphere); 
-			  }
-		  }
-		  //save spheres to memory, so they can be recalled
-		  VisualisationJsModule.spheres=spheres;
-	  
-		  
-		  createArrows(three_links, nodelinks);
-		  initialiseConstraints(nodes, spheres, three_links);
-		  VisualisationJsModule.three_links=three_links;
-		  VisualisationJsModule.container.addEventListener( 'mouseup', onDocumentMouseUp, false );
-		  VisualisationJsModule.container.addEventListener( 'touchstart', onDocumentTouchStart, false );
-		  VisualisationJsModule.container.addEventListener( 'mousedown', onDocumentMouseDown, false );			
+	  //create arrows based on nodelinks
+	  createArrows(nodelinks);
+	  scaleNodesAndArrows(nodes);
+  }catch( e ){console.log("error visualize"+e)}
   }//visualize
-		  
-		  
-  /*	function createLabel(key,distance){
-			  var canvas1 = document.createElement('canvas');
-			  var context1 = canvas1.getContext('2d');
-			  context1.font = VisualisationJsModule.getStyle(".containerAttributes").style.font;
-			  context1.fillStyle = VisualisationJsModule.getStyle(".nodeTextLabel").style.color;
-			  context1.fillText(key, 10, 30);
-			  var texture1 = new THREE.Texture(canvas1);
-			  texture1.needsUpdate = true;
-			  texture1.magFilter = THREE.NearestFilter;
-			  texture1.minFilter = THREE.LinearMipMapLinearFilter;
-			  texture1.minFilter = THREE.NearestFilter;
-			  var material1 = new THREE.MeshBasicMaterial({
-				  map : texture1,
-				  side : THREE.DoubleSide
-			  });
-			  material1.transparent = true;
-			  var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(30, 15), material1);						
-			  
-			  labels[key] = mesh1;
-			  VisualisationJsModule.scene.add(mesh1);	
-			  VisualisationJsModule.add3DObject(mesh1,distance);
-	  }*/
-		  
-		  
+
+  function getSphereColor(distance){
+    var color = CSSsphere_color;
+    try{
+      color=getStyleAttr(".sphere.level"+distance,"color",CSSsphere_colors[distance])
+    }
+      catch (e){//if level is too high, set default
+	color = getStyleAttr(".sphere","color",CSSsphere_color)
+      }
+      return color;
+  }
+
+
+  /*
+   * createSpheresBasedOnNodes
+   * create sphere for every node, and saves it within a node
+   */
+  function createSpheresBasedOnNodes(nodes,baseLevel){
+    try{
+    for (var key in nodes) {
+	    if (nodes.hasOwnProperty(key) && nodes[key].distance>=baseLevel) { 
+		    var val = nodes[key];
+		    
+		    // set up the sphere vars
+		    var radius = 5 - (nodes[key].distance)*0.93, //nodes get smaller as their depth increases
+			segments = 32,
+			rings = 32;
+
+		    // create the sphere's material and color
+		    var sphereColor=getSphereColor(nodes[key].distance);
+		    var sphereMaterial = new THREE.MeshPhongMaterial({
+				    color : sphereColor
+			    });												
+
+		    //create the sphere
+		    try {
+		      var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
+		      sphere.name = nodes[key].name;
+		      sphere.node = nodes[key];
+		      sphere.urlName = nodes[key].url.getLastPartOfUrl();
+		      nodes[key].sphere=sphere;
+		      add3DObject(sphere,nodes[key].distance);
+		      //spheres[key] = sphere;	
+		      sphereArray.push(sphere);
+
+		      // add the sphere to the scene
+		      scene.add(sphere);
+		      
+		      //modify node. uses array, so there's no need to return value from function
+
+		      nodes[key].label=createLabelWithSprite( key ,nodes[key]["uri:Eigenschap:Heading"] ,nodes[key].distance);
+		      
+		      
+		      createCallbackFunctionForSphere2(sphere); 
+		    } catch(e){console.log("error creating node for"+nodes[key]);}
+	    }
+    }
+  }catch( e ){console.log("error createSpheresBasedOnNodes"+e)}
+  }
+  
   //creates label and connect it to node	
   function createLabelWithSprite( key, text,distance ){
 
@@ -536,20 +552,20 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var canvas = document.createElement('canvas');
 	  var context = canvas.getContext('2d');
 	  var textWidth = context.measureText( text ).width;
+	  //console.log(textWidth);
 	  
 	  var canvas = document.createElement('canvas');
 	  //TODO make width of sprite dependant on width of text
-	  //size is now hard-coded!?
-	  var size = 350;
-	  canvas.width = size;
-	  canvas.height = size;
+	  //could it be it can be calculated using textWidth and fontsize?
+	  canvas.width = LABELSIZE;
+	  canvas.height = LABELSIZE;
 	  var context = canvas.getContext('2d');
 	  context.fillStyle = '#990000';
 	  context.textAlign = 'center';
-	  context.font = VisualisationJsModule.getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
-	    VisualisationJsModule.getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
-	    VisualisationJsModule.getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
-	  context.fillText(text, size / 2, size / 2);
+	  context.font = getStyleAttr(".containerAttributes","font-weight",CSScontainerAttributes_fontweight)+" "+
+	    getStyleAttr(".containerAttributes","font-size",CSScontainerAttributes_fontsize)+" "+
+	    getStyleAttr(".containerAttributes","font-family",CSScontainerAttributes_fontfamily);
+	  context.fillText(text, LABELSIZE / 2, LABELSIZE / 2);
 
 	  var amap = new THREE.Texture(canvas);
 	  amap.needsUpdate = true;
@@ -564,11 +580,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var sprite = new THREE.Sprite(mat);
 	  sprite.scale.set(50,50,1.2); //grootte van text
 	  sprite.textWidth=textWidth;
-	  
-	  labels[key] = sprite;
+	  nodes[key].label = sprite;
 	  sprite.position.set(10,10,0);
-	  VisualisationJsModule.scene.add( sprite );
-	  VisualisationJsModule.add3DObject(sprite,distance);		
+	  scene.add( sprite );
+	  add3DObject(sprite,distance);		
 	  //node.label=sprite;
 	  
 	  
@@ -576,52 +591,37 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  
   }//createLabelWithSprite
 	  
-  function roundRect(ctx, x, y, w, h, r){
-		  ctx.beginPath();
-		  ctx.moveTo(x+r, y);
-		  ctx.lineTo(x+w-r, y);
-		  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-		  ctx.lineTo(x+w, y+h-r);
-		  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-		  ctx.lineTo(x+r, y+h);
-		  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-		  ctx.lineTo(x, y+r);
-		  ctx.quadraticCurveTo(x, y, x+r, y);
-		  ctx.closePath();
-		  ctx.fill();
-		  ctx.stroke();   
-  }
-	  
   
-  function createArrows(three_links, nodelinks){	
+  function createArrows(nodelinks){	
 	  for (var i = 0; i < nodelinks.length; i++) {
-									  
-			  if(nodelinks[i].type.compareStrings("Eigenschap:Skos:related", true, true)){
-				  three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.related","color",CSSarrow_related_color), nodelinks[i]));					
-			  }
-			  else if(nodelinks[i].type.compareStrings("Eigenschap:Skosem:broader", true, true)){
-				  three_links.push(setArrowData(VisualisationJsModule.getStyleAttr(".arrow.broader","color",CSSarrow_broader_color), nodelinks[i]));			
-			  }
-			  else{
-				  console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");
-				  return;
-			  };			
+	    try{
+			    var link=setArrowData(getStyleAttr(CSSarrowColors[nodelinks[i].type].css,"color",CSSarrowColors[nodelinks[i].type].color), nodelinks[i]);
+			    nodelinks[i].three_link=link;
+	    }catch(e){console.log("ik heb geen nodelinks kunnen vinden dus heb de arrow geen kleurtje kunnen geven");}
+	    									  
 	  }			
   }
   
   
   /*
   * Function for adding an arrow to the visualisation scene, the given parameters will determine the color and the source and target of the arrows.
-  * Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the three_links data.
+  * Note: the arrows are added to the scene first, and after that they will get their positions assigned in the initialiseconstraints() function by the nodelinks.three_link data.
   *
   */
   //function for setting the data and creating the new arrow
   function setArrowData(arrowColor, currentNodeLink){
+    try{
+	  if (currentNodeLink.hasOwnProperty('arrow'))return;//do not draw more than one arrow for relation/link
 	  var origin = new THREE.Vector3(50, 100, 50);
 	  var terminus = new THREE.Vector3(75, 75, 75);
 	  var direction = new THREE.Vector3().subVectors(terminus, origin).normalize();
 	  var distance = origin.distanceTo(terminus);
-	  var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor); 		
+	  if (CSSarrowColors[currentNodeLink.type].arrow)
+	    var arrow = new THREE.ArrowHelper(direction, origin, distance, arrowColor);
+	  else{
+	    //introduced a copy of THREE.ArrowHelper which draws lines without arrows
+	    var arrow = new THREE.ArrowHelper2(direction, origin, distance, arrowColor,0,0);
+	  }
 	  arrow.userData = {
 				  target : currentNodeLink.target.name,
 				  source : currentNodeLink.source.name
@@ -630,22 +630,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  arrow.target=currentNodeLink.target;
 	  arrow.distance=currentNodeLink.distance;
 	  currentNodeLink.arrow=arrow;//keep connection between nodelink and arrow. Arrow is made for nodelink
-	  VisualisationJsModule.add3DObject(arrow,currentNodeLink.distance);
+	  add3DObject(arrow,currentNodeLink.distance);
 	  
-
-		  
-	  //sets the arrowcolor to narrower if the target is deeper than the source and the nodelinktype is related
-	  //This code become rudimentary if there are new types introduced
-		  if(arrow.target.distance < arrow.source.distance && currentNodeLink.type != "Eigenschap:Skos:related"){	
-		    //commented out by anton
-		    //color red was arbitrarily added to some arrows
-		    //TODO: see what next line does. If not necessary: omit it!
-			  //arrow.setColor(VisualisationJsModule.getStyle(".arrow.narrower").style.color);
-		  }
-	  
-	  
-	  VisualisationJsModule.scene.add(arrow);	
+	  scene.add(arrow);	
 	  return arrow;
+  }catch( e ){console.log("error setarrowdata"+e)}
   }//setArrowData
   
   //adds lightsources to the scene, for aesthetic purposes
@@ -653,43 +642,45 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  // Instantiate light sources
 	  var pointLight1 = new THREE.PointLight(0xFFFFFF);
 	  pointLight1.position.set(0,50,500);
-	  VisualisationJsModule.scene.add(pointLight1);
+	  scene.add(pointLight1);
 	  var pointLight2 = new THREE.PointLight(0xFFFFFF);
 	  pointLight2.position.set(0,500,-500);
-	  VisualisationJsModule.scene.add(pointLight2);
+	  scene.add(pointLight2);
 	  var pointLight3 = new THREE.PointLight(0xFFFFFF);
 	  pointLight3.position.set(500,500,0);
-	  VisualisationJsModule.scene.add(pointLight3);
+	  scene.add(pointLight3);
 	  var pointLight4 = new THREE.PointLight(0xFFFFFF);
 	  pointLight4.position.set(-500,50,0);
-	  VisualisationJsModule.scene.add(pointLight4);
+	  scene.add(pointLight4);
 	  var pointLight5 = new THREE.PointLight(0xFFFFFF);
 	  pointLight5.position.set(0,-100,0);
-	  VisualisationJsModule.scene.add(pointLight5);
+	  scene.add(pointLight5);
   }
 
   function clearCanvas(){
-		  for( var i = VisualisationJsModule.scene.children.length - 1; i >= 0; i--) {						
+		  for( var i = scene.children.length - 1; i >= 0; i--) {						
 			  //does it have a geometry or is it an Object3D? remove it. This just deletes the spheres and arrows and not the lighting and camera.
-			  if(VisualisationJsModule.scene.children[i].geometry != null | VisualisationJsModule.scene.children[i].type == "Object3D"){
-				  VisualisationJsModule.scene.remove(VisualisationJsModule.scene.children[i]);	
+			  if(scene.children[i].geometry != null | scene.children[i].type == "Object3D"){
+				  scene.remove(scene.children[i]);	
 			  }
 		  };			
   }	
   function changeDepth(depth){
     //make objects visible yes/no depending on depth
-    var links=VisualisationJsModule.threeDObjects
+    var links=threeDObjects;
+    try{
     links.forEach(function(link){
-      link.visible=link.distance<=depth;
+	link.visible=link.distance<=depth;
     });
+    }catch( e ){console.log("error changedepth"+e)}
   }
   
   function getNodeAndNodelinksFromMemory(jsonResult,baseLevel) {
+    try{
       //produces nodes, nodelinks and baseLevel when nodes are already on screen while ajax is called
       //gets nodes and nodelinks from memory
-      var nodes=VisualisationJsModule.nodes;
-      var labels=VisualisationJsModule.labels;
-      var nodelinks=VisualisationJsModule.nodelinks;
+      //var nodes=globalnodes;
+      //var nodelinks=globalnodelinks;
 
       //depth calculated to largest distance of old ones
       for (var key in nodes) {
@@ -707,10 +698,10 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	nodeFound=true;
       }
       if(!nodeFound)
-	baseLevel=VisualisationJsModule.depth;
+	baseLevel=DEPTH;
 
       //add new nodelinks to old ones
-      var nodelinks=VisualisationJsModule.nodelinks;
+      //var nodelinks=globalnodelinks;
       jsonResult.relations.forEach(function(link) {
 	var found=false;
 	nodelinks.forEach(function(linkold) {
@@ -722,87 +713,108 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       });
       //three return values
       return {nodes:nodes,nodelinks:nodelinks,baseLevel:baseLevel};
+  }catch( e ){console.log("error getnodesandlinksfrommemory"+e)}
   }//getNodeAndNodelinksFromMemory
 
 	//gets called after the ajax call
   var drawNewObjectsWithAjaxData = function (result) {
+    try{
     //end loading icon
     $("body").toggleClass("wait");
+    //TODO: wait icon is changed to a "finger"; change it to arrow.
 
-    if (result.length==0) 
-      result='{"relations":[],"nodes":{"'+thisconcept+'":{"name":"'+thisconcept+
+    if (result.length==0) {
+      //TODO change to new ip-address, and see if this can be done cleaner
+      result='{"relations":[],"nodes":{"'+currentPageName+'":{"name":"'+currentPageName+
       '","distance":0,"url":"http:\/\/195.93.238.56\/wiki\/hzportfolio\/wiki\/index.php\/KNKR_Oncologen"}}}';
+      console.log("no result; panic: what should be displayed? Just do something...");
+    }
 
-    VisualisationJsModule.init3DObjects();
+    //init3DObjects();
 
     var baseLevel=0;
 
     var jsonResult = JSON.parse(result);
     console.log(jsonResult);
-    if (typeof VisualisationJsModule.nodes == 'undefined'){
+    //check if first time to draw
+    if (!valuesHaveBeenShown){
       //first time to draw nodes and arrows.
       //init nodes, nodelinks and labels
-	  VisualisationJsModule.init3DObjects();
-		  
-	  //Contains arrows
-	  labels = []; //Contains label sprites			
 	  
-	  var nodes = jsonResult.nodes;
-	  var nodelinks = jsonResult.relations;
+	  nodes = jsonResult.nodes;
+	  nodelinks = jsonResult.relations;
     } else {
       //read nodes from memory
       var ret=getNodeAndNodelinksFromMemory(jsonResult,baseLevel);
       //parse return value
-      var nodes=ret.nodes,nodelinks=ret.nodelinks;
+      nodes=ret.nodes,nodelinks=ret.nodelinks;
       baseLevel=ret.baseLevel;
     }
+    //next time read from memory
+    valuesHaveBeenShown=true;
 
     // replace the description of the source and target of the links with the actual nodes.
     nodelinks.forEach(function(link) {
       {
-	//check if link-desccription already replaced with corresponding object
+	//check if link-description already replaced with corresponding object
+	try{
 	if (typeof link.source == "string"){
 	  //replace link-desccription with corresponding object
-	    link.source = nodes[link.source] ;
+	    var source=nodes[link.source];
+	    if (!(source.hasOwnProperty('sourcelist'))) {
+	      source.sourcelist=[];
+	    }
+				source.sourcelist.forEach(function(nlink) {
+				  if (nlink.source==source && nlink.target==nodes[link.target]&&nlink.type==link.type)
+				  {console.log("dubbele relatie");console.log(link);}
+				});
+	    
+	    link.source = source ;
+	    source.sourcelist.push(link);
 	    link.distance=link.source.distance;
-	    link.target = nodes[link.target];
+	    var target=nodes[link.target];
+	    link.target = target;
+	    if (!(target.hasOwnProperty('targetlist'))) {
+	      target.targetlist=[];
+	    }
+	    target.targetlist.push(link);
 	    //distance is smallest from target and source
 	    if (link.distance<link.target.distance) link.distance=link.target.distance;
-	}
+	};
+	}catch( e ){console.log("error replace source and target of links")}
       }
     });
 
-    VisualisationJsModule.camera.updateProjectionMatrix();
-    visualize(baseLevel,nodes, nodelinks);
-    animate();
-    changeDepth(VisualisationJsModule.newDepth);//initial position in depth-slider is 1
+    camera.updateProjectionMatrix();
+    createSpheresAndArrowsBasedOnNodesAndLinks(baseLevel,nodes, nodelinks);
+    //will omit all nodes with distance < baseLevel
+    changeDepth(GLOBALDEPTH);//initial position in depth-slider is 1
     console.log("initialized all");
-    VisualisationJsModule.nodes=nodes;
-    VisualisationJsModule.labels=labels;
-    VisualisationJsModule.nodelinks=nodelinks;
-    
+
+    animate();
     // Animate the webGL objects for rendering
     function animate() {
 	    requestAnimationFrame(animate);
-	    renderer.render(VisualisationJsModule.scene, VisualisationJsModule.camera);
-	    VisualisationJsModule.controls.update();
+	    renderer.render(scene, camera);
+	    controls.update();
+	    TWEEN.update();
 
-	    for (var label in labels) {
-		    labels[label].lookAt(VisualisationJsModule.camera.position); //makes the labels spin around to try to look at the camera
+	    for (var key in nodes) {
+		    nodes[key].label.lookAt(camera.position); //makes the labels spin around to try to look at the camera
 	    }
-	    render();
     }
 
-    // Extension of default render function, runs continuously, add code here if needed
-    function render() {
-
-    }
+  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
   };//drawNewObjectsWithAjaxData
 
 		  
+  /*
+   * initialiseDrawingSequence
+   * can be called from init, and from slider.
+   * if called from slider, newDepth is defined, otherwise it is undefined
+   */
   function initialiseDrawingSequence(concept, depth, newdepth){
-    thisconcept=concept;
-		  
+	  concept=concept.replace(/&#39;/g, "'");//hack-workaround. It appears ' is coded as &#39; in mediawiki........
 	  if ( typeof concept === 'undefined' || concept === '') {
 		  throw "Concept is undefined";
 	  }		
@@ -811,11 +823,11 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	  var mydepth =1 ;	
 	  if (typeof newdepth !== 'undefined'){
 	    mydepth = newdepth;
-	    VisualisationJsModule.depth=depth;
+	    DEPTH=depth;
 	  }
-	  else //TODO van Robert: waarom staat hier geen scoping?
+	  else 
 	    clearCanvas();//first time, clear canvas   
-	  VisualisationJsModule.newDepth=mydepth;//TODO is newdepth a good description? And it should become a class-variable
+	  GLOBALDEPTH=mydepth;
 	  var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";
 	  //display loading icon before ajax-call
 	  $("body").toggleClass("wait");	
@@ -827,7 +839,7 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 		  url : mw.config.get('wgExtensionAssetsPath')+"/EM3DNavigator/php/VisualisationScript.php", //refer to the path where the PHP class resides
 		  async : true,
 		  data : {
-			  concept : concept.replace(/_/g, " "),
+			  concept : decodeURI(concept.replace(/_/g, " ")),
 			  depth : depth.toString(),
 			  relations : relations,
 			  uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
@@ -840,108 +852,61 @@ function checkGeometryTypeAndSlice(intersects, urlname){
 	    }).done(drawNewObjectsWithAjaxData);
   }//initialiseDrawingSequence
 				    
-  /**
-  *Initialise the components that are relevant to the canvas/renderer
-  */	
-//  function initialiseTHREEComponents(currentPageName){ //current page name als concept mee
-//    //TODO anton:function not used anymore. can be removed.
-//	  drawHTMLElements(TARGETDIVID);
-//	  drawModel(currentPageName);  
-//  }//initialiseTHREEComponents
 
-  function initGlobalVariables(CONTAINERDIV){
-      //initalise global module to store global variables
-      VisualisationJsModule= new VisualisationJsModulePrototype(CONTAINERDIV);
-
-      var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width; //afmetingen staan in de module gedefinieerd
-
-      
-      // Create Renderer
-      renderer = new THREE.WebGLRenderer({
-	      alpha : true,
-	      antialiasing : true
-      });
-
-      renderer.setClearColor(0x000000, 0);
-      renderer.setSize(containerWIDTH, containerHEIGHT);
-      var containerDiv=document.getElementById( CONTAINERDIV ); //TODO van Robert, gets the containerdiv... again...
-      $("#"+CONTAINERDIV).empty();
-      containerDiv.appendChild(renderer.domElement);
-  }//initGlobalVariables
-  function drawTotalModel(currentPageName){
-        if (typeof currentPageName == 'undefined'){
-	  currentPageName=mw.config.get( 'wgPageName' );
-	}
-	    createExtraFunctions();
-	    initVariables();
-	    initGlobalVariables(CONTAINERDIV);
-	    drawModel(currentPageName);
+  function drawModel(initcurrentPageName){
+      if (typeof initcurrentPageName == 'undefined'){
+	initcurrentPageName=mw.config.get( 'wgPageName' );
+      }
+      currentPageName=initcurrentPageName;//save in class-variable so it can be used outside function
+      initGlobalVariables(CONTAINERDIV);
+      camera.position.y = HEIGHT/2;
+      camera.position.x = WIDTH/2;			
+      camera.position.z =  Math.pow((HEIGHT*HEIGHT + WIDTH*WIDTH), 1/4);			
+      scene.add(camera);
+		      
+      createLightingForScene();
+      if (typeof sliderObject == 'undefined')//TODO this is a hack. Check why sliderObject can be created more than once
+	sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,DEPTH); //creates the slider for the depth
+      initialiseDrawingSequence(currentPageName,DEPTH);
   }
 
   var  drawHTMLElements = function(targetDivId, currentPageNameFromMw){
   //draw html-elements, and give them basic csss-styles to position them
-  //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
-	if (window.EMMElementsDrawn) {
-		return;
-	}
+      if (window.EMMElementsDrawn) {
+	      return;
+      }
       window.EMMElementsDrawn=true;
-      createExtraFunctions(); //creates extra functions, they only have to be made once.
-      //create containerDiv 
-      d3.select("div").append("div:div").attr("id", "containerDiv").style("display", "inline-block");
-      var containerDiv=document.getElementById( CONTAINERDIV );//it is created, get element. //TODO van Robert: conainerDiv en divID splitsen
-      document.getElementById(targetDivId).appendChild( containerDiv);
-
-      initGlobalVariables(CONTAINERDIV); 
-	  
-
-      var sliderDiv='sliderDiv';
-      d3.select('#' + targetDivId).append("div")
-	      .attr("id", sliderDiv)
-	      .attr("width", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"width",30))
-	      .attr("position", "fixed")
-	      //TODO find out why vertical-align:top only works when added to css, and not here....
-	      //could it be it has to be changed to style?
-	      .attr("vertical-align", "top")
-	      .attr("height", VisualisationJsModule.getStyleAttrInt('#'+sliderDiv,"height",400))
-	      .style("display", "inline-block")
-	      .style("background", VisualisationJsModule.getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
-	      //getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)");//background: rgb(229,222,205)
-	      
-
-      var containerDivDescription=CONTAINERDIV;
+      
+      //create containerDiv and other elements
       jQuery('<div/>', {
-      id: EMMCONTAINERDIV/*,
-      css: "position:relative;height:"+$("#"+containerDivDescription).height()+ "px;width: "+$("#"+containerDivDescription).width()+ "px;display:inline-block;"*/
+	id: CONTAINERDIV,
+      }).appendTo('#'+targetDivId);
+      //create sliderdiv
+      jQuery('<div/>', {
+	id: SLIDERDIVID,
+      }).appendTo('#'+targetDivId);;
+      jQuery('<div/>', {
+	id: EMMCONTAINERDIV
       }).prependTo('#'+BODYCONTENTDIV);
-      $("#"+containerDivDescription).appendTo('#'+EMMCONTAINERDIV);
-      $("#"+containerDivDescription).attr("css","position:relative;");
-      $("#"+sliderDiv).appendTo('#'+EMMCONTAINERDIV);
-      //TODO see why vertical-align: top; has no effect here on #sliderDiv (in css it works although!)
-      $("#"+EMMCONTAINERDIV).css("position","relative").css("height",""+$("#"+containerDivDescription).height()+ "px")
-	.css("width",""+$("#"+containerDivDescription).width()+ "px").css("display","inline-block");
-      $("#"+sliderDiv).css("position","absolute").css("left",""+($("#"+containerDivDescription).width()-$("#"+sliderDiv).width())+"px").css("vertical-align","top");
-
+      $("#"+CONTAINERDIV).appendTo('#'+EMMCONTAINERDIV);
+      $("#"+SLIDERDIVID).appendTo('#'+EMMCONTAINERDIV);
       var showdivcontainer=jQuery('<div/>', {
-      id: SHOWBUTTONDIV+"container"
+	id: SHOWBUTTONDIV+"container"
       });
       var showdivtext=jQuery('<span/>', {
-      id: SHOWBUTTONDIV+"text",
-      html:"<b>Model</b>"
+	id: SHOWBUTTONDIV+"text",
+	html:"<b>Model</b>"
       });
       var showdivcontainer2=jQuery('<span/>', {
-      id: SHOWBUTTONDIV+"container2"/*,
-      class:"mw-collapsible-toggle mw-collapsible-toggle-collapsed"*/
+	id: SHOWBUTTONDIV+"container2"
       }).css("float","right");
 
-    var leftBracket=jQuery('<span/>', {
-		html:"["/*,
-		class:"mw-collapsible-bracket"*/
-     });
+      var leftBracket=jQuery('<span/>', {
+		  html:"["
+      });
 
       var rightBracket=jQuery('<span/>', {
-	html:"]"/*,
-	class:"mw-collapsible-bracket"*/
+	html:"]"
       });
       var showdiv=jQuery('<a/>', {
       id: SHOWBUTTONDIV,
@@ -954,116 +919,71 @@ function checkGeometryTypeAndSlice(intersects, urlname){
       showdivcontainer.append(showdivtext);
       showdivcontainer.append(showdivcontainer2);
       showdivcontainer.prependTo('#'+BODYCONTENTDIV);
+	      
+      //set CSS of elements
+      //met de volgende code extra, en het stuk in css, kun je de slider over het model heen laten vallen.
+      $("#"+SLIDERDIVID).css("position", "fixed")
+	      .css("vertical-align", "top")
+	      .css("display", "inline-block");
+      $("#"+CONTAINERDIV).css("position","absolute").css("display", "inline-block");
+      $("#"+EMMCONTAINERDIV).css("position","relative");
+         var divWidth=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+
+      $("#"+SLIDERDIVID).css("width",getStyleAttrInt('#'+SLIDERDIVID,"width",30))
+	      .css("width", getStyleAttrInt('#'+SLIDERDIVID,"width",30))
+	      .css("height", getStyleAttrInt('#'+SLIDERDIVID,"height",400))
+      $("#"+EMMCONTAINERDIV).css("height",""+$("#"+CONTAINERDIV).height()+ "px")
+	.css("width",""+divWidth+ "px").css("display","inline-block");
+
+      //define event on button
       $( '#'+EMMCONTAINERDIV ).hide();
       $( "#"+SHOWBUTTONDIV  ).click(function () {
 	if ( $( '#'+EMMCONTAINERDIV ).is( ":hidden" ) ) {
 	  var timeout=0;
 	  if (!valuesHaveBeenShown){
-	    drawTotalModel(currentPageNameFromMw);
+	    drawModel(currentPageNameFromMw);
 	    timeout=1000;
 	  }
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-collapse' ).text(),"Collapse"));
 	  //slide down after one second; smooth animation
 	  setTimeout(function(){$( '#'+EMMCONTAINERDIV ).slideDown( "slow" );}, timeout);
 	} else {
-	  valuesHaveBeenShown=true;
+	  //valuesHaveBeenShown=true;
 	  $( '#'+EMMCONTAINERDIV ).slideUp( "slow" );
 	  showdiv.html(checkIfEmpty(mw.message( 'collapsible-expand' ).text(),"Expand"));
 	}
       });
   }//drawHTMLElements
 
-  function isBlank(str) {
-      return (!str || /^\s*$/.test(str)); //TODO van Robert: wat doet test
-  }
-  function checkIfEmpty(text,alternative){
-    if (isBlank(text)||(text.length==0)||text.charAt(0)=="<") return alternative; else return text;
-  }
-
-  function drawModel(currentPageName){
-  //draw model
-      var containerHEIGHT = VisualisationJsModule.height;
-      var containerWIDTH = VisualisationJsModule.width; //TODO van Robert, deze variabelen worden ook al gedeclareerd in initglobalVariables, 2x.
-      VisualisationJsModule.camera.position.y = containerHEIGHT/2;
-      VisualisationJsModule.camera.position.x = containerWIDTH/2;			
-      VisualisationJsModule.camera.position.z =  Math.pow((containerHEIGHT*containerHEIGHT + containerWIDTH*containerWIDTH), 1/4);			
-      VisualisationJsModule.scene.add(VisualisationJsModule.camera);
-		      
-      createLightingForScene();
-      
-      sliderObject=createSlider(initialiseDrawingSequence,changeDepth, currentPageName,VisualisationJsModule.depth); //creates the slider for the depth
-      initialiseDrawingSequence(currentPageName,VisualisationJsModule.depth);
-  }
-
-	  
-  //creates additional functions	
-  function createExtraFunctions(){
-		  d3.selection.prototype.moveToFront = function() {//not used
-			  return this.each(function() {
-				  this.parentNode.appendChild(this);
-			  });
-		  };
-
-		  d3.selection.prototype.first = function() {//not used
-			  return d3.select(this[0][0]);
-		  };	
-		  
-		  String.prototype.lowerCaseFirstLetter = function() {//not used
-			  return this.charAt(0).toLowerCase() + this.slice(1);
-		  };
-
-		  String.prototype.getLastPartOfUrl= function() {
-			  return this.split("/").pop();
-		  };		
-		  
-		  String.prototype.getFirstPartOfUrl= function() {
-			  var strArray = this.split("/");
-			  strArray.splice(-1, 1); //remove last part of str
-			  var joinedString = strArray.join("/")+"/";
-			  return joinedString; //returns http://127.0.0.1/mediawiki2/index.php/ format
-		  };
-		  String.prototype.isEmpty = function() {//not used
-		      return (this.length === 0 || !this.trim());
-		  };
-		  
-		  //Compares 2 strings with each other, use ' "COMPARETHIS".compareStrings("CoMpAreThIs", true, true);" to receive true.
-		  String.prototype.compareStrings = function (string2, ignoreCase, useLocale) {
-			  var string1 = this;
-			  if (ignoreCase) {
-				  if (useLocale) {
-					  string1 = string1.toLocaleLowerCase();
-					  string2 = string2.toLocaleLowerCase();
-				  }
-				  else {
-					  string1 = string1.toLowerCase();
-					  string2 = string2.toLowerCase();
-				  }
-			  }
-			  return string1 === string2;
-		  };
-  }
-  
 
 	function setDivIdFromWiki(string1, string2){
 		console.log("het doorgegeven ID is =");
 		console.log(string1);
 		console.log(string2);
 	}
+
+		function init3DObjects(){
+		  threeDObjects=[];
+		};
+		//functions to set distance for visible yes/no
+		function add3DObject(object,distance){
+		  object.distance=distance;
+		  threeDObjects.push(object);
+		};
+  
+
 	
   return  {
 		//these properties can be asked by: Visualisation.propertyname
 		drawHTMLElements : drawHTMLElements,
 		setDivIdFromWiki : setDivIdFromWiki,
-		drawModel : drawTotalModel
+		drawModel : drawModel,
+		getStyle: getStyle,
+		getStyleAttrInt:getStyleAttrInt
+
   }
 });
 
-var visualisationInstance = new Visualisation();
+var visualisationInstance = new Visualisation();//TODO not used, can be omitted. Find out if an instance can be created that can be used in global space
 //var window.visualisationInstance= new Visualisation(); // . is unidentified token?
-
-//start program if html-elements are initialised
-$(document).ready(function() {
-  //start the drawing inside a document.ready-function
-  //visualisationInstance.drawHTMLElements(TARGETDIVID);
-});
 

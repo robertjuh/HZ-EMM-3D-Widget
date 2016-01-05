@@ -16,8 +16,14 @@ class QueryBuilder {
 			  ?s ?p ?o
 			  FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept }  || EXISTS{ ?s a  uri:Categorie-3ASocKrt_Concept} )
 			}
+			limit 12000
 		';
 
+	//TODO: limit 4000 is hack. Replace this with other algorithm:
+	//introduce queue
+	//while queue not empty and number of nodes < ...
+	//get all nodes for first member of queue, and add them to list.
+	//if new node not in queue, add it to queue.
 	//parameters passed by calling javascript
 	private $depth;
 	private $concept;
