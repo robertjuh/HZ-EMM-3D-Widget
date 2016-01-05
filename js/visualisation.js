@@ -848,7 +848,11 @@ var CSScontainerAttributes_height=400;
     console.log("initialized all");
 
     animate();
-    // Animate the webGL objects for rendering
+    
+
+  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
+  
+  // Animate the webGL objects for rendering
     function animate() {
 	    requestAnimationFrame(animate);
 	    renderer.render(scene, camera);
@@ -859,8 +863,6 @@ var CSScontainerAttributes_height=400;
 		    nodes[key].label.lookAt(camera.position); //makes the labels spin around to try to look at the camera
 	    }
     }
-
-  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
   };//drawNewObjectsWithAjaxData
 
 		  
