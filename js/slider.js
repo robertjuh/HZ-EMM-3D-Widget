@@ -52,8 +52,8 @@ vis.selectAll("polygon")
     .attr("id", "sliderArea")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
-    .attr("fill",  visualisationInstance.getStyle(".sliderAttributes.sliderPolygon").style.background )
-    .attr("stroke", visualisationInstance.getStyle(".sliderAttributes.sliderPolygon").style.color )
+    .attr("fill",  getStyleAttr(".sliderAttributes.sliderPolygon","background","rgb(229,222,205)") )
+    .attr("stroke", getStyleAttr(".sliderAttributes.sliderPolygon","color","rgb(229,222,205)") )
     .attr("stroke-width",2);
 
 

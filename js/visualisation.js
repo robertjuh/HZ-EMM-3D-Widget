@@ -774,7 +774,7 @@ var CSScontainerAttributes_height=400;
 
 	//gets called after the ajax call
   var drawNewObjectsWithAjaxData = function (result) {
-    try{
+  //  try{
     //end loading icon
     $("body").toggleClass("wait");
     //TODO: wait icon is changed to a "finger"; change it to arrow.
@@ -813,7 +813,7 @@ var CSScontainerAttributes_height=400;
     nodelinks.forEach(function(link) {
       {
 	//check if link-description already replaced with corresponding object
-	try{
+//	try{
 	if (typeof link.source == "string"){
 	  //replace link-desccription with corresponding object
 	    var source=nodes[link.source];
@@ -837,7 +837,7 @@ var CSScontainerAttributes_height=400;
 	    //distance is smallest from target and source
 	    if (link.distance<link.target.distance) link.distance=link.target.distance;
 	};
-	}catch( e ){console.log("error replace source and target of links")}
+//	}catch( e ){console.log("error replace source and target of links")}
       }
     });
 
@@ -860,7 +860,7 @@ var CSScontainerAttributes_height=400;
 	    }
     }
 
-  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
+  //}catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
   };//drawNewObjectsWithAjaxData
 
 		  
