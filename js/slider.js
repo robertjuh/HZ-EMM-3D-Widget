@@ -52,11 +52,11 @@ vis.selectAll("polygon")
     .attr("id", "sliderArea")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
-    .attr("fill",  getStyleAttr(".sliderAttributes.sliderPolygon","background","rgb(229,222,205)") )
-    .attr("stroke", getStyleAttr(".sliderAttributes.sliderPolygon","color","rgb(229,222,205)") )
+    .style("fill",  getStyleAttr(".sliderAttributes.sliderPolygon","background","rgb(229,222,205)") )
+    .style("stroke", getStyleAttr(".sliderAttributes.sliderPolygon","color","rgb(229,222,205)") )
     .attr("stroke-width",2);
 
-
+ 
   
 var setSliderInfoText=function(width,value){
   return ((width<40)?"":"Depth: ") + value;
