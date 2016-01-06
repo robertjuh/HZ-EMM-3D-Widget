@@ -32,7 +32,7 @@ display:inline-block;
 }
 
 .sliderAttributes.sliderButton{
-	color: rgb(10,24,111);
+	background: rgb(10,24,111);
 }
 
 .sliderAttributes.sliderPolygon{
