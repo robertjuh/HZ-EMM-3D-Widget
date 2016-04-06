@@ -78,10 +78,94 @@ var CSScontainerAttributes_height=400;
       //initalise global variables
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
+	  console.log("mouse");
+	  console.log(mouse);
       DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
       WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
       HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
 
+      var containervar=document.getElementById( CONTAINERDIV );
+	  var d3containervar = d3.select("#containerDiv"); 
+      var ASPECT = WIDTH / HEIGHT;
+      camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
+      controls = new THREE.OrbitControls(camera, containervar);
+      scene = new THREE.Scene;
+
+      //set width and height of divs. Can only be done here because css is not read earlier
+      $("#"+EMMCONTAINERDIV).css("height",""+HEIGHT+ "px").css("width",""+WIDTH+ "px");
+      $("#"+SLIDERDIVID).css("position","absolute").css("left",""+(WIDTH-$("#"+SLIDERDIVID).width())+"px")
+	      .css("background", getStyleAttr(".sliderAttributes.background","background","rgb(229,222,205)") );
+
+      SELECTEDSPHERECOLOR=getStyleAttr(".sphere.selected","color",SELECTEDSPHERECOLOR);
+      // Create Renderer
+      renderer = new THREE.WebGLRenderer({
+	      alpha : true,
+	      antialiasing : true
+      });
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setSize(WIDTH, HEIGHT);
+      //set scaling, only has to be done once.
+      setScaling();
+
+      $("#"+CONTAINERDIV).empty();
+      //add renderer to container
+      containervar.appendChild(renderer.domElement);
+      //add listeners
+      //containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
+      containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
+      //containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
+      window.addEventListener('keydown', keydown, false);
+      window.addEventListener('keyup', keyup, false);
+	 		
+	  	d3containervar.on( 'contextmenu', onDocumentRightMouseDown, false );	
+	  	//d3containervar.on( 'mouseup', onDocumentMouseUp, false );	
+	    d3containervar.on( 'click', onDocumentMouseDown, false );	
+
+	  
+  }//initGlobalVariables
+  
+	
+  var keyup=function(event) {
+    pressedkey="";
+  };
+  var getAllowedKey=function(key){
+    var char=String.fromCharCode(key);
+    //TODO allowedkeys in constant, combined with choices.
+    if ("ASXEDF".indexOf(char)>=0){return char;console.log(char);} else return "";
+  }
+  var keydown=function(event) {
+    var key = event.keyCode;
+    //TODO: up and down also move the screen up and down. see if key-events can be split up. Otherwise stick to xsedaf
+    //better: use shift-arrows. Already implemented.
+    if (key==37) pressedkey="left";else
+    if (key==38) pressedkey="up";else
+    if (key==39) pressedkey="right";else
+    if (key==40) pressedkey="down";else
+    if (key==33) pressedkey="pgup";else
+    if (key==34) pressedkey="pgdn";else
+    pressedkey=getAllowedKey(key);
+    if (event.shiftKey&&selectedSphere&&pressedkey.length>0)moveIntersectedSphere(selectedSphere)
+  };
+  var keyIsPressed=function(){
+    if (pressedkey.length>0) return pressedkey; else return false;
+  }
+	  
+	  	//uses d3.mouse(this)[0],[1] to find the mouse coordinates on the current element
+		//uses the mouse variable which is a THREE.Vector2
+		function normalizeCurrentMouseCoordinates(e, mouse){
+			mouse.x = (  (e[0])  / renderer.domElement.width ) * 2 - 1;			
+			mouse.y = - (  (e[1]) / renderer.domElement.height ) * 2 + 1;			
+		}
+
+  function initGlobalVariables(CONTAINERDIV){
+      //initalise global variables
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      DEPTH=getStyleAttrInt(".maxDepth","order",CSSmaxDepth_order);
+      WIDTH=getStyleAttrInt('.containerAttributes',"width",CSScontainerAttributes_width);
+      HEIGHT=getStyleAttrInt('.containerAttributes',"height",CSScontainerAttributes_height);
+	  var d3containervar = d3.select("#containerDiv"); 
       var containervar=document.getElementById( CONTAINERDIV );
       var ASPECT = WIDTH / HEIGHT;
       camera =  new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);	
@@ -109,10 +193,14 @@ var CSScontainerAttributes_height=400;
       //add renderer to container
       containervar.appendChild(renderer.domElement);
       //add listeners
-      containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
-      containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
-      containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
-      window.addEventListener('keydown', keydown, false);
+     // containervar.addEventListener( 'mouseup', onDocumentMouseUp, false );
+     // containervar.addEventListener( 'touchstart', onDocumentTouchStart, false );
+     // containervar.addEventListener( 'mousedown', onDocumentMouseDown, false );	
+	  d3containervar.on( 'contextmenu', onDocumentRightMouseDown, false );	
+	  //d3containervar.on( 'mouseup', onDocumentMouseUp, false );	
+	  d3containervar.on( 'click', onDocumentMouseDown, false );	    
+
+	  window.addEventListener('keydown', keydown, false);
       window.addEventListener('keyup', keyup, false);
 	  
   }//initGlobalVariables
@@ -142,118 +230,58 @@ var CSScontainerAttributes_height=400;
   var keyIsPressed=function(){
     if (pressedkey.length>0) return pressedkey; else return false;
   }
-  //pakt de sphere die als eerste getroffen wordt door de ray, negeert labels en arrows.
-  function filterFirstSpheregeometryWithRay(event, mouse){			
-		  normalizeCurrentMouseCoordinates(event, mouse);						
-		  raycaster.setFromCamera( mouse, camera);
-
-		  var intersects = raycaster.intersectObjects( sphereArray ); 
-
-		  if(intersects.length > 0 && intersects[0].object != null && intersects[0].object.urlName != null){
-			  checkGeometryTypeAndSlice(intersects, intersects[0].object.callback(intersects[0].object.urlName,event));			
-		  }			
-	  }
 	  
-  function colorSelectedSphere(event, mouse){
+	  
+	  function colorSelectedSphere(event, mouse){
 		  normalizeCurrentMouseCoordinates(event,mouse);
 		  
 		  raycaster.setFromCamera( mouse, camera );
 		  
-		  var intersects = raycaster.intersectObjects( scene.children ); 	
+		  var intersects = raycaster.intersectObjects( sphereArray); 	
+
+		  checkGeometryTypeAndSlice(intersects);	
 
 		  return checkGeometryTypeAndSlice(intersects,event)	
 	  }	
+	  
+	  function checkGeometryTypeAndSlice(intersects){
+			var intersectLength = intersects.length;
+			//If there is an intersection, and it is a sphere, apply click event.
+			//Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
+			for (var i = 0; i <= intersectLength; i++) {
+				if(intersects == 0 || intersects[0].object.geometry.type == null){	
+					return;
+				}else{			 
+					intersects[0].object.callback(intersects[0].object);
+				}		
+			}
+		}
 		  
-		  
-//TODO onderstaande functie volledig opschonen omdat er nu alleen nog spheres worden meegenomen in intersects (intersectable objects.
-function checkGeometryTypeAndSlice(intersects, event){
-    var intersectLength = intersects.length;
-    //If there is an intersection, and it is a sphere, apply click event.
-    //Loops through each intersected object and cuts off the planeGeometries so that the sphere will be clicked even though there is something in front of it.
-    for (var i = 0; i <= intersectLength; i++) {
 
-    if(intersects == 0 || intersects[0].object.geometry.type == null){	
-	    return;
-    }else{				 
-	switch(intersects[0].object.geometry.type){
-		case 'SphereGeometry':
-		  //anton: do not change color anymore
-			//intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
-				intersects[0].object.callback(intersects[0].object.urlName,event);
 
-			//console.log("je heb geklikt op een geometry:");
-			//console.log(intersects[0].object.geometry.type);
-			return true;
-			//break;
-		case 'PlaneGeometry':
-			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere								
-			break;
-		case 'BufferGeometry':
-			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere
-			break;
-		case 'CylinderGeometry':
-			intersects = intersects.slice(1); //cut off the first element(a plane) and check if the next one is a sphere		
-		    break;
-		default:					
-	}
-      }
-    }
-    return false;
-  }
-	
+
+  
+  		//create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
+		//Clickevents on objects on the canvas are registered here
+		function createCallbackFunctionForSphere(sphere, nodelinks, three_links){		
+			try{
+			//sphere.callback = function(conceptNameString){
+			sphere.callback = function(intersectedObject){
+				//if user leftclicked a sphere
+				if(d3.event.type == 'click'){
+					clearCanvas();
+					window.location = window.location.href.getFirstPartOfUrl() + intersectedObject.urlName; //navigate to the clicked object
+				}				
+
+				//if user rightclicked a sphere
+				if(d3.event.type == 'contextmenu'){			
+					moveIntersectedSphere(intersectedObject);					
+				}		
+			}		
+		
+			}catch( e ){console.log("error create callbackfunction"+e)}}
 	
 
-
-  //get offset for dom-element, while looping over all parent elements and summing all offsets
-  function getOffset( el ) {
-      var _x = 0;
-      var _y = 0;
-      while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
-	  _x += el.offsetLeft - el.scrollLeft;
-	  _y += el.offsetTop - el.scrollTop;
-	  el = el.offsetParent;
-      }
-      return { top: _y, left: _x };
-  }
-  //function for normalising mouse coordinates to prevent duplicate code. This will take offset and scrolled position into account and the renderer width/height.
-  //uses the mouse variable which is a THREE.Vector2
-  function normalizeCurrentMouseCoordinates(e, mouse){
-  var x = getOffset( e.target ).left; 
-      /*console.log($("#EMMContainerDiv").offset().left,$("#EMMContainerDiv").offset().top);
-      console.log(getOffset( e.target ).left,getOffset( e.target ).top);//1
-      console.log($(document).scrollLeft(),$(document).scrollTop());//2
-      console.log(e.clientX,e.clientY);//3
-      console.log(e.layerX,e.layerY);
-      console.log( (e.clientX - (getOffset( e.target ).left-$(document).scrollLeft())),( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()))   );*/
-			  var x=(e.clientX - (getOffset( e.target ).left-$(document).scrollLeft()));
-			  if (x>e.layerX)x=e.layerX;
-			  var y=( e.clientY - (getOffset( e.target ).top-$(document).scrollTop()));
-			  if (y>e.layerY)y=e.layerY;
-			  /*mouse.x = ( ( (e.clientX+$(document).scrollLeft()) - (renderer.domElement.offsetLeft )) / renderer.domElement.width ) * 2 - 1;			
-			  mouse.y = - ( ( (e.clientY+$(document).scrollTop()) - (renderer.domElement.offsetTop)) / renderer.domElement.height ) * 2 + 1;	*/		
-			  mouse.x = ( (x) / renderer.domElement.width ) * 2 - 1;			
-			  mouse.y = - ( (y) / renderer.domElement.height ) * 2 + 1;			
-      //console.log(mouse.x,mouse.y);
-  }
-
-
-  //create a callback function for each sphere, after clicking on a sphere the canvas will be cleared and the selected sphere will be the center point
-  function createCallbackFunctionForSphere(sphere){
-    try {
-    sphere.callback = function(conceptNameString,event){
-      if (sphere.distance>0){
-	if (event.button==2 ||(event.button==0 && keyIsPressed())) {moveIntersectedSphere(sphere);}
-	else
-	  if (event.button==0)//left mouse key
-	    window.location = window.location.href.getFirstPartOfUrl() + conceptNameString;
-      }
-	//TODO: conceptNameString can be omitted from function-call, can be exchanged with sphere.node.page;
-	//this is more complicated than it looks. sphere.node.page is the url from the original page.
-	//it is possible that the current url is not the same as the url from the triple store.
-	//this is the case for the test-site anyway.
-    }		
-    }catch( e ){console.log("error create callbackfunction"+e)}
-  }
 	
   function changePosition(node,move,first){
 	  node.x=node.x+move[0];//v3.x;//
@@ -408,21 +436,18 @@ function checkGeometryTypeAndSlice(intersects, event){
 		  event.preventDefault();
 		  event.clientX = event.touches[0].clientX;
 		  event.clientY = event.touches[0].clientY;
-		  onDocumentMouseUp( event );
+		  onDocumentMouseDown( event );
   }
 
   //colors the ball that is being clicked, serves no real purpose yet.
-  function onDocumentMouseDown(event){
-    //event.button==0:lmouse, 2:rmouse
-	  event.preventDefault();
-	  colorSelectedSphere(event, mouse); //Mouse and camera are global variables.
+  function onDocumentMouseDown(){
+	  colorSelectedSphere(d3.mouse(this), mouse); //Mouse and camera are global variables.
   }
   
-  //calls the callback function on mouse up, on the appointed sphere. Mouse and camera are global variables.
-  function onDocumentMouseUp(event){
-	  event.preventDefault();	
-	  //filterFirstSpheregeometryWithRay(event, mouse);
+  function onDocumentRightMouseDown(){
+		colorSelectedSphere(d3.mouse(this), mouse); //Mouse and camera are global variables.
   }
+  
   //end of functions for mouseEvents -----======-----
   
 	    function randomVector(grootte){
@@ -823,7 +848,11 @@ function checkGeometryTypeAndSlice(intersects, event){
     console.log("initialized all");
 
     animate();
-    // Animate the webGL objects for rendering
+    
+
+  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
+  
+  // Animate the webGL objects for rendering
     function animate() {
 	    requestAnimationFrame(animate);
 	    renderer.render(scene, camera);
@@ -834,8 +863,6 @@ function checkGeometryTypeAndSlice(intersects, event){
 		    nodes[key].label.lookAt(camera.position); //makes the labels spin around to try to look at the camera
 	    }
     }
-
-  }catch( e ){console.log("error drawnewobjectswithajaxdata"+e)}
   };//drawNewObjectsWithAjaxData
 
 		  
@@ -856,7 +883,7 @@ function checkGeometryTypeAndSlice(intersects, event){
 	    mydepth = newdepth;
 	    DEPTH=depth;
 	  }
-	  else //TODO van Robert: waarom staat hier geen scoping?
+	  else 
 	    clearCanvas();//first time, clear canvas   
 	  GLOBALDEPTH=mydepth;
 	  var relations = typeof relations !== 'undefined' ? relations : "broader,narrower,related";

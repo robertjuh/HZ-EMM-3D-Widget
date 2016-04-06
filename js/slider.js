@@ -52,24 +52,26 @@ vis.selectAll("polygon")
     .attr("id", "sliderArea")
     .attr("points",function(d) { 
         return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
-    .attr("fill",  visualisationInstance.getStyle(".sliderAttributes.sliderPolygon").style.background )
-    .attr("stroke", visualisationInstance.getStyle(".sliderAttributes.sliderPolygon").style.color )
+    .style("fill",  getStyleAttr(".sliderAttributes.sliderPolygon","background","rgb(229,222,205)") )
+    .style("stroke", getStyleAttr(".sliderAttributes.sliderPolygon","color","rgb(229,222,205)") )
     .attr("stroke-width",2);
 
-
+ 
   
 var setSliderInfoText=function(width,value){
   return ((width<40)?"":"Depth: ") + value;
 }
+
   //text boven de slider
-   var sliderInfo = svgContainer.append('foreignObject')
+   var sliderInfo = svgContainer.append('text')
+   //var sliderInfo = svgContainer.append('foreignObject')
                         .attr('x', 2)
-                        .attr('y', 1)
+                        .attr('y', 15)
 			.attr("id","sliderText")
 			  //center text above slider
 			.style(    "text-align","center")
-                        .attr('width', containerWidth)
-                        .attr('height', 100)
+                        .style('width', containerWidth)
+                        .style('height', 100)
     .text(setSliderInfoText(containerWidth-(sliderOffsetSides), slideDepth));
 
 
@@ -88,8 +90,9 @@ var rectangleAttributes = sliderRect
                           .attr("y", function (d) { return d.ry; })
                           .attr("height", function (d) { return d.height; })
                           .attr("width", function (d) { return d.width; })
-                         .style("fill", visualisationInstance.getStyle(".sliderAttributes.sliderButton").style.color );
+                         .style("fill", getStyleAttr(".sliderAttributes.sliderButton","background", "red") );
 	
+
 
 
 			 
