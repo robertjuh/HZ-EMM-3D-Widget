@@ -874,7 +874,8 @@ function checkGeometryTypeAndSlice(intersects, event){
 			  depth : depth.toString(),
 			  relations : relations,
 			  uri : mw.config.get('wgEM3DNavigator').eM3DNavigatorUri,
-			  fusekidataset : mw.config.get('wgEM3DNavigator').eM3DFusekiDataset
+			  fusekidataset : mw.config.get('wgEM3DNavigator').eM3DFusekiDataset,
+			  fusekilanguage : mw.config.get('wgEM3DNavigator').eM3DFusekiLanguage
 		  },
 		  success:function(result)//we got the response
 		  {

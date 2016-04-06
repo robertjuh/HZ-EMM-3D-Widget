@@ -7,13 +7,16 @@ $concept=$_POST["concept"];
 //called by javascript. Started in mediawiki-page by: {{#widget:EM3DNavigator| currentPageName={{PAGENAME}}}}
 // Load data
 $SMWServer = "http://127.0.0.1/mediawiki2/index.php/Speciaal:URIResolver"; //server of Nick Steijaart
+$FusekiLanguage="en";
 //fuseki by default running on port 3030 on localhost
-$fusekiDataset='http://localhost:3030/ds';
+$fusekiDataset='http://localhost:3030/portfolios';
 //values can be changed in LocalSettings: 
 //example:
 //$wgEM3DNavigatorUri='http://192.168.238.133/index.php/Speciaal:URIResolver';
 //$wgFusekiDataset='http://localhost:3030/ds';
 //replace with parameter from calling script, if passed
+if (isset($_POST['fusekilanguage']))
+  $FusekiLanguage=$_POST['fusekilanguage'];
 if (isset($_POST['uri']))
   $SMWServer=$_POST['uri'];
 if (isset($_POST['fusekidataset']))
@@ -23,7 +26,17 @@ if (isset($_POST['fusekidataset']))
 $depth=intval ($_POST["depth"]);
 $querybuilder = new QueryBuilder($depth, $concept,$SMWServer);
 $query = $querybuilder -> generateQuery($_POST["relations"]);
-//file_put_contents('php://stderr', print_r($query, TRUE));
+$languageConvertlist=array(
+  "en"=>array("Eigenschap"=>"Property", "Categorie"=>"Category"),
+  "nl"=>array("Eigenschap"=>"Eigenschap", "Categorie"=>"Categorie")
+);
+file_put_contents('php://stderr', print_r($languageConvertlist, TRUE));
+file_put_contents('php://stderr', print_r($FusekiLanguage, TRUE));
+foreach ($languageConvertlist[$FusekiLanguage] as $key => $val)
+  {
+      $query = str_replace($key,$val,$query);
+  }
+file_put_contents('php://stderr', print_r($query, TRUE));
 //execute query
 //replace url-encoded chars. Problem: % has been replaced with -
 //this is a workaround. Possible problems occur with a %-sign.

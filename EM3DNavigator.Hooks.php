@@ -3,11 +3,13 @@ class EM3DNavigatorHooks {
 	public static function onResourceLoaderGetConfigVars( array &$vars ) {
 		global $wgEM3DNavigatorUri;
 		global $wgFusekiDataset;
+		global $wgFusekiLanguage;
 
 		//$wgEM3DNavigatorUri='http://192.168.238.132/index.php/Speciaal:URIResolver';
 		$vars['wgEM3DNavigator'] = array(
 			'eM3DNavigatorUri' => $wgEM3DNavigatorUri,//$wgFusekiDataset
 			'eM3DFusekiDataset' => $wgFusekiDataset,//
+			'eM3DFusekiLanguage' => $wgFusekiLanguage,
 		);
 //can be used in javascript like:
 //console.log(mw.config.get('wgEM3DNavigator').eM3DNavigatorUri);//contains the uri to be passed to QueryBuilder
