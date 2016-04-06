@@ -50,6 +50,11 @@ foreach ($convertlist as $key => $val)
 //$result =  str_replace("-C3-AF", "ï", str_replace("-27", "'", str_replace("-2D", "-", str_replace("-3A", ":", file_get_contents($fusekiDataset.'/query?output=json&query=' . urlencode($query))))));
 						//file_put_contents('php://stderr', print_r('---result waar alle JSON data waarschijnlijk instaat is:', TRUE));
 						//file_put_contents('php://stderr', print_r($result, TRUE));//-C3-AF ï
+// Normalize result back to dutch
+foreach ($languageConvertlist[$FusekiLanguage] as $key => $val)
+  {
+      $result = str_replace($val,$key,$result);
+  }
 // Parse data
 $parser = new DataParser(json_decode($result, true));
 $objects = $parser -> parseDataRDF();
