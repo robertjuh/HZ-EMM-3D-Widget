@@ -11,7 +11,7 @@ var SLIDERDIVID='sliderDiv';
 var EMMCONTAINERDIV='EMMContainerDiv';	
 
 //CSS constants (integers!)
-var CSSmaxDepth_order=4;
+var CSSmaxDepth_order=3;
 var CSScontainerAttributes_width=400;
 var CSScontainerAttributes_height=400;	
 //size of labels of spheres
