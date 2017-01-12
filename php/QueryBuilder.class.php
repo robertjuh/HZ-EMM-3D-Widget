@@ -11,13 +11,16 @@ class QueryBuilder {
 			
 			construct { ?s ?p ?o }
 			where {
-			  ?c rdfs:label "%s" .
+			  ?c uri:Property-3ASelf uri:"%s" .
 			  ?c (%s){,%d} ?s .
 			  ?s ?p ?o
 			}
 			limit 12000
 		';
+        //uri:Property-3ASelf             uri:TRW_Landbouw_VN
+        
         //2017-01-12: removed the line FILTER(EXISTS { ?s a uri:Categorie-3ASKOS_Concept }  || EXISTS{ ?s a  uri:Categorie-3ASocKrt_Concept} )
+        //?c rdfs:label "%s" .
 	//TODO: limit 4000 is hack. Replace this with other algorithm:
 	//introduce queue
 	//while queue not empty and number of nodes < ...
