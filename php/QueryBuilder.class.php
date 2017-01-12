@@ -11,7 +11,7 @@ class QueryBuilder {
 			
 			construct { ?s ?p ?o }
 			where {
-			  ?c uri:Property-3ASelf uri:"%s" .
+			  ?c uri:Property-3ASelf uri:%s .
 			  ?c (%s){,%d} ?s .
 			  ?s ?p ?o
 			}
@@ -75,7 +75,7 @@ class QueryBuilder {
 
 
 		//inject concept, relation and depth into sparql-query
-		$resultRDFQuery = sprintf(self::RDFQuery, $concept, $relation, $depth);	
+		$resultRDFQuery = sprintf(self::RDFQuery, str_replace(' ', '_', $concept), $relation, $depth);	
 		//now replace dummyuri with correct uri-path of smw-resources
 
 		$resultRDFQuery=str_replace ( "dummyuri",$this -> uri,$resultRDFQuery );
